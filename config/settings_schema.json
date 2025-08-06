@@ -1,0 +1,1748 @@
+[
+	{
+		"name": "theme_info",
+		"theme_name": "Digital",
+		"theme_version": "1.3.2",
+		"theme_author": "Segment",
+		"theme_documentation_url": "https://madebysegment.com/help-center/documentation/digital/",
+		"theme_support_url": "https://madebysegment.com/help-center/"
+	},
+	{
+		"name": "深色/淺色模式",
+		"settings": [
+			{
+				"type": "radio",
+				"id": "color_scheme",
+				"label": "網站色彩模式",
+				"info": "僅適用於尚未選擇色彩模式的新用戶，或在 JavaScript 停用的情況下。",
+				"options": [
+					{
+						"value": "auto",
+						"label": "跟隨系統偏好"
+					},
+					{
+						"value": "light",
+						"label": "淺色"
+					},
+					{
+						"value": "dark",
+						"label": "深色"
+					}
+				],
+				"default": "light"
+			},
+			{
+				"type": "checkbox",
+				"id": "dark_mode_toggle",
+				"default": true,
+				"label": "啟用深色/淺色模式切換按鈕"
+			}
+		]
+	},
+	{
+		"name": "色彩",
+		"settings": [
+			{
+				"type": "color_scheme_group",
+				"id": "color_schemes",
+				"definition": [
+					{
+						"type": "header",
+						"content": "文字"
+					},
+					{
+						"type": "color",
+						"id": "colors_text",
+						"default": "#011624",
+						"label": "主要文字",
+						"info": "用於一般內文。"
+					},
+					{
+						"type": "color",
+						"id": "colors_secondary_text",
+						"default": "#797979",
+						"label": "次要文字",
+						"info": "用於副標題、註解等。"
+					},
+					{
+						"type": "color",
+						"id": "colors_text_title",
+						"default": "#011624",
+						"label": "標題文字",
+						"info": "用於主要標題。"
+					},
+					{
+						"type": "header",
+						"content": "背景"
+					},
+					{
+						"type": "color",
+						"id": "colors_background_1",
+						"default": "#FFFFFF",
+						"label": "背景 1"
+					},
+					{
+						"type": "color",
+						"id": "colors_background_2",
+						"default": "#F2F2F2",
+						"label": "背景 2"
+					},
+					{
+						"type": "color_background",
+						"id": "background_gradient",
+						"label": "漸層背景",
+						"info": "若設定，將會覆蓋純色背景。"
+					},
+					{
+						"type": "header",
+						"content": "主要按鈕"
+					},
+					{
+						"type": "color",
+						"id": "colors_solid_button_labels",
+						"default": "#FFFFFF",
+						"label": "文字顏色"
+					},
+					{
+						"type": "color",
+						"id": "colors_solid_button_labels_hover",
+						"default": "#FFFFFF",
+						"label": "文字顏色 (懸停)"
+					},
+					{
+						"type": "color",
+						"id": "colors_solid_button_background",
+						"default": "#278BFF",
+						"label": "背景顏色"
+					},
+					{
+						"type": "color",
+						"id": "colors_solid_button_background_hover",
+						"default": "#011624",
+						"label": "背景顏色 (懸停)"
+					},
+					{
+						"type": "header",
+						"content": "次要按鈕"
+					},
+					{
+						"type": "color",
+						"id": "colors_secondary_button_labels",
+						"default": "#FFFFFF",
+						"label": "文字顏色"
+					},
+					{
+						"type": "color",
+						"id": "colors_secondary_button_labels_hover",
+						"default": "#FFFFFF",
+						"label": "文字顏色 (懸停)"
+					},
+					{
+						"type": "color",
+						"id": "colors_outline_button_labels",
+						"default": "#011624",
+						"label": "外框/文字顏色"
+					},
+					{
+						"type": "color",
+						"id": "colors_outline_button_labels_hover",
+						"default": "#278BFF",
+						"label": "外框/文字顏色 (懸停)"
+					},
+					{
+						"type": "header",
+						"content": "第三按鈕"
+					},
+					{
+						"type": "color",
+						"id": "colors_tertiary_button_labels",
+						"default": "#011624",
+						"label": "文字顏色"
+					},
+					{
+						"type": "color",
+						"id": "colors_tertiary_button_labels_hover",
+						"default": "#FFFFFF",
+						"label": "文字顏色 (懸停)"
+					},
+					{
+						"type": "color",
+						"id": "colors_tertiary_button_background",
+						"default": "#F0F1F2",
+						"label": "背景顏色"
+					},
+					{
+						"type": "color",
+						"id": "colors_tertiary_button_background_hover",
+						"default": "#278BFF",
+						"label": "背景顏色 (懸停)"
+					},
+					{
+						"type": "header",
+						"content": "輸入框"
+					},
+					{
+						"type": "color",
+						"id": "colors_input_background",
+						"default": "#FFFFFF",
+						"label": "背景顏色"
+					},
+					{
+						"type": "color",
+						"id": "colors_input_border",
+						"default": "#E6E8E9",
+						"label": "邊框顏色"
+					},
+					{
+						"type": "header",
+						"content": "價格"
+					},
+					{
+						"type": "color",
+						"id": "card_new_price_color",
+						"default": "#011624",
+						"label": "售價顏色"
+					},
+					{
+						"type": "color",
+						"id": "card_old_price_color",
+						"default": "#67737c",
+						"label": "原價顏色"
+					},
+					{
+						"type": "header",
+						"content": "其他"
+					},
+					{
+						"type": "color",
+						"id": "color_accent",
+						"default": "#278BFF",
+						"label": "強調色"
+					},
+					{
+						"type": "color_background",
+						"id": "color_accent_gradient",
+						"label": "漸層強調色",
+						"info": "若設定，將會覆蓋純色強調色。",
+						"default": "linear-gradient(135deg, #50EAFF 0%, #0A7AFE 100%)"
+					},
+					{
+						"type": "color",
+						"id": "colors_background_overlay",
+						"default": "#000000",
+						"label": "背景遮罩"
+					},
+					{
+						"type": "color",
+						"id": "color_border",
+						"default": "#EBEBEB",
+						"label": "邊框"
+					}
+				],
+				"role": {
+					"text": "colors_text",
+					"background": {
+						"solid": "colors_background_1",
+						"gradient": "background_gradient"
+					},
+					"links": "colors_text",
+					"icons": "colors_text",
+					"primary_button": "colors_solid_button_background",
+					"on_primary_button": "colors_solid_button_labels",
+					"primary_button_border": "colors_solid_button_background",
+					"secondary_button": "colors_outline_button_labels",
+					"on_secondary_button": "colors_secondary_button_labels",
+					"secondary_button_border": "colors_outline_button_labels"
+				}
+			}
+		]
+	},
+	{
+		"name": "字體設定",
+		"settings": [
+			{
+				"type": "header",
+				"content": "標題 (H1-H5)"
+			},
+			{
+				"type": "font_picker",
+				"id": "type_header_font",
+				"default": "inter_n6",
+				"label": "標題字體",
+				"info": "標題將使用此字體。"
+			},
+			{
+				"type": "range",
+				"id": "heading_h1_scale",
+				"min": 100,
+				"max": 200,
+				"step": 1,
+				"unit": "%",
+				"label": "H1 標題大小",
+				"default": 115
+			},
+			{
+				"type": "range",
+				"id": "heading_h2_scale",
+				"min": 100,
+				"max": 200,
+				"step": 1,
+				"unit": "%",
+				"label": "H2 標題大小",
+				"default": 115
+			},
+			{
+				"type": "range",
+				"id": "heading_h3_scale",
+				"min": 100,
+				"max": 200,
+				"step": 1,
+				"unit": "%",
+				"label": "H3 標題大小",
+				"default": 100
+			},
+			{
+				"type": "range",
+				"id": "heading_h4_scale",
+				"min": 100,
+				"max": 200,
+				"step": 1,
+				"unit": "%",
+				"label": "H4 標題大小",
+				"default": 114
+			},
+			{
+				"type": "range",
+				"id": "heading_h5_scale",
+				"min": 100,
+				"max": 200,
+				"step": 1,
+				"unit": "%",
+				"label": "H5 標題大小",
+				"default": 100
+			},
+			{
+				"type": "range",
+				"id": "type_header_letter_spacing",
+				"min": -1,
+				"max": 1,
+				"step": 0.1,
+				"default": -0.5,
+				"unit": "px",
+				"label": "字元間距"
+			},
+			{
+				"type": "range",
+				"min": 1,
+				"max": 2,
+				"step": 0.1,
+				"id": "type_header_line_height",
+				"default": 1.2,
+				"label": "行高"
+			},
+			{
+				"type": "select",
+				"id": "heading_text_transform",
+				"label": "文字轉換",
+				"options": [
+					{
+						"value": "none",
+						"label": "無"
+					},
+					{
+						"value": "uppercase",
+						"label": "全部大寫"
+					},
+					{
+						"value": "lowercase",
+						"label": "全部小寫"
+					},
+					{
+						"value": "capitalize",
+						"label": "首字大寫"
+					}
+				],
+				"default": "none"
+			},
+			{
+				"type": "header",
+				"content": "卡片字體"
+			},
+			{
+				"type": "font_picker",
+				"id": "type_header_font_card",
+				"default": "inter_n6",
+				"label": "卡片標題字體",
+				"info": "用於產品卡片等標題。"
+			},
+			{
+				"type": "range",
+				"id": "heading_scale_card",
+				"min": 100,
+				"max": 200,
+				"step": 1,
+				"unit": "%",
+				"label": "卡片標題大小",
+				"default": 150
+			},
+			{
+				"type": "font_picker",
+				"id": "type_text_font_card",
+				"default": "inter_n5",
+				"label": "卡片內文字體",
+				"info": "用於產品卡片等內文。"
+			},
+			{
+				"type": "range",
+				"id": "text_scale_card",
+				"min": 100,
+				"max": 200,
+				"step": 1,
+				"unit": "%",
+				"label": "卡片內文大小",
+				"default": 114
+			},
+			{
+				"type": "header",
+				"content": "內文"
+			},
+			{
+				"type": "font_picker",
+				"id": "type_body_font",
+				"default": "inter_n5",
+				"label": "內文字體",
+				"info": "用於段落等一般文字。"
+			},
+			{
+				"type": "range",
+				"id": "type_body_line_height",
+				"min": 1,
+				"max": 2,
+				"step": 0.1,
+				"default": 1.4,
+				"label": "行高"
+			},
+			{
+				"type": "range",
+				"id": "body_scale",
+				"min": 100,
+				"max": 150,
+				"step": 1,
+				"unit": "%",
+				"label": "內文大小",
+				"default": 115
+			},
+			{
+				"type": "range",
+				"id": "type_body_letter_spacing",
+				"min": -1,
+				"max": 1,
+				"step": 0.1,
+				"default": -0.3,
+				"unit": "px",
+				"label": "字元間距"
+			},
+			{
+				"type": "header",
+				"content": "副標題 1"
+			},
+			{
+				"type": "font_picker",
+				"id": "type_subtitle_font",
+				"default": "inter_n7",
+				"label": "副標題字體",
+				"info": "用於小標題、區塊標題等。"
+			},
+			{
+				"type": "select",
+				"id": "subtitle_text_transform",
+				"label": "文字轉換",
+				"options": [
+					{
+						"value": "none",
+						"label": "無"
+					},
+					{
+						"value": "uppercase",
+						"label": "全部大寫"
+					},
+					{
+						"value": "lowercase",
+						"label": "全部小寫"
+					},
+					{
+						"value": "capitalize",
+						"label": "首字大寫"
+					}
+				],
+				"default": "uppercase"
+			},
+			{
+				"type": "range",
+				"id": "subtitle_scale",
+				"min": 100,
+				"max": 200,
+				"step": 1,
+				"unit": "%",
+				"label": "副標題大小",
+				"default": 130
+			},
+			{
+				"type": "header",
+				"content": "副標題 2"
+			},
+			{
+				"type": "font_picker",
+				"id": "type_subtitle_font_2",
+				"default": "inter_n7",
+				"label": "副標題字體",
+				"info": "用於小標題、區塊標題等。"
+			},
+			{
+				"type": "select",
+				"id": "subtitle_text_transform_2",
+				"label": "文字轉換",
+				"options": [
+					{
+						"value": "none",
+						"label": "無"
+					},
+					{
+						"value": "uppercase",
+						"label": "全部大寫"
+					},
+					{
+						"value": "lowercase",
+						"label": "全部小寫"
+					},
+					{
+						"value": "capitalize",
+						"label": "首字大寫"
+					}
+				],
+				"default": "none"
+			},
+			{
+				"type": "range",
+				"id": "subtitle_scale_2",
+				"min": 100,
+				"max": 200,
+				"step": 1,
+				"unit": "%",
+				"label": "副標題大小",
+				"default": 140
+			},
+			{
+				"type": "header",
+				"content": "按鈕"
+			},
+			{
+				"type": "font_picker",
+				"id": "type_button_font",
+				"default": "inter_n6",
+				"label": "按鈕字體",
+				"info": "用於所有按鈕。"
+			},
+			{
+				"type": "select",
+				"id": "button_text_transform",
+				"label": "文字轉換",
+				"options": [
+					{
+						"value": "none",
+						"label": "無"
+					},
+					{
+						"value": "uppercase",
+						"label": "全部大寫"
+					},
+					{
+						"value": "lowercase",
+						"label": "全部小寫"
+					},
+					{
+						"value": "capitalize",
+						"label": "首字大寫"
+					}
+				],
+				"default": "none"
+			},
+			{
+				"type": "range",
+				"id": "button_border_radius",
+				"min": 0,
+				"max": 60,
+				"step": 1,
+				"unit": "px",
+				"label": "按鈕圓角",
+				"default": 6
+			},
+			{
+				"type": "header",
+				"content": "頁首選單"
+			},
+			{
+				"type": "font_picker",
+				"id": "type_header_menu_font",
+				"default": "inter_n5",
+				"label": "頁首選單字體",
+				"info": "用於頁首導覽選單。"
+			},
+			{
+				"type": "select",
+				"id": "header_menu_text_transform",
+				"label": "文字轉換",
+				"options": [
+					{
+						"value": "none",
+						"label": "無"
+					},
+					{
+						"value": "uppercase",
+						"label": "全部大寫"
+					},
+					{
+						"value": "lowercase",
+						"label": "全部小寫"
+					}
+				],
+				"default": "none"
+			},
+			{
+				"type": "header",
+				"content": "頁尾選單"
+			},
+			{
+				"type": "font_picker",
+				"id": "type_footer_menu_font",
+				"default": "inter_n6",
+				"label": "頁尾選單字體",
+				"info": "用於頁尾導覽選單。"
+			},
+			{
+				"type": "header",
+				"content": "彈出式視窗"
+			},
+			{
+				"type": "font_picker",
+				"id": "type_popups_heading_font",
+				"default": "inter_n6",
+				"label": "彈窗標題字體"
+			},
+			{
+				"type": "font_picker",
+				"id": "type_popups_text_font",
+				"default": "inter_n5",
+				"label": "彈窗內文字體"
+			},
+			{
+				"type": "range",
+				"id": "popup_heading_scale",
+				"min": 100,
+				"max": 200,
+				"step": 1,
+				"unit": "%",
+				"label": "彈出視窗標題大小",
+				"default": 123
+			},
+			{
+				"type": "range",
+				"id": "popup_desc_scale",
+				"min": 100,
+				"max": 200,
+				"step": 1,
+				"unit": "%",
+				"label": "彈出視窗說明文字大小",
+				"default": 100
+			},
+			{
+				"type": "range",
+				"id": "popup_text_scale",
+				"min": 100,
+				"max": 200,
+				"step": 1,
+				"unit": "%",
+				"label": "彈出視窗內文大小",
+				"default": 107
+			},
+			{
+				"type": "range",
+				"id": "notification_heading_scale",
+				"min": 100,
+				"max": 200,
+				"step": 1,
+				"unit": "%",
+				"label": "通知橫幅標題大小",
+				"default": 100
+			},
+			{
+				"type": "range",
+				"id": "notification_text_scale",
+				"min": 100,
+				"max": 200,
+				"step": 1,
+				"unit": "%",
+				"label": "通知橫幅內文大小",
+				"default": 100
+			},
+			{
+				"type": "header",
+				"content": "附加字體"
+			},
+			{
+				"type": "font_picker",
+				"id": "type_additional_font",
+				"default": "inter_n7",
+				"label": "附加字體",
+				"info": "用於特定裝飾性文字。"
+			}
+		]
+	},
+	{
+		"name": "產品卡片",
+		"settings": [
+			{
+				"type": "color_scheme",
+				"id": "card_color_scheme",
+				"default": "background-1",
+				"label": "卡片配色"
+			},
+			{
+				"type": "checkbox",
+				"id": "badge_sale_show",
+				"default": true,
+				"label": "顯示特價標籤"
+			},
+			{
+				"type": "select",
+				"id": "badge_sale_type",
+				"label": "特價標籤類型",
+				"options": [
+					{
+						"value": "sale",
+						"label": "文字 (特價)"
+					},
+					{
+						"value": "percentage",
+						"label": "百分比 (%)"
+					}
+				],
+				"default": "sale"
+			},
+			{
+				"type": "select",
+				"id": "sale_icon",
+				"options": [
+					{ "value": "none", "label": "無" },
+					{ "value": "arrow-bar", "label": "箭頭橫條" },
+					{ "value": "bag-1", "label": "購物袋 1" },
+					{ "value": "bag-2", "label": "購物袋 2" },
+					{ "value": "bar-chart", "label": "長條圖" },
+					{ "value": "bars-upward", "label": "向上箭頭" },
+					{ "value": "baseball", "label": "棒球" },
+					{ "value": "battery-1", "label": "電池 1" },
+					{ "value": "battery-2", "label": "電池 2" },
+					{ "value": "battery-3", "label": "電池 3" },
+					{ "value": "book", "label": "書本" },
+					{ "value": "card", "label": "卡片" },
+					{ "value": "card-holder", "label": "名片夾" },
+					{ "value": "chart", "label": "圖表" },
+					{ "value": "chats", "label": "對話" },
+					{ "value": "check-1", "label": "勾選 1" },
+					{ "value": "check-2", "label": "勾選 2" },
+					{ "value": "check-3", "label": "勾選 3" },
+					{ "value": "check-4", "label": "勾選 4" },
+					{ "value": "circle", "label": "圓圈" },
+					{ "value": "circles", "label": "多個圓圈" },
+					{ "value": "close", "label": "關閉 (X)" },
+					{ "value": "cloud-server", "label": "雲端伺服器" },
+					{ "value": "computer", "label": "電腦" },
+					{ "value": "confetti", "label": "彩紙" },
+					{ "value": "delivery", "label": "貨車" },
+					{ "value": "delivery-box", "label": "包裹" },
+					{ "value": "devices", "label": "多裝置" },
+					{ "value": "directions", "label": "方向" },
+					{ "value": "dumbbell", "label": "啞鈴" },
+					{ "value": "eye", "label": "眼睛" },
+					{ "value": "facebook", "label": "Facebook" },
+					{ "value": "file-1", "label": "檔案 1" },
+					{ "value": "file-2", "label": "檔案 2" },
+					{ "value": "flag", "label": "旗幟" },
+					{ "value": "folder-1", "label": "資料夾 1" },
+					{ "value": "folder-2", "label": "資料夾 2" },
+					{ "value": "food", "label": "食物" },
+					{ "value": "hand-1", "label": "手 1" },
+					{ "value": "hand-2", "label": "手 2" },
+					{ "value": "hand-3", "label": "手 3" },
+					{ "value": "headphones", "label": "耳機" },
+					{ "value": "instagram", "label": "Instagram" },
+					{ "value": "laptop-1", "label": "筆電 1" },
+					{ "value": "laptop-2", "label": "筆電 2" },
+					{ "value": "leaf", "label": "葉子" },
+					{ "value": "lightning-bolt-1", "label": "閃電 1" },
+					{ "value": "lightning-bolt-2", "label": "閃電 2" },
+					{ "value": "like", "label": "讚" },
+					{ "value": "link", "label": "連結" },
+					{ "value": "lock-1", "label": "鎖 1" },
+					{ "value": "lock-2", "label": "鎖 2" },
+					{ "value": "logout", "label": "登出" },
+					{ "value": "luggage", "label": "行李箱" },
+					{ "value": "mark", "label": "標記" },
+					{ "value": "medicine", "label": "藥物" },
+					{ "value": "microphone", "label": "麥克風" },
+					{ "value": "moon", "label": "月亮" },
+					{ "value": "pencil", "label": "鉛筆" },
+					{ "value": "phone-1", "label": "手機 1" },
+					{ "value": "phone-2", "label": "手機 2" },
+					{ "value": "phone-3", "label": "手機 3" },
+					{ "value": "phone-4", "label": "手機 4" },
+					{ "value": "pinterest", "label": "Pinterest" },
+					{ "value": "plug", "label": "插頭" },
+					{ "value": "presentation-1", "label": "簡報 1" },
+					{ "value": "presentation-2", "label": "簡報 2" },
+					{ "value": "pulse", "label": "脈搏" },
+					{ "value": "recycle", "label": "回收" },
+					{ "value": "rocket", "label": "火箭" },
+					{ "value": "search", "label": "搜尋" },
+					{ "value": "server-1", "label": "伺服器 1" },
+					{ "value": "server-2", "label": "伺服器 2" },
+					{ "value": "settings", "label": "設定" },
+					{ "value": "shield", "label": "盾牌" },
+					{ "value": "shopping-basket", "label": "購物籃" },
+					{ "value": "shuffle", "label": "隨機播放" },
+					{ "value": "snapchat", "label": "Snapchat" },
+					{ "value": "sound-waves", "label": "聲波" },
+					{ "value": "speaker", "label": "喇叭" },
+					{ "value": "squares-1", "label": "方塊 1" },
+					{ "value": "squares-2", "label": "方塊 2" },
+					{ "value": "stack", "label": "堆疊" },
+					{ "value": "star", "label": "星星" },
+					{ "value": "stopwatch", "label": "碼錶" },
+					{ "value": "sun", "label": "太陽" },
+					{ "value": "tag", "label": "標籤" },
+					{ "value": "telephone-tower", "label": "電塔" },
+					{ "value": "tik-tok", "label": "TikTok" },
+					{ "value": "tree", "label": "樹" },
+					{ "value": "trend", "label": "趨勢" },
+					{ "value": "trophy", "label": "獎盃" },
+					{ "value": "tumblr", "label": "Tumblr" },
+					{ "value": "tv", "label": "電視" },
+					{ "value": "twitter", "label": "Twitter" },
+					{ "value": "user-1", "label": "使用者 1" },
+					{ "value": "user-2", "label": "使用者 2" },
+					{ "value": "user-3", "label": "使用者 3" },
+					{ "value": "user-4", "label": "使用者 4" },
+					{ "value": "video", "label": "影片" },
+					{ "value": "vimeo", "label": "Vimeo" },
+					{ "value": "wallet", "label": "錢包" },
+					{ "value": "watch", "label": "手錶" },
+					{ "value": "water-1", "label": "水滴 1" },
+					{ "value": "water-2", "label": "水滴 2" },
+					{ "value": "water-3", "label": "水滴 3" },
+					{ "value": "wave-1", "label": "波浪 1" },
+					{ "value": "wave-2", "label": "波浪 2" },
+					{ "value": "wifi-1", "label": "Wifi 1" },
+					{ "value": "wifi-2", "label": "Wifi 2" },
+					{ "value": "window", "label": "視窗" },
+					{ "value": "youtube", "label": "YouTube" }
+				],
+				"default": "none",
+				"label": "圖示"
+			},
+			{
+				"type": "select",
+				"id": "sale_icon_style",
+				"options": [
+					{
+						"value": "subtle",
+						"label": "柔和"
+					},
+					{
+						"value": "contrast",
+						"label": "對比"
+					},
+					{
+						"value": "colored",
+						"label": "彩色"
+					}
+				],
+				"default": "colored",
+				"label": "圖示樣式"
+			},
+			{
+				"type": "select",
+				"id": "sale_icon_fill_type",
+				"options": [
+					{
+						"value": "solid",
+						"label": "實心"
+					},
+					{
+						"value": "gradient",
+						"label": "漸層"
+					}
+				],
+				"default": "solid",
+				"label": "圖示填滿類型"
+			},
+			{
+				"type": "color_scheme",
+				"id": "badge_sale_color_scheme",
+				"default": "background-3",
+				"label": "特價標籤配色"
+			},
+			{
+				"type": "checkbox",
+				"id": "badge_soldout_show",
+				"default": true,
+				"label": "顯示售完標籤"
+			},
+			{
+				"type": "select",
+				"id": "soldout_icon",
+				"options": [
+					{ "value": "none", "label": "無" },
+					{ "value": "arrow-bar", "label": "箭頭橫條" },
+					{ "value": "bag-1", "label": "購物袋 1" },
+					{ "value": "bag-2", "label": "購物袋 2" },
+					{ "value": "bar-chart", "label": "長條圖" },
+					{ "value": "bars-upward", "label": "向上箭頭" },
+					{ "value": "baseball", "label": "棒球" },
+					{ "value": "battery-1", "label": "電池 1" },
+					{ "value": "battery-2", "label": "電池 2" },
+					{ "value": "battery-3", "label": "電池 3" },
+					{ "value": "book", "label": "書本" },
+					{ "value": "card", "label": "卡片" },
+					{ "value": "card-holder", "label": "名片夾" },
+					{ "value": "chart", "label": "圖表" },
+					{ "value": "chats", "label": "對話" },
+					{ "value": "check-1", "label": "勾選 1" },
+					{ "value": "check-2", "label": "勾選 2" },
+					{ "value": "check-3", "label": "勾選 3" },
+					{ "value": "check-4", "label": "勾選 4" },
+					{ "value": "circle", "label": "圓圈" },
+					{ "value": "circles", "label": "多個圓圈" },
+					{ "value": "close", "label": "關閉 (X)" },
+					{ "value": "cloud-server", "label": "雲端伺服器" },
+					{ "value": "computer", "label": "電腦" },
+					{ "value": "confetti", "label": "彩紙" },
+					{ "value": "delivery", "label": "貨車" },
+					{ "value": "delivery-box", "label": "包裹" },
+					{ "value": "devices", "label": "多裝置" },
+					{ "value": "directions", "label": "方向" },
+					{ "value": "dumbbell", "label": "啞鈴" },
+					{ "value": "eye", "label": "眼睛" },
+					{ "value": "facebook", "label": "Facebook" },
+					{ "value": "file-1", "label": "檔案 1" },
+					{ "value": "file-2", "label": "檔案 2" },
+					{ "value": "flag", "label": "旗幟" },
+					{ "value": "folder-1", "label": "資料夾 1" },
+					{ "value": "folder-2", "label": "資料夾 2" },
+					{ "value": "food", "label": "食物" },
+					{ "value": "hand-1", "label": "手 1" },
+					{ "value": "hand-2", "label": "手 2" },
+					{ "value": "hand-3", "label": "手 3" },
+					{ "value": "headphones", "label": "耳機" },
+					{ "value": "instagram", "label": "Instagram" },
+					{ "value": "laptop-1", "label": "筆電 1" },
+					{ "value": "laptop-2", "label": "筆電 2" },
+					{ "value": "leaf", "label": "葉子" },
+					{ "value": "lightning-bolt-1", "label": "閃電 1" },
+					{ "value": "lightning-bolt-2", "label": "閃電 2" },
+					{ "value": "like", "label": "讚" },
+					{ "value": "link", "label": "連結" },
+					{ "value": "lock-1", "label": "鎖 1" },
+					{ "value": "lock-2", "label": "鎖 2" },
+					{ "value": "logout", "label": "登出" },
+					{ "value": "luggage", "label": "行李箱" },
+					{ "value": "mark", "label": "標記" },
+					{ "value": "medicine", "label": "藥物" },
+					{ "value": "microphone", "label": "麥克風" },
+					{ "value": "moon", "label": "月亮" },
+					{ "value": "pencil", "label": "鉛筆" },
+					{ "value": "phone-1", "label": "手機 1" },
+					{ "value": "phone-2", "label": "手機 2" },
+					{ "value": "phone-3", "label": "手機 3" },
+					{ "value": "phone-4", "label": "手機 4" },
+					{ "value": "pinterest", "label": "Pinterest" },
+					{ "value": "plug", "label": "插頭" },
+					{ "value": "presentation-1", "label": "簡報 1" },
+					{ "value": "presentation-2", "label": "簡報 2" },
+					{ "value": "pulse", "label": "脈搏" },
+					{ "value": "recycle", "label": "回收" },
+					{ "value": "rocket", "label": "火箭" },
+					{ "value": "search", "label": "搜尋" },
+					{ "value": "server-1", "label": "伺服器 1" },
+					{ "value": "server-2", "label": "伺服器 2" },
+					{ "value": "settings", "label": "設定" },
+					{ "value": "shield", "label": "盾牌" },
+					{ "value": "shopping-basket", "label": "購物籃" },
+					{ "value": "shuffle", "label": "隨機播放" },
+					{ "value": "snapchat", "label": "Snapchat" },
+					{ "value": "sound-waves", "label": "聲波" },
+					{ "value": "speaker", "label": "喇叭" },
+					{ "value": "squares-1", "label": "方塊 1" },
+					{ "value": "squares-2", "label": "方塊 2" },
+					{ "value": "stack", "label": "堆疊" },
+					{ "value": "star", "label": "星星" },
+					{ "value": "stopwatch", "label": "碼錶" },
+					{ "value": "sun", "label": "太陽" },
+					{ "value": "tag", "label": "標籤" },
+					{ "value": "telephone-tower", "label": "電塔" },
+					{ "value": "tik-tok", "label": "TikTok" },
+					{ "value": "tree", "label": "樹" },
+					{ "value": "trend", "label": "趨勢" },
+					{ "value": "trophy", "label": "獎盃" },
+					{ "value": "tumblr", "label": "Tumblr" },
+					{ "value": "tv", "label": "電視" },
+					{ "value": "twitter", "label": "Twitter" },
+					{ "value": "user-1", "label": "使用者 1" },
+					{ "value": "user-2", "label": "使用者 2" },
+					{ "value": "user-3", "label": "使用者 3" },
+					{ "value": "user-4", "label": "使用者 4" },
+					{ "value": "video", "label": "影片" },
+					{ "value": "vimeo", "label": "Vimeo" },
+					{ "value": "wallet", "label": "錢包" },
+					{ "value": "watch", "label": "手錶" },
+					{ "value": "water-1", "label": "水滴 1" },
+					{ "value": "water-2", "label": "水滴 2" },
+					{ "value": "water-3", "label": "水滴 3" },
+					{ "value": "wave-1", "label": "波浪 1" },
+					{ "value": "wave-2", "label": "波浪 2" },
+					{ "value": "wifi-1", "label": "Wifi 1" },
+					{ "value": "wifi-2", "label": "Wifi 2" },
+					{ "value": "window", "label": "視窗" },
+					{ "value": "youtube", "label": "YouTube" }
+				],
+				"default": "none",
+				"label": "圖示"
+			},
+			{
+				"type": "select",
+				"id": "soldout_icon_style",
+				"options": [
+					{
+						"value": "subtle",
+						"label": "柔和"
+					},
+					{
+						"value": "contrast",
+						"label": "對比"
+					},
+					{
+						"value": "colored",
+						"label": "彩色"
+					}
+				],
+				"default": "colored",
+				"label": "圖示樣式"
+			},
+			{
+				"type": "select",
+				"id": "soldout_icon_fill_type",
+				"options": [
+					{
+						"value": "solid",
+						"label": "實心"
+					},
+					{
+						"value": "gradient",
+						"label": "漸層"
+					}
+				],
+				"default": "solid",
+				"label": "圖示填滿類型"
+			},
+			{
+				"type": "color_scheme",
+				"id": "badge_soldout_color_scheme",
+				"default": "background-1",
+				"label": "售完標籤配色"
+			},
+			{
+				"type": "checkbox",
+				"id": "badge_custom_show",
+				"default": true,
+				"label": "顯示自訂標籤",
+				"info": "使用 'custom' 產品標籤來觸發。"
+			},
+			{
+				"type": "select",
+				"id": "custom_icon",
+				"options": [
+					{ "value": "none", "label": "無" },
+					{ "value": "arrow-bar", "label": "箭頭橫條" },
+					{ "value": "bag-1", "label": "購物袋 1" },
+					{ "value": "bag-2", "label": "購物袋 2" },
+					{ "value": "bar-chart", "label": "長條圖" },
+					{ "value": "bars-upward", "label": "向上箭頭" },
+					{ "value": "baseball", "label": "棒球" },
+					{ "value": "battery-1", "label": "電池 1" },
+					{ "value": "battery-2", "label": "電池 2" },
+					{ "value": "battery-3", "label": "電池 3" },
+					{ "value": "book", "label": "書本" },
+					{ "value": "card", "label": "卡片" },
+					{ "value": "card-holder", "label": "名片夾" },
+					{ "value": "chart", "label": "圖表" },
+					{ "value": "chats", "label": "對話" },
+					{ "value": "check-1", "label": "勾選 1" },
+					{ "value": "check-2", "label": "勾選 2" },
+					{ "value": "check-3", "label": "勾選 3" },
+					{ "value": "check-4", "label": "勾選 4" },
+					{ "value": "circle", "label": "圓圈" },
+					{ "value": "circles", "label": "多個圓圈" },
+					{ "value": "close", "label": "關閉 (X)" },
+					{ "value": "cloud-server", "label": "雲端伺服器" },
+					{ "value": "computer", "label": "電腦" },
+					{ "value": "confetti", "label": "彩紙" },
+					{ "value": "delivery", "label": "貨車" },
+					{ "value": "delivery-box", "label": "包裹" },
+					{ "value": "devices", "label": "多裝置" },
+					{ "value": "directions", "label": "方向" },
+					{ "value": "dumbbell", "label": "啞鈴" },
+					{ "value": "eye", "label": "眼睛" },
+					{ "value": "facebook", "label": "Facebook" },
+					{ "value": "file-1", "label": "檔案 1" },
+					{ "value": "file-2", "label": "檔案 2" },
+					{ "value": "flag", "label": "旗幟" },
+					{ "value": "folder-1", "label": "資料夾 1" },
+					{ "value": "folder-2", "label": "資料夾 2" },
+					{ "value": "food", "label": "食物" },
+					{ "value": "hand-1", "label": "手 1" },
+					{ "value": "hand-2", "label": "手 2" },
+					{ "value": "hand-3", "label": "手 3" },
+					{ "value": "headphones", "label": "耳機" },
+					{ "value": "instagram", "label": "Instagram" },
+					{ "value": "laptop-1", "label": "筆電 1" },
+					{ "value": "laptop-2", "label": "筆電 2" },
+					{ "value": "leaf", "label": "葉子" },
+					{ "value": "lightning-bolt-1", "label": "閃電 1" },
+					{ "value": "lightning-bolt-2", "label": "閃電 2" },
+					{ "value": "like", "label": "讚" },
+					{ "value": "link", "label": "連結" },
+					{ "value": "lock-1", "label": "鎖 1" },
+					{ "value": "lock-2", "label": "鎖 2" },
+					{ "value": "logout", "label": "登出" },
+					{ "value": "luggage", "label": "行李箱" },
+					{ "value": "mark", "label": "標記" },
+					{ "value": "medicine", "label": "藥物" },
+					{ "value": "microphone", "label": "麥克風" },
+					{ "value": "moon", "label": "月亮" },
+					{ "value": "pencil", "label": "鉛筆" },
+					{ "value": "phone-1", "label": "手機 1" },
+					{ "value": "phone-2", "label": "手機 2" },
+					{ "value": "phone-3", "label": "手機 3" },
+					{ "value": "phone-4", "label": "手機 4" },
+					{ "value": "pinterest", "label": "Pinterest" },
+					{ "value": "plug", "label": "插頭" },
+					{ "value": "presentation-1", "label": "簡報 1" },
+					{ "value": "presentation-2", "label": "簡報 2" },
+					{ "value": "pulse", "label": "脈搏" },
+					{ "value": "recycle", "label": "回收" },
+					{ "value": "rocket", "label": "火箭" },
+					{ "value": "search", "label": "搜尋" },
+					{ "value": "server-1", "label": "伺服器 1" },
+					{ "value": "server-2", "label": "伺服器 2" },
+					{ "value": "settings", "label": "設定" },
+					{ "value": "shield", "label": "盾牌" },
+					{ "value": "shopping-basket", "label": "購物籃" },
+					{ "value": "shuffle", "label": "隨機播放" },
+					{ "value": "snapchat", "label": "Snapchat" },
+					{ "value": "sound-waves", "label": "聲波" },
+					{ "value": "speaker", "label": "喇叭" },
+					{ "value": "squares-1", "label": "方塊 1" },
+					{ "value": "squares-2", "label": "方塊 2" },
+					{ "value": "stack", "label": "堆疊" },
+					{ "value": "star", "label": "星星" },
+					{ "value": "stopwatch", "label": "碼錶" },
+					{ "value": "sun", "label": "太陽" },
+					{ "value": "tag", "label": "標籤" },
+					{ "value": "telephone-tower", "label": "電塔" },
+					{ "value": "tik-tok", "label": "TikTok" },
+					{ "value": "tree", "label": "樹" },
+					{ "value": "trend", "label": "趨勢" },
+					{ "value": "trophy", "label": "獎盃" },
+					{ "value": "tumblr", "label": "Tumblr" },
+					{ "value": "tv", "label": "電視" },
+					{ "value": "twitter", "label": "Twitter" },
+					{ "value": "user-1", "label": "使用者 1" },
+					{ "value": "user-2", "label": "使用者 2" },
+					{ "value": "user-3", "label": "使用者 3" },
+					{ "value": "user-4", "label": "使用者 4" },
+					{ "value": "video", "label": "影片" },
+					{ "value": "vimeo", "label": "Vimeo" },
+					{ "value": "wallet", "label": "錢包" },
+					{ "value": "watch", "label": "手錶" },
+					{ "value": "water-1", "label": "水滴 1" },
+					{ "value": "water-2", "label": "水滴 2" },
+					{ "value": "water-3", "label": "水滴 3" },
+					{ "value": "wave-1", "label": "波浪 1" },
+					{ "value": "wave-2", "label": "波浪 2" },
+					{ "value": "wifi-1", "label": "Wifi 1" },
+					{ "value": "wifi-2", "label": "Wifi 2" },
+					{ "value": "window", "label": "視窗" },
+					{ "value": "youtube", "label": "YouTube" }
+				],
+				"default": "none",
+				"label": "圖示"
+			},
+			{
+				"type": "select",
+				"id": "custom_icon_style",
+				"options": [
+					{
+						"value": "subtle",
+						"label": "柔和"
+					},
+					{
+						"value": "contrast",
+						"label": "對比"
+					},
+					{
+						"value": "colored",
+						"label": "彩色"
+					}
+				],
+				"default": "colored",
+				"label": "圖示樣式"
+			},
+			{
+				"type": "select",
+				"id": "custom_icon_fill_type",
+				"options": [
+					{
+						"value": "solid",
+						"label": "實心"
+					},
+					{
+						"value": "gradient",
+						"label": "漸層"
+					}
+				],
+				"default": "solid",
+				"label": "圖示填滿類型"
+			},
+			{
+				"type": "color_scheme",
+				"id": "badge_custom_color_scheme",
+				"default": "background-1",
+				"label": "自訂標籤配色"
+			},
+			{
+				"type": "checkbox",
+				"id": "quickview_hover",
+				"default": true,
+				"label": "滑鼠懸停時顯示快速預覽"
+			}
+		]
+	},
+	{
+		"name": "顏色色票",
+		"settings": [
+			{
+				"type": "select",
+				"id": "type_color_swatch",
+				"options": [
+					{
+						"value": "custom",
+						"label": "自訂圖片"
+					},
+					{
+						"value": "standart",
+						"label": "標準顏色"
+					}
+				],
+				"default": "custom",
+				"label": "色票類型"
+			},
+			{
+				"type": "text",
+				"id": "trigger_swatch",
+				"label": "觸發色票的選項名稱",
+				"info": "輸入您用於顏色選項的名稱，例如 \"顏色\" 或 \"Color\"。",
+				"default": "Color"
+			},
+			{
+				"type": "textarea",
+				"id": "custom_colors",
+				"label": "自訂顏色/圖片",
+				"info": "每行輸入一個。格式： '顏色名稱: #HEX碼' 或 '顏色名稱: 圖片檔名.jpg'。圖片需先上傳至「內容 > 檔案」中。例如：\n深藍色: #000080\n木紋: wood.jpg"
+			},
+			{
+				"type": "range",
+				"id": "swatch_border_radius",
+				"min": 0,
+				"max": 25,
+				"step": 1,
+				"unit": "px",
+				"label": "色票圓角",
+				"default": 25
+			}
+		]
+	},
+	{
+		"name": "社群媒體",
+		"settings": [
+			{
+				"type": "header",
+				"content": "社群媒體連結"
+			},
+			{
+				"type": "text",
+				"id": "social_twitter_link",
+				"label": "Twitter 連結",
+				"info": "例如： https://twitter.com/shopify"
+			},
+			{
+				"type": "text",
+				"id": "social_facebook_link",
+				"label": "Facebook 連結",
+				"info": "例如： https://facebook.com/shopify"
+			},
+			{
+				"type": "text",
+				"id": "social_pinterest_link",
+				"label": "Pinterest 連結",
+				"info": "例如： https://pinterest.com/shopify"
+			},
+			{
+				"type": "text",
+				"id": "social_instagram_link",
+				"label": "Instagram 連結",
+				"info": "例如： https://instagram.com/shopify"
+			},
+			{
+				"type": "text",
+				"id": "social_linkedin_link",
+				"label": "LinkedIn 連結",
+				"info": "例如： https://www.linkedin.com/company/shopify"
+			},
+			{
+				"type": "text",
+				"id": "social_tiktok_link",
+				"label": "TikTok 連結",
+				"info": "例如： https://www.tiktok.com/@shopify"
+			},
+			{
+				"type": "text",
+				"id": "social_tumblr_link",
+				"label": "Tumblr 連結",
+				"info": "例如： https://shopify.tumblr.com"
+			},
+			{
+				"type": "text",
+				"id": "social_snapchat_link",
+				"label": "Snapchat 連結",
+				"info": "例如： https://www.snapchat.com/add/shopify"
+			},
+			{
+				"type": "text",
+				"id": "social_youtube_link",
+				"label": "YouTube 連結",
+				"info": "例如： https://www.youtube.com/shopify"
+			},
+			{
+				"type": "text",
+				"id": "social_vimeo_link",
+				"label": "Vimeo 連結",
+				"info": "例如： https://vimeo.com/shopify"
+			}
+		]
+	},
+	{
+		"name": "網站圖示 (Favicon)",
+		"settings": [
+			{
+				"type": "image_picker",
+				"id": "favicon",
+				"label": "網站圖示",
+				"info": "將顯示在瀏覽器分頁上。建議尺寸 32x32px，.png 格式。"
+			}
+		]
+	},
+	{
+		"name": "快速預覽",
+		"settings": [
+			{
+				"type": "checkbox",
+				"id": "quickview_show",
+				"default": false,
+				"label": "啟用快速預覽"
+			},
+			{
+				"type": "checkbox",
+				"id": "add_to_cart_enabled",
+				"default": true,
+				"label": "在快速預覽中顯示「加入購物車」按鈕"
+			},
+			{
+				"type": "text",
+				"id": "more_label",
+				"label": "「查看更多」按鈕文字",
+				"info": "當商品需要選擇規格時，會顯示此按鈕引導至商品頁面。",
+				"default": "查看更多"
+			},
+			{
+				"type": "checkbox",
+				"id": "show_on_mobile",
+				"default": true,
+				"label": "在行動裝置上顯示"
+			},
+			{
+				"type": "select",
+				"id": "quickview_button_style",
+				"label": "按鈕樣式",
+				"options": [
+					{
+						"value": "primary",
+						"label": "主要"
+					},
+					{
+						"value": "secondary",
+						"label": "次要"
+					},
+					{
+						"value": "link",
+						"label": "純連結"
+					}
+				],
+				"default": "link"
+			},
+			{
+				"type": "select",
+				"id": "quickview_button_mobile_size",
+				"label": "行動裝置按鈕大小",
+				"options": [
+					{
+						"value": "standard",
+						"label": "標準"
+					},
+					{
+						"value": "small",
+						"label": "小"
+					}
+				],
+				"default": "standard"
+			},
+			{
+				"type": "select",
+				"id": "quickview_button_layout",
+				"label": "按鈕顯示方式",
+				"info": "選擇按鈕是總是顯示，還是在滑鼠懸停時才出現。",
+				"options": [
+					{
+						"value": "hover",
+						"label": "滑鼠懸停時顯示"
+					},
+					{
+						"value": "static",
+						"label": "總是顯示"
+					}
+				],
+				"default": "hover"
+			}
+		]
+	},
+	{
+		"name": "搜尋",
+		"settings": [
+			{
+				"type": "checkbox",
+				"id": "predictive_search_enabled",
+				"default": true,
+				"label": "啟用預測搜尋"
+			},
+			{
+				"type": "checkbox",
+				"id": "predictive_search_show_vendor",
+				"default": false,
+				"label": "在搜尋結果中顯示品牌/廠商"
+			},
+			{
+				"type": "select",
+				"id": "search_media_size",
+				"options": [
+					{ "value": "1/1", "label": "正方形 (1:1)" },
+					{ "value": "3/2", "label": "橫向 (3:2)" },
+					{ "value": "4/5", "label": "直向 (4:5)" },
+					{ "value": "5/4", "label": "橫向 (5:4)" }
+				],
+				"default": "5/4",
+				"label": "圖片長寬比"
+			},
+			{
+				"type": "select",
+				"id": "search_media_fit",
+				"label": "圖片適應方式",
+				"options": [
+					{ "value": "contain", "label": "維持比例 (Contain)" },
+					{ "value": "cover", "label": "填滿 (Cover)" }
+				],
+				"default": "cover"
+			},
+			{
+				"type": "select",
+				"id": "predictive_search_collection_image",
+				"options": [
+					{
+						"value": "collection",
+						"label": "使用分類圖片"
+					},
+					{
+						"value": "product",
+						"label": "使用第一個產品圖片"
+					},
+					{
+						"value": "product_hover",
+						"label": "使用產品的第二張圖片"
+					}
+				],
+				"default": "collection",
+				"label": "分類的預覽圖片"
+			}
+		]
+	},
+	{
+		"name": "分頁",
+		"settings": [
+			{
+				"type": "select",
+				"id": "pagination_type",
+				"options": [
+					{
+						"value": "load_more",
+						"label": "載入更多 (按鈕)"
+					},
+					{
+						"value": "infinite_scroll",
+						"label": "無限滾動"
+					},
+					{
+						"value": "pagination",
+						"label": "頁碼"
+					}
+				],
+				"default": "pagination",
+				"label": "分頁類型",
+				"info": "適用於商品列表頁面。"
+			},
+			{
+				"type": "select",
+				"id": "button_style",
+				"options": [
+					{
+						"value": "primary",
+						"label": "主要"
+					},
+					{
+						"value": "secondary",
+						"label": "次要"
+					},
+					{
+						"value": "tertiary",
+						"label": "第三"
+					}
+				],
+				"default": "tertiary",
+				"label": "按鈕樣式"
+			}
+		]
+	},
+	{
+		"name": "顧客評論樣式",
+		"settings": [
+			{
+				"type": "checkbox",
+				"id": "enable_styles",
+				"default": true,
+				"label": "為 Shopify Product Reviews App 啟用佈景主題樣式"
+			}
+		]
+	},
+	{
+		"name": "購物車",
+		"settings": [
+			{
+				"type": "select",
+				"id": "cart_type",
+				"options": [
+					{
+						"value": "drawer",
+						"label": "側邊彈出式"
+					},
+					{
+						"value": "page",
+						"label": "獨立頁面"
+					}
+				],
+				"default": "drawer",
+				"label": "購物車類型"
+			},
+			{
+				"type": "textarea",
+				"id": "text_empty",
+				"label": "購物車清空時的文字"
+			},
+			{
+				"type": "checkbox",
+				"id": "show_cart_note",
+				"label": "啟用訂單備註"
+			},
+			{
+				"type": "select",
+				"id": "cart_icon_style",
+				"options": [
+					{ "value": "subtle", "label": "柔和" },
+					{ "value": "contrast", "label": "對比" },
+					{ "value": "colored", "label": "彩色" }
+				],
+				"default": "colored",
+				"label": "購物車圖示樣式"
+			},
+			{
+				"type": "select",
+				"id": "cart_icon_fill_type",
+				"options": [
+					{ "value": "solid", "label": "實心" },
+					{ "value": "gradient", "label": "漸層" }
+				],
+				"default": "gradient",
+				"label": "購物車圖示填滿類型"
+			},
+			{
+				"type": "checkbox",
+				"id": "cart_icon_box_shadow",
+				"default": true,
+				"label": "為購物車圖示啟用陰影"
+			},
+			{
+				"type": "color_scheme",
+				"id": "cart_color_scheme",
+				"default": "background-1",
+				"label": "購物車配色"
+			},
+			{
+				"type": "select",
+				"id": "cart_button_style",
+				"options": [
+					{ "value": "primary", "label": "主要" },
+					{ "value": "secondary", "label": "次要" },
+					{ "value": "tertiary", "label": "第三" }
+				],
+				"default": "primary",
+				"label": "按鈕樣式"
+			},
+			{
+				"type": "checkbox",
+				"id": "cart_show_vendor",
+				"default": true,
+				"label": "顯示品牌/廠商"
+			},
+			{
+				"type": "select",
+				"id": "cart_image_ratio",
+				"options": [
+					{ "value": "1/1", "label": "正方形 (1:1)" },
+					{ "value": "3/2", "label": "橫向 (3:2)" },
+					{ "value": "4/5", "label": "直向 (4:5)" },
+					{ "value": "5/4", "label": "橫向 (5:4)" }
+				],
+				"default": "5/4",
+				"label": "圖片長寬比"
+			},
+			{
+				"type": "select",
+				"id": "cart_image_fit",
+				"label": "圖片適應方式",
+				"options": [
+					{ "value": "contain", "label": "維持比例 (Contain)" },
+					{ "value": "cover", "label": "填滿 (Cover)" }
+				],
+				"default": "cover"
+			},
+			{
+				"type": "header",
+				"content": "運費計算器"
+			},
+			{
+				"type": "checkbox",
+				"id": "show_shipping",
+				"label": "顯示運費計算器",
+				"default": false
+			},
+			{
+				"type": "textarea",
+				"id": "message_shipping",
+				"label": "距離免運門檻的訊息",
+				"info": "使用 ||amount|| 來代表剩餘金額。",
+				"default": "再消費 ||amount|| 即可享免運！"
+			},
+			{
+				"type": "text",
+				"id": "min_spend",
+				"label": "免運消費門檻",
+				"info": "請輸入純數字，不含貨幣符號。",
+				"default": "100"
+			},
+			{
+				"type": "textarea",
+				"id": "message_shipping_free",
+				"label": "已達免運門檻的訊息",
+				"default": "恭喜！您已享有免運資格！"
+			}
+		]
+	},
+	{
+		"name": "貨幣格式",
+		"settings": [
+			{
+				"type": "header",
+				"content": "貨幣顯示設定"
+			},
+			{
+				"type": "paragraph",
+				"content": "此設定會影響價格的顯示方式。您可以在 Shopify 管理後台的「設定 > 商店詳細資料 > 商店貨幣」中管理您的貨幣。"
+			},
+			{
+				"type": "checkbox",
+				"id": "currency_code_enabled",
+				"label": "在價格旁顯示貨幣代碼 (例如 TWD)",
+				"default": false
+			}
+		]
+	},
+	{
+		"name": "進階設定",
+		"settings": [
+			{
+				"type": "checkbox",
+				"id": "enable_vendor_link",
+				"default": false,
+				"label": "將品牌/廠商名稱設為可點擊連結"
+			},
+			{
+				"type": "checkbox",
+				"id": "show_back_to_top",
+				"default": false,
+				"label": "顯示「回到頂部」按鈕"
+			},
+			{
+				"type": "checkbox",
+				"id": "show_breadcrumbs",
+				"default": true,
+				"label": "顯示麵包屑導覽"
+			}
+		]
+	},
+	{
+		"name": "連結",
+		"settings": [
+			{
+				"type": "checkbox",
+				"id": "links_blank",
+				"default": false,
+				"label": "在新分頁中開啟外部連結"
+			}
+		]
+	}
+]
