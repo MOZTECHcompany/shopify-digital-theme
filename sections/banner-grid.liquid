@@ -1,0 +1,946 @@
+{{ 'section-banner-grid.css' | asset_url | stylesheet_tag }}
+<script src='{{ 'banner-grid.js' | asset_url }}' defer='defer'></script>
+
+{%- style -%}
+	{% render 'section-padding' %}
+	{% render 'section-margin' %}
+{%- endstyle -%}
+
+<div
+	class='
+		banner-grid color-{{ section.settings.color_scheme }} background section-{{ section.id }}-padding
+		{% if section.settings.enable_border %} section-border {% if section.settings.border_full %} section-border-full {% endif %} {% endif %}
+	'
+	style='--gap: {{ section.settings.gap }}px; {% if section.settings.gap == '24' %} --gap-mobile: 16px; {% else %} --gap-mobile: {{ section.settings.gap }}px {% endif %}'
+>
+	<div class='container'>
+		{% render 'section-text',
+			section: section,
+			class: 'banner-grid',
+			text_align: section.settings.text_align,
+			heading_level: section.settings.heading_level
+		%}
+
+		<div class='content{% if section.settings.enable_mobile_overflow_slider %} banner-grid-slider{% endif %}'>
+			<div
+				class='
+					banner-grid__grid banner-grid__grid--{{ section.settings.layout }}
+					{% if section.settings.layout == 'columns' %} banner-grid__grid--columns-{{ section.settings.columns }} {% endif %}
+				'
+			>
+				{% for block in section.blocks %}
+					<div
+						class='
+							banner-grid__card color-{{ block.settings.color_scheme }}
+							banner-grid__card--{{ section.settings.text_align_content }}
+							{% if block.settings.show_button and block.settings.full_link %} banner-grid__card_full-link {% endif %}
+						'
+						{{ block.shopify_attributes }}
+						{% if section.settings.border_radius == false %}
+							style='border-radius: 0'
+						{% endif %}
+					>
+						{% if block.settings.button_link != blank
+							and block.settings.full_link
+						%}
+							<a
+								href='{{ block.settings.button_link }}'
+								class='banner-grid__link-overlay'
+							></a>
+						{% endif %}
+						<div class='banner-grid__media media'>
+							{%- if block.settings.image != blank -%}
+								{% if section.settings.layout != 'columns' %}
+									{% capture sizes %}
+                    (min-width: 576px) calc(50vw - 40px), calc((100vw - 40px))
+                  {% endcapture %}
+								{% else %}
+									{% assign columns = section.settings.columns %}
+									{% capture sizes %}
+                    (min-width: 1360px) calc((100vw - 40px) / {{ columns }}),
+                    (min-width: 1200px) {% if columns >= 5 %} calc((100vw - 40px) / {{ columns | minus: 1 }}) {% else %} calc((100vw - 40px) / {{ columns }}) {% endif %},
+                    (min-width: 990px) {% if columns >= 5 %} calc((100vw - 40px) / {{ columns | minus: 2 }}) {% elsif columns == 4 %} calc((100vw - 40px) / 3) {% else %} calc((100vw - 40px) / {{ columns }}) {% endif %},
+                    {% if columns == 6 %}
+                      (min-width: 750px) calc((100vw - 40px) / {{ columns | minus: 3 }}),
+                    {% endif %}
+                    (min-width: 576px) {% if columns >= 2 %} calc((100vw - 40px) / 2) {% else %} calc((100vw - 40px)) {% endif %},
+                    calc((100vw - 40px))
+                  {% endcapture %}
+								{% endif %}
+								{{
+									block.settings.image
+									| image_url: width: block.settings.image.width
+									| image_tag:
+										class: 'banner-grid__image',
+										loading: 'lazy',
+										sizes: sizes,
+										widths: '360, 550, 720, 990, 1100, 1500, 1800, 2200, 2500, 3000'
+								}}
+							{%- endif -%}
+							<div
+								class='banner-grid__overlay'
+								style='opacity: {{ block.settings.overlay_opacity }}'
+							></div>
+						</div>
+
+						{% if block.settings.icon != 'none'
+							or block.settings.logo != blank
+							or block.settings.logo_dm
+						%}
+							<div class='banner-grid__top'>
+								{% if block.settings.icon != 'none' %}
+									<div
+										class='
+											banner-grid__icon
+											banner-grid__icon--{{- block.settings.icon_size }}
+											banner-grid__icon--{{- section.settings.icon_style }}
+										'
+									>
+										<i
+											class='icon icon-pack icon-{{ block.settings.icon }} {% if section.settings.icon_style == 'colored' and section.settings.icon_fill_type == 'gradient' %} text-gradient {% endif %}'
+										></i>
+									</div>
+								{% endif %}
+								{% if block.settings.logo != blank or block.settings.logo_dm %}
+									<div class='banner-grid__logos'>
+										{%- assign width = block.settings.logo_width -%}
+										{%- assign sizes = '(min-width: 1100px) 750, (min-width: 750px) 550, 275' -%}
+										{% capture style %}
+                      --width-adapt: {{ block.settings.logo_width | times: 0.9 | round: 2 }}px
+                    {% endcapture %}
+
+										{%- if block.settings.logo_dm != blank -%}
+											{{
+												block.settings.logo_dm
+												| image_url: width: 710
+												| image_tag:
+													loading: 'lazy',
+													sizes: sizes,
+													widths: '275, 550, 750',
+													height: 'auto',
+													width: width,
+													class: ' banner-grid__logo  banner-grid__logo--dark',
+													style: style
+											}}
+										{%- endif -%}
+										{%- if block.settings.logo != blank -%}
+											{{
+												block.settings.logo
+												| image_url: width: 710
+												| image_tag:
+													loading: 'lazy',
+													sizes: sizes,
+													widths: '275, 550, 750',
+													height: 'auto',
+													width: width,
+													class: ' banner-grid__logo  banner-grid__logo--light',
+													style: style
+											}}
+										{%- endif -%}
+									</div>
+								{% endif %}
+							</div>
+						{% endif %}
+
+						<div class='banner-grid__content-group'>
+							{% if block.settings.heading != blank %}
+								{% liquid
+									assign card_heading_size = block.settings.heading_size
+
+									if card_heading_size == 'recommended'
+										case section.settings.layout
+											when 'type_1'
+												assign mod = forloop.index | modulo: 4
+												if forloop.first or mod == 1
+													assign card_heading_size = 'h3 recommended'
+												elsif mod == 2
+													assign card_heading_size = 'h4 recommended'
+												else
+													assign card_heading_size = 'h5 recommended'
+												endif
+											when 'type_2'
+												assign mod = forloop.index | modulo: 4
+												if forloop.first or mod == 1
+													assign card_heading_size = 'h2 recommended'
+												elsif mod == 2
+													assign card_heading_size = 'h3 recommended'
+												else
+													assign card_heading_size = 'h4 recommended'
+												endif
+											when 'type_3'
+												assign mod = forloop.index | modulo: 6
+												if forloop.first or mod == 1 or forloop.index == 5 or mod == 5
+													assign card_heading_size = 'h3 recommended'
+												else
+													assign card_heading_size = 'h4 recommended'
+												endif
+											when 'type_4'
+												assign mod = forloop.index | modulo: 6
+												if forloop.first or mod == 1 or forloop.index == 6 or mod == 0
+													assign card_heading_size = 'h3 recommended'
+												else
+													assign card_heading_size = 'h5 recommended'
+												endif
+											when 'type_5'
+												assign mod = forloop.index | modulo: 5
+												if forloop.first or mod == 1 or forloop.index == 2 or mod == 2
+													assign card_heading_size = 'h3 recommended'
+												elsif forloop.index == 3 or mod == 3
+													assign card_heading_size = 'h4 recommended'
+												else
+													assign card_heading_size = 'h6 recommended'
+												endif
+											when 'columns'
+												case section.settings.columns
+													when 1
+														assign card_heading_size = 'h2'
+													when 2
+														assign card_heading_size = 'h3'
+													when 3
+														assign card_heading_size = 'h4'
+													when 4
+														assign card_heading_size = 'h5'
+													else
+														assign card_heading_size = 'h6'
+												endcase
+										endcase
+									endif
+								%}
+								<{{ block.settings.heading_level }} class='banner-grid__title-content {{ card_heading_size }}'>
+									{{- block.settings.heading -}}
+								</{{ block.settings.heading_level }}>
+							{% endif %}
+							{%- if block.settings.show_button -%}
+								{% render 'button',
+									link: block.settings.button_link,
+									label: block.settings.button_label,
+									style: block.settings.button_style,
+									class: 'banner-grid'
+								%}
+							{% endif %}
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+</div>
+
+{% schema %}
+{
+	"name": "網格橫幅",
+	"tag": "section",
+	"class": "banner-grid-section",
+	"enabled_on": {
+		"templates": ["*"]
+	},
+	"settings": [
+		{
+			"type": "select",
+			"id": "layout",
+			"label": "版面配置",
+			"options": [
+				{ "value": "type_1", "label": "類型 1" },
+				{ "value": "type_2", "label": "類型 2" },
+				{ "value": "type_3", "label": "類型 3" },
+				{ "value": "type_4", "label": "類型 4" },
+				{ "value": "type_5", "label": "類型 5" },
+				{ "value": "columns", "label": "欄位" }
+			],
+			"default": "type_1"
+		},
+		{
+			"type": "range",
+			"id": "columns",
+			"min": 1,
+			"max": 6,
+			"step": 1,
+			"default": 3,
+			"label": "欄位數量",
+			"info": "僅適用於「欄位」版面配置。"
+		},
+		{
+			"type": "checkbox",
+			"id": "enable_mobile_overflow_slider",
+			"label": "在行動裝置上啟用滑動瀏覽",
+			"default": false
+		},
+		{
+			"type": "color_scheme",
+			"id": "color_scheme",
+			"default": "background-1",
+			"label": "色彩配置"
+		},
+		{
+			"type": "checkbox",
+			"id": "enable_border",
+			"label": "啟用邊框",
+			"default": false
+		},
+		{
+			"type": "checkbox",
+			"id": "border_full",
+			"label": "全寬度邊框",
+			"default": false
+		},
+		{
+			"type": "text",
+			"id": "subheading",
+			"label": "副標題",
+			"default": "網格橫幅"
+		},
+		{
+			"type": "select",
+			"id": "subheading_style",
+			"options": [
+				{ "value": "subtitle", "label": "副標題" },
+				{ "value": "subtitle subtitle--secondary", "label": "副標題 (次要)" }
+			],
+			"default": "subtitle",
+			"label": "副標題樣式"
+		},
+		{
+			"type": "select",
+			"id": "subheading_icon",
+			"options": [
+				{ "value": "none", "label": "無" },
+				{ "value": "arrow-bar", "label": "箭頭條" },
+				{ "value": "bag-1", "label": "提袋 1" },
+				{ "value": "bag-2", "label": "提袋 2" },
+				{ "value": "bag-3", "label": "提袋 3" },
+				{ "value": "bar-chart", "label": "長條圖" },
+				{ "value": "bars-upward", "label": "向上長條" },
+				{ "value": "baseball", "label": "棒球" },
+				{ "value": "battery-1", "label": "電池 1" },
+				{ "value": "battery-2", "label": "電池 2" },
+				{ "value": "battery-3", "label": "電池 3" },
+				{ "value": "book", "label": "書本" },
+				{ "value": "card", "label": "卡片" },
+				{ "value": "card-holder", "label": "名片夾" },
+				{ "value": "chart", "label": "圖表" },
+				{ "value": "chart-2", "label": "圖表 2" },
+				{ "value": "chart-3", "label": "圖表 3" },
+				{ "value": "chats", "label": "對話" },
+				{ "value": "check-1", "label": "勾號 1" },
+				{ "value": "check-2", "label": "勾號 2" },
+				{ "value": "check-3", "label": "勾號 3" },
+				{ "value": "check-4", "label": "勾號 4" },
+				{ "value": "circle", "label": "圓圈" },
+				{ "value": "circles", "label": "多個圓圈" },
+				{ "value": "clock-1", "label": "時鐘 1" },
+				{ "value": "clock-2", "label": "時鐘 2" },
+				{ "value": "close", "label": "關閉" },
+				{ "value": "cloud-server", "label": "雲端伺服器" },
+				{ "value": "computer", "label": "電腦" },
+				{ "value": "computer-mouse", "label": "滑鼠" },
+				{ "value": "confetti", "label": "彩紙" },
+				{ "value": "delivery", "label": "運送" },
+				{ "value": "delivery-box", "label": "包裹" },
+				{ "value": "devices", "label": "裝置" },
+				{ "value": "directions", "label": "方向" },
+				{ "value": "dumbbell", "label": "啞鈴" },
+				{ "value": "eye", "label": "眼睛" },
+				{ "value": "facebook", "label": "Facebook" },
+				{ "value": "file-1", "label": "檔案 1" },
+				{ "value": "file-2", "label": "檔案 2" },
+				{ "value": "flag", "label": "旗幟" },
+				{ "value": "folder-1", "label": "資料夾 1" },
+				{ "value": "folder-2", "label": "資料夾 2" },
+				{ "value": "food", "label": "食物" },
+				{ "value": "hand-1", "label": "手 1" },
+				{ "value": "hand-2", "label": "手 2" },
+				{ "value": "hand-3", "label": "手 3" },
+				{ "value": "headphones", "label": "耳機" },
+				{ "value": "instagram", "label": "Instagram" },
+				{ "value": "laptop-1", "label": "筆電 1" },
+				{ "value": "laptop-2", "label": "筆電 2" },
+				{ "value": "leaf", "label": "葉子" },
+				{ "value": "lightning-bolt-1", "label": "閃電 1" },
+				{ "value": "lightning-bolt-2", "label": "閃電 2" },
+				{ "value": "like", "label": "讚" },
+				{ "value": "link", "label": "連結" },
+				{ "value": "lock-1", "label": "鎖 1" },
+				{ "value": "lock-2", "label": "鎖 2" },
+				{ "value": "logout", "label": "登出" },
+				{ "value": "luggage", "label": "行李" },
+				{ "value": "mark", "label": "標記" },
+				{ "value": "medicine", "label": "藥品" },
+				{ "value": "microphone", "label": "麥克風" },
+				{ "value": "moon", "label": "月亮" },
+				{ "value": "pencil", "label": "鉛筆" },
+				{ "value": "phone-1", "label": "電話 1" },
+				{ "value": "phone-2", "label": "電話 2" },
+				{ "value": "phone-3", "label": "電話 3" },
+				{ "value": "phone-4", "label": "電話 4" },
+				{ "value": "pinterest", "label": "Pinterest" },
+				{ "value": "plug", "label": "插頭" },
+				{ "value": "presentation-1", "label": "簡報 1" },
+				{ "value": "presentation-2", "label": "簡報 2" },
+				{ "value": "pulse", "label": "脈搏" },
+				{ "value": "recycle", "label": "回收" },
+				{ "value": "rocket", "label": "火箭" },
+				{ "value": "search", "label": "搜尋" },
+				{ "value": "sending", "label": "傳送" },
+				{ "value": "server-1", "label": "伺服器 1" },
+				{ "value": "server-2", "label": "伺服器 2" },
+				{ "value": "settings", "label": "設定" },
+				{ "value": "shield", "label": "盾牌" },
+				{ "value": "shopping-basket", "label": "購物籃" },
+				{ "value": "shuffle", "label": "隨機播放" },
+				{ "value": "snapchat", "label": "Snapchat" },
+				{ "value": "sound-waves", "label": "聲波" },
+				{ "value": "speaker", "label": "喇叭" },
+				{ "value": "squares-1", "label": "方塊 1" },
+				{ "value": "squares-2", "label": "方塊 2" },
+				{ "value": "stack", "label": "堆疊" },
+				{ "value": "star", "label": "星星" },
+				{ "value": "stopwatch", "label": "碼錶" },
+				{ "value": "sun", "label": "太陽" },
+				{ "value": "tag", "label": "標籤" },
+				{ "value": "telephone-tower", "label": "電信塔" },
+				{ "value": "tik-tok", "label": "TikTok" },
+				{ "value": "tree", "label": "樹" },
+				{ "value": "trend", "label": "趨勢" },
+				{ "value": "trophy", "label": "獎盃" },
+				{ "value": "tumblr", "label": "Tumblr" },
+				{ "value": "tv", "label": "電視" },
+				{ "value": "twitter", "label": "Twitter" },
+				{ "value": "user-1", "label": "使用者 1" },
+				{ "value": "user-2", "label": "使用者 2" },
+				{ "value": "user-3", "label": "使用者 3" },
+				{ "value": "user-4", "label": "使用者 4" },
+				{ "value": "user-5", "label": "使用者 5" },
+				{ "value": "video", "label": "影片" },
+				{ "value": "vimeo", "label": "Vimeo" },
+				{ "value": "wallet", "label": "錢包" },
+				{ "value": "watch", "label": "手錶" },
+				{ "value": "water-1", "label": "水 1" },
+				{ "value": "water-2", "label": "水 2" },
+				{ "value": "water-3", "label": "水 3" },
+				{ "value": "wave-1", "label": "波浪 1" },
+				{ "value": "wave-2", "label": "波浪 2" },
+				{ "value": "wifi-1", "label": "Wi-Fi 1" },
+				{ "value": "wifi-2", "label": "Wi-Fi 2" },
+				{ "value": "window", "label": "視窗" },
+				{ "value": "youtube", "label": "YouTube" }
+			],
+			"default": "none",
+			"label": "副標題圖示"
+		},
+		{
+			"type": "inline_richtext",
+			"id": "heading",
+			"label": "標題",
+			"info": "使用方括號 `[文字]` 來突顯標題中的特定單字。",
+			"default": "瀏覽我們的分類"
+		},
+		{
+			"type": "select",
+			"id": "heading_size",
+			"options": [
+				{ "value": "h3", "label": "中" },
+				{ "value": "h2", "label": "大" },
+				{ "value": "h1", "label": "最大" }
+			],
+			"default": "h2",
+			"label": "標題大小"
+		},
+		{
+			"type": "select",
+			"id": "heading_level",
+			"options": [
+				{ "value": "h1", "label": "H1" },
+				{ "value": "h2", "label": "H2" },
+				{ "value": "h3", "label": "H3" }
+			],
+			"default": "h2",
+			"label": "標題層級 (HTML 標籤)"
+		},
+		{
+			"type": "select",
+			"id": "heading_line",
+			"options": [
+				{ "value": "simple", "label": "簡潔線條" },
+				{ "value": "rounded", "label": "圓角線條" },
+				{ "value": "background", "label": "背景色塊" },
+				{ "value": "none", "label": "無" }
+			],
+			"default": "simple",
+			"label": "標題線條樣式"
+		},
+		{
+			"type": "color",
+			"id": "line_color",
+			"label": "線條顏色",
+			"default": "#1566E0"
+		},
+		{
+			"type": "checkbox",
+			"id": "word_break",
+			"label": "啟用標題自動換行",
+			"default": false
+		},
+		{
+			"type": "select",
+			"id": "heading_animation",
+			"options": [
+				{ "value": "typewriter", "label": "打字機" },
+				{ "value": "rolling", "label": "滾動" },
+				{ "value": "appearing", "label": "浮現" },
+				{ "value": "none", "label": "無" }
+			],
+			"default": "none",
+			"label": "標題動畫",
+			"info": "此動畫僅在頁面首次載入時播放一次。"
+		},
+		{
+			"type": "checkbox",
+			"id": "word_break_an",
+			"label": "啟用動畫文字自動換行",
+			"default": false
+		},
+		{
+			"type": "textarea",
+			"id": "text",
+			"label": "內文",
+			"default": "在此分享有關您品牌的更多資訊。"
+		},
+		{
+			"type": "select",
+			"id": "text_align",
+			"label": "文字對齊",
+			"options": [
+				{ "value": "left", "label": "靠左" },
+				{ "value": "center", "label": "置中" }
+			],
+			"default": "left"
+		},
+		{
+			"type": "select",
+			"id": "gap",
+			"label": "間距",
+			"options": [
+				{ "value": "0", "label": "無 (0px)" },
+				{ "value": "4", "label": "小 (4px)" },
+				{ "value": "24", "label": "大 (24px)" }
+			],
+			"default": "24"
+		},
+		{
+			"type": "checkbox",
+			"id": "border_radius",
+			"label": "啟用圓角",
+			"default": true
+		},
+		{
+			"type": "select",
+			"id": "text_align_content",
+			"options": [
+				{ "value": "top-left", "label": "左上" },
+				{ "value": "left", "label": "置中 (靠左)" },
+				{ "value": "bottom-left", "label": "左下" },
+				{ "value": "top-center", "label": "中上" },
+				{ "value": "center", "label": "正中" },
+				{ "value": "bottom-center", "label": "中下" }
+			],
+			"default": "bottom-left",
+			"label": "內容對齊"
+		},
+		{
+			"type": "header",
+			"content": "圖示設定"
+		},
+		{
+			"type": "select",
+			"id": "icon_style",
+			"options": [
+				{ "value": "subtle", "label": "精緻" },
+				{ "value": "contrast", "label": "對比" },
+				{ "value": "colored", "label": "彩色" }
+			],
+			"default": "contrast",
+			"label": "圖示樣式"
+		},
+		{
+			"type": "select",
+			"id": "icon_fill_type",
+			"options": [
+				{ "value": "solid", "label": "實心" },
+				{ "value": "gradient", "label": "漸層" }
+			],
+			"default": "gradient",
+			"label": "圖示填色類型"
+		},
+		{
+			"type": "header",
+			"content": "區塊內距 (Padding)"
+		},
+		{
+			"type": "select",
+			"id": "padding_top",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "超小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "超大" }
+			],
+			"default": "l",
+			"label": "頂部內距"
+		},
+		{
+			"type": "select",
+			"id": "padding_bottom",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "超小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "超大" }
+			],
+			"default": "l",
+			"label": "底部內距"
+		},
+		{
+			"type": "header",
+			"content": "區塊外距 (Margin)"
+		},
+		{
+			"type": "select",
+			"id": "margin_top",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "超小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "超大" }
+			],
+			"default": "no-indent",
+			"label": "頂部外距"
+		},
+		{
+			"type": "select",
+			"id": "margin_bottom",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "超小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "超大" }
+			],
+			"default": "no-indent",
+			"label": "底部外距"
+		}
+	],
+	"blocks": [
+		{
+			"type": "card",
+			"name": "網格卡片",
+			"settings": [
+				{
+					"type": "color_scheme",
+					"id": "color_scheme",
+					"default": "background-3",
+					"label": "色彩配置"
+				},
+				{
+					"type": "image_picker",
+					"id": "image",
+					"label": "背景圖片"
+				},
+				{
+					"type": "range",
+					"id": "overlay_opacity",
+					"min": 0,
+					"max": 1,
+					"step": 0.1,
+					"label": "疊加層不透明度",
+					"default": 0.5
+				},
+				{
+					"type": "select",
+					"id": "icon",
+					"options": [
+						{ "value": "none", "label": "無" },
+						{ "value": "arrow-bar", "label": "箭頭條" },
+						{ "value": "bag-1", "label": "提袋 1" },
+						{ "value": "bag-2", "label": "提袋 2" },
+						{ "value": "bag-3", "label": "提袋 3" },
+						{ "value": "bar-chart", "label": "長條圖" },
+						{ "value": "bars-upward", "label": "向上長條" },
+						{ "value": "baseball", "label": "棒球" },
+						{ "value": "battery-1", "label": "電池 1" },
+						{ "value": "battery-2", "label": "電池 2" },
+						{ "value": "battery-3", "label": "電池 3" },
+						{ "value": "book", "label": "書本" },
+						{ "value": "card", "label": "卡片" },
+						{ "value": "card-holder", "label": "名片夾" },
+						{ "value": "chart", "label": "圖表" },
+						{ "value": "chart-2", "label": "圖表 2" },
+						{ "value": "chart-3", "label": "圖表 3" },
+						{ "value": "chats", "label": "對話" },
+						{ "value": "check-1", "label": "勾號 1" },
+						{ "value": "check-2", "label": "勾號 2" },
+						{ "value": "check-3", "label": "勾號 3" },
+						{ "value": "check-4", "label": "勾號 4" },
+						{ "value": "circle", "label": "圓圈" },
+						{ "value": "circles", "label": "多個圓圈" },
+						{ "value": "clock-1", "label": "時鐘 1" },
+						{ "value": "clock-2", "label": "時鐘 2" },
+						{ "value": "close", "label": "關閉" },
+						{ "value": "cloud-server", "label": "雲端伺服器" },
+						{ "value": "computer", "label": "電腦" },
+						{ "value": "computer-mouse", "label": "滑鼠" },
+						{ "value": "confetti", "label": "彩紙" },
+						{ "value": "delivery", "label": "運送" },
+						{ "value": "delivery-box", "label": "包裹" },
+						{ "value": "devices", "label": "裝置" },
+						{ "value": "directions", "label": "方向" },
+						{ "value": "dumbbell", "label": "啞鈴" },
+						{ "value": "eye", "label": "眼睛" },
+						{ "value": "facebook", "label": "Facebook" },
+						{ "value": "file-1", "label": "檔案 1" },
+						{ "value": "file-2", "label": "檔案 2" },
+						{ "value": "flag", "label": "旗幟" },
+						{ "value": "folder-1", "label": "資料夾 1" },
+						{ "value": "folder-2", "label": "資料夾 2" },
+						{ "value": "food", "label": "食物" },
+						{ "value": "hand-1", "label": "手 1" },
+						{ "value": "hand-2", "label": "手 2" },
+						{ "value": "hand-3", "label": "手 3" },
+						{ "value": "headphones", "label": "耳機" },
+						{ "value": "instagram", "label": "Instagram" },
+						{ "value": "laptop-1", "label": "筆電 1" },
+						{ "value": "laptop-2", "label": "筆電 2" },
+						{ "value": "leaf", "label": "葉子" },
+						{ "value": "lightning-bolt-1", "label": "閃電 1" },
+						{ "value": "lightning-bolt-2", "label": "閃電 2" },
+						{ "value": "like", "label": "讚" },
+						{ "value": "link", "label": "連結" },
+						{ "value": "lock-1", "label": "鎖 1" },
+						{ "value": "lock-2", "label": "鎖 2" },
+						{ "value": "logout", "label": "登出" },
+						{ "value": "luggage", "label": "行李" },
+						{ "value": "mark", "label": "標記" },
+						{ "value": "medicine", "label": "藥品" },
+						{ "value": "microphone", "label": "麥克風" },
+						{ "value": "moon", "label": "月亮" },
+						{ "value": "pencil", "label": "鉛筆" },
+						{ "value": "phone-1", "label": "電話 1" },
+						{ "value": "phone-2", "label": "電話 2" },
+						{ "value": "phone-3", "label": "電話 3" },
+						{ "value": "phone-4", "label": "電話 4" },
+						{ "value": "pinterest", "label": "Pinterest" },
+						{ "value": "plug", "label": "插頭" },
+						{ "value": "presentation-1", "label": "簡報 1" },
+						{ "value": "presentation-2", "label": "簡報 2" },
+						{ "value": "pulse", "label": "脈搏" },
+						{ "value": "recycle", "label": "回收" },
+						{ "value": "rocket", "label": "火箭" },
+						{ "value": "search", "label": "搜尋" },
+						{ "value": "sending", "label": "傳送" },
+						{ "value": "server-1", "label": "伺服器 1" },
+						{ "value": "server-2", "label": "伺服器 2" },
+						{ "value": "settings", "label": "設定" },
+						{ "value": "shield", "label": "盾牌" },
+						{ "value": "shopping-basket", "label": "購物籃" },
+						{ "value": "shuffle", "label": "隨機播放" },
+						{ "value": "snapchat", "label": "Snapchat" },
+						{ "value": "sound-waves", "label": "聲波" },
+						{ "value": "speaker", "label": "喇叭" },
+						{ "value": "squares-1", "label": "方塊 1" },
+						{ "value": "squares-2", "label": "方塊 2" },
+						{ "value": "stack", "label": "堆疊" },
+						{ "value": "star", "label": "星星" },
+						{ "value": "stopwatch", "label": "碼錶" },
+						{ "value": "sun", "label": "太陽" },
+						{ "value": "tag", "label": "標籤" },
+						{ "value": "telephone-tower", "label": "電信塔" },
+						{ "value": "tik-tok", "label": "TikTok" },
+						{ "value": "tree", "label": "樹" },
+						{ "value": "trend", "label": "趨勢" },
+						{ "value": "trophy", "label": "獎盃" },
+						{ "value": "tumblr", "label": "Tumblr" },
+						{ "value": "tv", "label": "電視" },
+						{ "value": "twitter", "label": "Twitter" },
+						{ "value": "user-1", "label": "使用者 1" },
+						{ "value": "user-2", "label": "使用者 2" },
+						{ "value": "user-3", "label": "使用者 3" },
+						{ "value": "user-4", "label": "使用者 4" },
+						{ "value": "user-5", "label": "使用者 5" },
+						{ "value": "video", "label": "影片" },
+						{ "value": "vimeo", "label": "Vimeo" },
+						{ "value": "wallet", "label": "錢包" },
+						{ "value": "watch", "label": "手錶" },
+						{ "value": "water-1", "label": "水 1" },
+						{ "value": "water-2", "label": "水 2" },
+						{ "value": "water-3", "label": "水 3" },
+						{ "value": "wave-1", "label": "波浪 1" },
+						{ "value": "wave-2", "label": "波浪 2" },
+						{ "value": "wifi-1", "label": "Wi-Fi 1" },
+						{ "value": "wifi-2", "label": "Wi-Fi 2" },
+						{ "value": "window", "label": "視窗" },
+						{ "value": "youtube", "label": "YouTube" }
+					],
+					"default": "none",
+					"label": "圖示"
+				},
+				{
+					"type": "select",
+					"id": "icon_size",
+					"options": [
+						{ "value": "recommended", "label": "建議大小" },
+						{ "value": "normal", "label": "一般" },
+						{ "value": "small", "label": "小" },
+						{ "value": "large", "label": "大" },
+						{ "value": "extra-large", "label": "超大" }
+					],
+					"default": "recommended",
+					"label": "圖示大小"
+				},
+				{
+					"type": "image_picker",
+					"id": "logo",
+					"label": "Logo (用於淺色背景)"
+				},
+				{
+					"type": "image_picker",
+					"id": "logo_dm",
+					"label": "Logo (用於深色背景)",
+					"info": "選填。在深色色彩配置上顯示。"
+				},
+				{
+					"type": "range",
+					"id": "logo_width",
+					"min": 50,
+					"max": 350,
+					"step": 5,
+					"default": 135,
+					"unit": "px",
+					"label": "Logo 寬度"
+				},
+				{
+					"type": "textarea",
+					"id": "heading",
+					"default": "卡片標題",
+					"label": "標題"
+				},
+				{
+					"type": "select",
+					"id": "heading_size",
+					"options": [
+						{ "value": "recommended", "label": "建議大小" },
+						{ "value": "h1", "label": "最大" },
+						{ "value": "h2", "label": "大" },
+						{ "value": "h3", "label": "中" },
+						{ "value": "h4", "label": "小" },
+						{ "value": "h5", "label": "更小" },
+						{ "value": "h6", "label": "最小" }
+					],
+					"default": "recommended",
+					"label": "標題大小"
+				},
+				{
+					"type": "select",
+					"id": "heading_level",
+					"options": [
+						{ "value": "h1", "label": "H1" },
+						{ "value": "h2", "label": "H2" },
+						{ "value": "h3", "label": "H3" }
+					],
+					"default": "h3",
+					"label": "標題層級 (HTML 標籤)"
+				},
+				{
+					"type": "header",
+					"content": "按鈕設定"
+				},
+				{
+					"type": "checkbox",
+					"id": "show_button",
+					"default": true,
+					"label": "顯示按鈕"
+				},
+				{
+					"type": "select",
+					"id": "button_style",
+					"options": [
+						{
+							"group": "實心按鈕",
+							"value": "primary",
+							"label": "主要"
+						},
+						{
+							"group": "實心按鈕",
+							"value": "secondary",
+							"label": "次要"
+						},
+						{
+							"group": "實心按鈕",
+							"value": "tertiary",
+							"label": "第三"
+						},
+						{
+							"group": "外框/連結按鈕",
+							"value": "simple",
+							"label": "簡潔"
+						},
+						{
+							"group": "外框/連結按鈕",
+							"value": "simple_secondary",
+							"label": "簡潔 (次要)"
+						},
+						{
+							"group": "外框/連結按鈕",
+							"value": "simple_link",
+							"label": "簡潔 (連結樣式)"
+						}
+					],
+					"default": "simple_link",
+					"label": "按鈕樣式"
+				},
+				{
+					"type": "text",
+					"id": "button_label",
+					"default": "立即選購",
+					"label": "按鈕文字"
+				},
+				{
+					"type": "url",
+					"id": "button_link",
+					"label": "按鈕連結"
+				},
+				{
+					"type": "checkbox",
+					"id": "full_link",
+					"label": "將整個卡片設為連結",
+					"default": true
+				}
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "網格橫幅",
+			"blocks": [
+				{
+					"type": "card"
+				},
+				{
+					"type": "card"
+				},
+				{
+					"type": "card"
+				},
+				{
+					"type": "card"
+				}
+			]
+		}
+	]
+}
+{% endschema %}

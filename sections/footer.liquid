@@ -1,0 +1,1243 @@
+{{ 'section-footer.css' | asset_url | stylesheet_tag }}
+{{ 'component-accordion.css' | asset_url | stylesheet_tag }}
+{{ 'component-list-menu.css' | asset_url | stylesheet_tag }}
+{{ 'component-list-payment.css' | asset_url | stylesheet_tag }}
+{{ 'component-list-social.css' | asset_url | stylesheet_tag }}
+{{ 'component-rte.css' | asset_url | stylesheet_tag }}
+{{ 'disclosure.css' | asset_url | stylesheet_tag }}
+
+{% assign logo_block = section.blocks | where: "type", "logo_info" | first %}
+
+<footer 
+  class='footer color-{{ section.settings.color_scheme }} background footer--align-{{ section.settings.content_alignment }}'
+  {% if section.settings.background_color_override != blank %}
+    style="background: {{ section.settings.background_color_override }};"
+  {% endif %}
+>
+	<div class='footer__content-top container'>
+		{% if section.blocks.size > 0 %}
+			<div class='footer__blocks-container'>
+				<div class='footer__blocks-wrapper'>
+					{% for block in section.blocks %}
+						{% case block.type %}
+							{% when 'link_list' %}
+								{% if block.type == 'link_list' and block.settings.heading != blank %}
+									<div class='accordion'>
+										<details {% if block.settings.default_open %}open{% endif %}>
+											<summary>
+												<h2 class='footer-block__heading subtitle'>
+													{{ block.settings.heading | escape }}
+												</h2>
+												{% render 'icon-caret' %}
+											</summary>
+											{% if block.settings.menu != blank %}
+												<ul class='footer-block__details-content list-unstyled'>
+													{% for link in block.settings.menu.links %}
+														<li>
+															<a
+																href='{{ link.url }}'
+																{% if settings.links_blank and link.type == 'http_link' %}
+																	target='_blank'
+																{% endif %}
+																class='list-menu__item list-menu__item--link{% if link.active %} list-menu__item--active{% endif %}'
+															>
+																<span>{{ link.title }}</span>
+															</a>
+														</li>
+													{% endfor %}
+												</ul>
+											{% endif %}
+										</details>
+									</div>
+								{% endif %}
+
+								<div
+									class='footer-block {% if block.type == 'link_list' and block.settings.heading != blank %}footer-block--menu{% endif %}'
+									{{ block.shopify_attributes }}
+								>
+									{% if block.settings.heading != blank %}
+										<h2 class='footer-block__heading subtitle'>
+											{{ block.settings.heading | escape }}
+										</h2>
+									{% endif %}
+
+									{% if block.settings.menu != blank and block.settings.heading != blank %}
+										<ul class='footer-block__details-content list-unstyled'>
+											{% for link in block.settings.menu.links %}
+												<li>
+													<a
+														href='{{ link.url }}'
+														{% if settings.links_blank and link.type == 'http_link' %}
+															target='_blank'
+														{% endif %}
+														class='list-menu__item body-small list-menu__item--link{% if link.active %} list-menu__item--active{% endif %} focus-inset'
+													>
+														{{ link.title }}
+													</a>
+												</li>
+											{% endfor %}
+										</ul>
+									{% endif %}
+								</div>
+							{% when 'logo_info' %}
+								<div
+									class='footer-block footer-block--logo'
+									{{ block.shopify_attributes }}
+								>
+									<a
+										href='{{ routes.root_url }}'
+										class='footer__logo-link link link--text focus-inset'
+									>
+										{% if block.settings.logo != blank %}
+											{% assign logo_height = block.settings.logo_width | divided_by: block.settings.logo.aspect_ratio %}
+											{% assign logo_alt = block.settings.logo.alt | default: shop.name | escape %}
+											{% assign image_size_2x = block.settings.logo_width | times: 2 %}
+											{% capture srcset %}
+												{{ block.settings.logo | image_url: width: block.settings.logo_width }}, {{ block.settings.logo | image_url: width: image_size_2x }} 2x
+											{% endcapture %}
+											{{
+												block.settings.logo
+												| image_url: width: block.settings.logo_width
+												| image_tag:
+													class: 'footer__logo header__heading-logo',
+													srcset: srcset,
+													height: logo_height,
+													width: block.settings.logo_width,
+													alt: logo_alt
+											}}
+											{% if block.settings.logo_2 != blank %}
+												{% capture srcset %}
+												{{ block.settings.logo_2 | image_url: width: block.settings.logo_width }}, {{ block.settings.logo_2 | image_url: width: image_size_2x }} 2x
+											{% endcapture %}
+												{{
+													block.settings.logo_2
+													| image_url: width: block.settings.logo_width
+													| image_tag:
+														class: 'footer__logo header__heading-logo header__heading-logo--overlay',
+														srcset: srcset,
+														height: logo_height,
+														width: block.settings.logo_width,
+														alt: logo_alt
+												}}
+											{% endif %}
+										{% else %}
+											<span class='h5'>{{ shop.name }}</span>
+										{% endif %}
+									</a>
+									<div 
+                    class='footer-block__text body-small'
+                    style="font-size: {{ block.settings.description_font_size }}px;"
+                  >
+										{{ block.settings.description }}
+									</div>
+								</div>
+							{% when 'contacts' %}
+								<div class='footer-block footer-block--menu contacts' {{ block.shopify_attributes }}>
+									{% if block.settings.heading != blank %}
+										<div class='accordion'>
+											<details {% if block.settings.default_open %}open{% endif %}>
+												<summary>
+													<h2 class='footer-block__heading subtitle'>
+														{{ block.settings.heading | escape }}
+													</h2>
+													{% render 'icon-caret' %}
+												</summary>
+												<div class='contacts__info'>
+													{{ block.settings.contact_info }}
+												</div>
+											</details>
+										</div>
+
+										<p class='contacts__text footer-block__heading subtitle footer-block--desktop-only'> 
+											{{ block.settings.heading }}
+										</p>
+									{% endif %}
+									<div class='contacts__info footer-block--desktop-only'> 
+										{{ block.settings.contact_info }}
+									</div>
+								</div>
+							{% when 'subscribe' %}
+								<div
+									class='footer-block footer-block--subscribe'
+									{{ block.shopify_attributes }}
+								>
+									{% form 'customer', class: 'newsletter-form' %}
+										{% if block.settings.heading != blank %}
+											<h3 class='newsletter__title h5 title--section title--section-m-none'>
+												{{ block.settings.heading }}
+											</h3>
+										{% endif %}
+										{% if block.settings.text != blank %}
+											<p class='newsletter__text'>
+												{{ block.settings.text }}
+											</p>
+										{% endif %}
+                    
+										<div class='custom-newsletter-container'>
+											<input
+											  dir="ltr"
+												id='NewsletterForm--{{ section.id }}'
+												type='email'
+												name='contact[email]'
+												class='field__input field'
+												value='{{ form.email }}'
+												aria-required='true'
+												autocorrect='off'
+												autocapitalize='off'
+												autocomplete='email'
+												pattern='[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$'
+												{% if form.errors %}
+													autofocus
+													aria-invalid='true'
+													aria-describedby='Newsletter-error--{{ section.id }}'
+												{% elsif form.posted_successfully? %}
+													aria-describedby='Newsletter-success--{{ section.id }}'
+												{% endif %}
+												placeholder="{{ 'newsletter.label' | t | default: '電子郵件' }}"
+												required
+											>
+											<label
+												class='visually-hidden'
+												for='NewsletterForm--{{ section.id }}'
+											>
+												{{ 'newsletter.label' | t | default: '電子郵件' }}
+											</label>
+											<button
+												type='submit'
+												class='newsletter__button'
+												name='commit'
+                        aria-label="{{ 'newsletter.button_label' | t | default: '訂閱' }}"
+											>
+												{{ 'newsletter.button_label' | t | default: '訂閱' }}
+											</button>
+										</div>
+
+										{% if form.errors %}
+											<small
+												class='newsletter-form__message form__message'
+												id='Newsletter-error--{{ section.id }}'
+											>
+												{% render 'icon-error' %}
+												{{ form.errors.translated_fields.email | capitalize }}
+												{{ form.errors.messages.email }}
+											</small>
+										{% endif %}
+										
+										{% if form.posted_successfully %}
+											<h3
+												class='newsletter-form__message newsletter-form__message--success form__message'
+												id='Newsletter-success--{{ section.id }}'
+												tabindex='-1'
+												autofocus
+											>
+												{% render 'icon-success' %}
+												{{ 'newsletter.success' | t | default: '感謝您的訂閱' }}
+											</h3>
+										{% endif %}
+										{% if block.settings.additional_text != blank %}
+											<p class='newsletter__text newsletter__text--additional'>
+												{{ block.settings.additional_text }}
+											</p>
+										{% endif %}
+									{% endform %}
+								</div>
+						{% endcase %}
+					{% endfor %}
+				</div>
+			</div>
+		{% endif %}
+	</div>
+
+	{% if section.settings.show_social
+		and settings.social_twitter_link != blank
+		or settings.social_facebook_link != blank
+		or settings.social_pinterest_link != blank
+		or settings.social_instagram_link != blank
+		or settings.social_linkedin_link != blank
+		or settings.social_tiktok_link != blank
+		or settings.social_tumblr_link != blank
+		or settings.social_snapchat_link != blank
+		or settings.social_youtube_link != blank
+		or settings.social_vimeo_link != blank
+	%}
+		{% assign social = true %}
+	{% else %}
+		{% assign social = false %}
+	{% endif %}
+
+	{% if section.settings.enable_country_selector
+		or section.settings.enable_language_selector
+		or section.settings.payment_enable
+		or social == true
+	%}
+		<div class='container'>
+			<div class='footer__content-middle'>
+				<div class='footer__content-middle-container'>
+					<div
+						class='
+							      footer__content-middle-main {%
+							        if section.settings.payment_enable
+							        and social == true
+							and section.settings.enable_country_selector
+							        or section.settings.enable_language_selector
+							      %}footer__content-middle-main--3-columns{% endif %}
+						'
+					>
+						{% if section.settings.enable_country_selector or section.settings.enable_language_selector %}
+							<div
+								class='footer__column footer__column--localization'
+								{{ block.shopify_attributes }}
+							>
+								<div class='footer__localization'>
+									{% if section.settings.enable_country_selector and localization.available_countries.size > 1 %}
+										<noscript>
+											{% form 'localization', id: 'FooterCountryFormNoScript', class: 'localization-form' %}
+												<div class='localization-form__select'>
+													<select
+														class='localization-selector link'
+														name='country_code'
+														aria-labelledby='FooterCountryLabelNoScript'
+													>
+														{% for country in localization.available_countries %}
+															<option
+																value='{{ country.iso_code }}'
+																{% if country.iso_code == localization.country.iso_code %}
+																	selected
+																{% endif %}
+															>
+																{{ country.name }} (
+																{{ country.currency.iso_code }}
+																{{ country.currency.symbol }})
+															</option>
+														{% endfor %}
+													</select>
+													{% render 'icon-caret' %}
+												</div>
+												<button class='button button--primary focus-inset'>
+													{{ 'localization.update_country' | t | default: '更新國家/地區' }}
+												</button>
+											{% endform %}
+										</noscript>
+										<localization-form>
+											{% form 'localization', id: 'FooterCountryForm', class: 'localization-form' %}
+												<div class='no-js-hidden'>
+													<div class='disclosure'>
+														<button
+															type='button'
+															class='disclosure__button localization-form__select localization-selector link link--text focus-inset'
+															aria-expanded='false'
+															aria-controls='FooterCountryList'
+														>
+															<span class='value'>
+																{{ localization.country.currency.iso_code }}
+																{{ localization.country.currency.symbol }}
+															</span>
+															{% render 'icon-caret' %}
+														</button>
+														<ul
+															id='FooterCountryList'
+															role='list'
+															class='disclosure__list list-unstyled'
+															hidden
+														>
+															{% for country in localization.available_countries %}
+																<li class='disclosure__item' tabindex='-1'>
+																	<a
+																		class='link link--text disclosure__link caption-large{% if country.iso_code == localization.country.iso_code %} disclosure__link--active{% endif %} focus-inset'
+																		href='#'
+																		{% if country.iso_code == localization.country.iso_code %}aria-current='true'{% endif %} 
+																		data-value='{{ country.iso_code }}'
+																	>
+																		<span>
+																			{{ country.name }},
+																			{{ country.currency.iso_code }}
+																			{{ country.currency.symbol }}
+																		</span>
+																	</a>
+																</li>
+															{% endfor %}
+														</ul>
+													</div>
+													<input
+														type='hidden'
+														name='country_code'
+														value='{{ localization.country.iso_code }}'
+													>
+												</div>
+											{% endform %}
+										</localization-form>
+									{% endif %}
+
+									{% if section.settings.enable_language_selector and localization.available_languages.size > 1 %}
+										<noscript>
+											{% form 'localization', id: 'FooterLanguageFormNoScript', class: 'localization-form' %}
+												<div class='localization-form__select'>
+													<select
+														class='localization-selector link'
+														name='locale_code'
+														aria-labelledby='FooterLanguageLabelNoScript'
+													>
+														{% for language in localization.available_languages %}
+															<option
+																value='{{ language.iso_code }}'
+																lang='{{ language.iso_code }}'
+																{% if language.iso_code == localization.language.iso_code %}
+																	selected
+																{% endif %}
+															>
+																{{ language.endonym_name | capitalize }}
+															</option>
+														{% endfor %}
+													</select>
+													{% render 'icon-caret' %}
+												</div>
+												<button class='button button--primary'>
+													{{ 'localization.update_language' | t | default: '更新語言' }}
+												</button>
+											{% endform %}
+										</noscript>
+										<localization-form>
+											{% form 'localization', id: 'FooterLanguageForm', class: 'localization-form' %}
+												<div class='no-js-hidden'>
+													<div class='disclosure'>
+														<button
+															type='button'
+															class='disclosure__button localization-form__select localization-selector link link--text focus-inset'
+															aria-expanded='false'
+															aria-controls='FooterLanguageList'
+														>
+															<span class='value'>
+																{{ localization.language.endonym_name | capitalize }}
+															</span>
+															{% render 'icon-caret' %}
+														</button>
+														<ul
+															id='FooterLanguageList'
+															role='list'
+															class='disclosure__list list-unstyled'
+															hidden
+														>
+															{% for language in localization.available_languages %}
+																<li class='disclosure__item' tabindex='-1'>
+																	<a
+																		class='link link--text disclosure__link caption-large{% if language.iso_code == localization.language.iso_code %} disclosure__link--active{% endif %} focus-inset'
+																		href='#'
+																		hreflang='{{ language.iso_code }}'
+																		lang='{{ language.iso_code }}'
+                                    {% if language.iso_code == localization.language.iso_code %}aria-current='true'{% endif %} 
+																		data-value='{{ language.iso_code }}'
+																	>
+																		<span>
+																			{{ language.endonym_name | capitalize }}
+																		</span>
+																	</a>
+																</li>
+															{% endfor %}
+														</ul>
+													</div>
+													<input
+														type='hidden'
+														name='locale_code'
+														value='{{ localization.language.iso_code }}'
+													>
+												</div>
+											{% endform %}
+										</localization-form>
+									{% endif %}
+								</div>
+							</div>
+						{% endif %}
+						{% if section.settings.payment_enable %}
+							<div class='footer__column footer__column--payment'>
+								<div class='footer__payment'>
+									<ul class='list list-payment' role='list'>
+										{% for type in shop.enabled_payment_types %}
+											<li class='list-payment__item'>
+												{{
+													type
+													| payment_type_svg_tag: class: 'icon icon--full-color'
+												}}
+											</li>
+										{% endfor %}
+									</ul>
+								</div>
+							</div>
+						{% endif %}
+						{% if social == true %}
+							<div class='footer__column footer__column--social'>
+								<ul
+									class='footer__list-social list-unstyled list-social'
+									role='list'
+								>
+									{% if settings.social_twitter_link != blank %}
+										<li class='list-social__item'>
+											<a
+												href='{{ settings.social_twitter_link }}'
+												class='link link--text list-social__link focus-inset'
+												aria-describedby='a11y-external-message'
+											>
+												{% render 'icon-twitter' %}
+												<span class='visually-hidden'>
+													{{ 'general.social.links.twitter' | t | default: "Twitter" }}
+												</span>
+											</a>
+										</li>
+									{% endif %}
+									{% if settings.social_facebook_link != blank %}
+										<li class='list-social__item'>
+											<a
+												href='{{ settings.social_facebook_link }}'
+												class='link link--text list-social__link focus-inset'
+												aria-describedby='a11y-external-message'
+											>
+												{% render 'icon-facebook' %}
+												<span class='visually-hidden'>
+													{{ 'general.social.links.facebook' | t | default: "Facebook" }}
+												</span>
+											</a>
+										</li>
+									{% endif %}
+									{% if settings.social_pinterest_link != blank %}
+										<li class='list-social__item'>
+											<a
+												href='{{ settings.social_pinterest_link }}'
+												class='link link--text list-social__link'
+												aria-describedby='a11y-external-message'
+											>
+												{% render 'icon-pinterest' %}
+												<span class='visually-hidden'>
+													{{ 'general.social.links.pinterest' | t | default: "Pinterest" }}
+												</span>
+											</a>
+										</li>
+									{% endif %}
+									{% if settings.social_instagram_link != blank %}
+										<li class='list-social__item'>
+											<a
+												href='{{ settings.social_instagram_link }}'
+												class='link link--text list-social__link'
+												aria-describedby='a11y-external-message'
+											>
+												{% render 'icon-instagram' %}
+												<span class='visually-hidden'>
+													{{ 'general.social.links.instagram' | t | default: "Instagram" }}
+												</span>
+											</a>
+										</li>
+									{% endif %}
+									{% if settings.social_linkedin_link != blank %}
+										<li class='list-social__item'>
+											<a
+												href='{{ settings.social_linkedin_link }}'
+												class='link link--text list-social__link'
+												aria-describedby='a11y-external-message'
+											>
+												{% render 'icon-linkedin' %}
+												<span class='visually-hidden'>
+													{{ 'general.social.links.linkedin' | t | default: "LinkedIn" }}
+												</span>
+											</a>
+										</li>
+									{% endif %}
+									{% if settings.social_tiktok_link != blank %}
+										<li class='list-social__item'>
+											<a
+												href='{{ settings.social_tiktok_link }}'
+												class='link link--text list-social__link'
+												aria-describedby='a11y-external-message'
+											>
+												{% render 'icon-tiktok' %}
+												<span class='visually-hidden'>
+													{{ 'general.social.links.tiktok' | t | default: "TikTok" }}
+												</span>
+											</a>
+										</li>
+									{% endif %}
+									{% if settings.social_tumblr_link != blank %}
+										<li class='list-social__item'>
+											<a
+												href='{{ settings.social_tumblr_link }}'
+												class='link link--text list-social__link'
+												aria-describedby='a11y-external-message'
+											>
+												{% render 'icon-tumblr' %}
+												<span class='visually-hidden'>
+													{{ 'general.social.links.tumblr' | t | default: "Tumblr" }}
+												</span>
+											</a>
+										</li>
+									{% endif %}
+									{% if settings.social_snapchat_link != blank %}
+										<li class='list-social__item'>
+											<a
+												href='{{ settings.social_snapchat_link }}'
+												class='link link--text list-social__link'
+												aria-describedby='a11y-external-message'
+											>
+												{% render 'icon-snapchat' %}
+												<span class='visually-hidden'>
+													{{ 'general.social.links.snapchat' | t | default: "Snapchat" }}
+												</span>
+											</a>
+										</li>
+									{% endif %}
+									{% if settings.social_youtube_link != blank %}
+										<li class='list-social__item'>
+											<a
+												href='{{ settings.social_youtube_link }}'
+												class='link link--text list-social__link'
+												aria-describedby='a11y-external-message'
+											>
+												{% render 'icon-youtube' %}
+												<span class='visually-hidden'>
+													{{ 'general.social.links.youtube' | t | default: "YouTube" }}
+												</span>
+											</a>
+										</li>
+									{% endif %}
+									{% if settings.social_vimeo_link != blank %}
+										<li class='list-social__item'>
+											<a
+												href='{{ settings.social_vimeo_link }}'
+												class='link link--text list-social__link'
+												aria-describedby='a11y-external-message'
+											>
+												{% render 'icon-vimeo' %}
+												<span class='visually-hidden'>
+													{{ 'general.social.links.vimeo' | t | default: "Vimeo" }}
+												</span>
+											</a>
+										</li>
+									{% endif %}
+								</ul>
+							</div>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+
+	<div class='container'>
+		<div class='footer__content-bottom'>
+			<div class='footer__content-bottom-wrapper {% if section.settings.menu_bottom != blank and section.settings.show_policy %}footer__content-bottom-wrapper--3-columns{% endif %}'>
+				<div class='footer__copyright'>
+					<span class='copyright__content body-small'>
+						{% if section.settings.enable_copyright_shopname %}
+							©
+						{% endif %}
+						{% if section.settings.enable_copyright_date %}
+							{{ 'now' | date: '%Y' }}
+						{% endif %}
+						{% if section.settings.enable_copyright_shopname %}
+							{{ shop.name | link_to: routes.root_url }}.
+						{% endif %}
+					</span>
+					<span class='copyright__content body-small'>
+						{{- powered_by_link -}}
+					</span>
+				</div>
+				{% if section.settings.menu_bottom != blank %}
+					<ul class='footer__menu-bottom list-unstyled'>
+						{% for link in section.settings.menu_bottom.links %}
+							<li>
+								<a href='{{ link.url }}'>
+									<span class='body-small'>{{ link.title }}</span>
+								</a>
+							</li>
+						{% endfor %}
+					</ul>
+				{% endif %}
+				{% if section.settings.show_policy %}
+					<ul class='footer__policies list-unstyled'>
+						{% for policy in shop.policies %}
+							{% if policy != blank %}
+								<li>
+									<span class='copyright__content'
+										><a href='{{ policy.url }}' class='focus-inset body-small'>
+											{{- policy.title -}}
+										</a></span
+									>
+								</li>
+							{% endif %}
+						{% endfor %}
+					</ul>
+				{% endif %}
+				{% if shop.features.follow_on_shop? and section.settings.enable_follow_on_shop %}
+					<div class='footer__follow-on-shop copyright__content focus-inset'>
+						{% comment %} TODO: enable theme-check once `login_button` is accepted as valid filter {% endcomment %}
+						{% # theme-check-disable %}
+						{{ shop | login_button: action: 'follow' }}
+						{% # theme-check-enable %}
+					</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</footer>
+
+<style>
+  /* --- 新增：確保所有頁尾區塊從頂部對齊 --- */
+  .footer__blocks-wrapper {
+    align-items: flex-start; 
+  }
+  
+  /* --- 最終品牌化互動樣式 --- */
+  {%- assign brand_blue = '#00C1FF' -%}
+
+  /* --- Logo 區塊佈局修正 --- */
+  .footer-block--logo {
+    flex-basis: auto !important; 
+    flex-grow: 1; 
+    max-width: 100%; 
+    padding-right: 20px; 
+  }
+
+  /* Logo 圖片本身尺寸控制 */
+  .footer-block--logo .footer__logo-link {
+      display: inline-block; 
+      max-width: {{ logo_block.settings.logo_width | default: 100 }}px; 
+      height: auto; 
+  }
+
+  .footer-block--logo .footer__logo {
+      max-width: 100% !important; 
+      height: auto !important; 
+      display: block; 
+  }
+  
+  .footer-block--logo .footer-block__text {
+    margin-top: 1.5rem; 
+  }
+
+  /* 電子報區塊 */
+  .footer-block--subscribe .newsletter__title {
+      margin-bottom: 1rem; 
+  }
+
+  .footer-block--subscribe .newsletter__text {
+      white-space: normal; 
+      word-wrap: break-word; 
+      overflow-wrap: break-word; 
+      margin-bottom: 1.5rem; 
+      max-width: 380px; 
+      margin-left: auto; 
+      margin-right: auto; 
+  }
+
+  .footer .custom-newsletter-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+    transition: border-color 0.3s ease;
+  }
+  .footer .custom-newsletter-container:hover {
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+  .footer .custom-newsletter-container .field__input {
+    height: 48px;
+    background: transparent !important;
+    border: none !important;
+    color: #FFFFFF !important;
+    padding-left: 20px;
+    padding-right: 55px; 
+    box-shadow: none !important;
+    width: 100%; 
+  }
+  .footer .custom-newsletter-container .field__input::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+    opacity: 1 !important;
+  }
+  .footer .custom-newsletter-container .newsletter__button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 55px;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    font-size: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2; 
+  }
+  .footer .custom-newsletter-container .newsletter__button::before {
+    content: '';
+    display: block;
+    width: 22px;
+    height: 22px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='{{ brand_blue | url_encode }}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='22' y1='2' x2='11' y2='13'%3E%3C/line%3E%3Cpolygon points='22 2 15 22 11 13 2 9 22 2'%3E%3C/polygon%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+  }
+  .footer .custom-newsletter-container .newsletter__button:hover::before {
+    opacity: 1;
+    transform: scale(1.15) rotate(10deg);
+  }
+
+  /* --- 頁尾連結懸停效果 --- */
+  .footer .footer-block__details-content .list-menu__item--link {
+    transition: color 0.2s ease-in-out;
+  }
+  .footer .footer-block__details-content .list-menu__item--link:hover {
+    color: {{ brand_blue }};
+  }
+
+  /* --- 縮小付款方式圖示 --- */
+  .footer .list-payment {
+    justify-content: flex-start;
+  }
+  .footer .list-payment .list-payment__item .icon {
+    height: 24px; 
+    width: auto; 
+  }
+
+  /* --- 品牌化版權文字顏色 (只針對商店名稱) --- */
+  .footer .footer__copyright .copyright__content:first-child a {
+    color: {{ brand_blue }};
+    transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out;
+  }
+  .footer .footer__copyright .copyright__content:first-child a:hover {
+    color: {{ brand_blue }};
+    opacity: 0.8;
+    text-decoration: underline;
+  }
+  
+  /* --- 底部政策連結品牌化懸停效果 --- */
+  .footer .footer__policies a,
+  .footer .footer__menu-bottom a {
+      transition: color 0.2s ease-in-out;
+  }
+  .footer .footer__policies a:hover,
+  .footer .footer__menu-bottom a:hover {
+      color: {{ brand_blue }};
+  }
+
+  /* ============================================== */
+  /* === 手機版響應式調整 (主要優化區域) === */
+  /* ============================================== */
+  @media screen and (max-width: 749px) {
+    .footer__blocks-wrapper {
+        flex-direction: column; 
+        align-items: center; 
+    }
+
+    .footer-block {
+        width: 100%; 
+        margin-bottom: var(--spacing-xl); 
+        padding-left: 2rem; 
+        padding-right: 2rem;
+        box-sizing: border-box; 
+    }
+
+    /* Logo 區塊的手機版優化 */
+    .footer-block--logo {
+        text-align: center; 
+        padding-right: 2rem; 
+        margin-bottom: 4rem; /* 增加 Logo 區塊與下方電子報區塊間距 */
+    }
+    .footer-block--logo .footer__logo-link {
+        display: block; 
+        margin-left: auto; 
+        margin-right: auto;
+    }
+    .footer-block--logo .footer__logo {
+        max-width: 100% !important; 
+        height: auto !important; 
+        display: block; 
+        margin: 0 auto; 
+    }
+    .footer-block--logo .footer-block__text {
+        text-align: center; 
+        padding: 0 1rem; 
+        margin-top: 1rem; 
+        font-size: 1.15rem; /* 提升 Slogan 文字大小 */
+        font-weight: bold; /* 提升 Slogan 文字粗細 */
+        line-height: 1.4; /* 調整行高 */
+    }
+
+    /* 電子報區塊的手機版優化 */
+    .footer-block--subscribe {
+        text-align: center; 
+        margin-bottom: 4rem; /* 確保電子報下方有足夠間距 */
+    }
+    .footer-block--subscribe .newsletter__text {
+        max-width: 100%; 
+        padding: 0 0.5rem; /* 微調內縮 */
+        box-sizing: border-box;
+        text-align: left; /* 強制說明文字左對齊 */
+    }
+    .footer .custom-newsletter-container {
+        max-width: 350px; 
+        margin-left: auto; 
+        margin-right: auto;
+        border-radius: 25px; /* 增加圓角以符合現代感 */
+    }
+    .footer .custom-newsletter-container .field__input {
+        padding-left: 25px; /* 配合圓角調整內邊距 */
+        padding-right: 60px; /* 配合按鈕寬度調整 */
+    }
+    .footer .custom-newsletter-container .newsletter__button {
+        width: 60px; /* 調整按鈕寬度 */
+    }
+
+    /* 連結列表區塊 (Accordion) 的手機版優化 - 解決箭頭重疊和間距 */
+    .footer-block--menu {
+        margin-bottom: 3rem; /* 調整各連結列表之間的間距，讓整體不那麼擁擠 */
+    }
+    .footer .accordion summary {
+        display: flex !important; /* 強制使用 Flexbox */
+        align-items: center !important; /* 垂直居中 */
+        justify-content: space-between !important; /* 將標題和箭頭推到兩端 */
+        padding: 0.8rem 0; /* 增加點擊區域的垂直高度，讓點擊更舒適 */
+        list-style: none; /* 移除默認的 details 標記 */
+    }
+    /* 確保標題有空間 */
+    .footer .accordion summary .footer-block__heading {
+        flex-grow: 1;
+        text-align: left;
+        padding-right: 2rem; /* 在標題右側留出足夠空間給箭頭 */
+    }
+    /* 核心修正: 強制箭頭 (icon-caret) 回到佈局流中並確保間距 */
+    .footer .accordion summary svg.icon-caret { /* 精確鎖定 icon-caret */
+        flex-shrink: 0; /* 箭頭不縮小 */
+        /* 以下是強制覆蓋佈景主題可能導致重疊的樣式 */
+        position: static !important; /* 強制取消絕對定位 */
+        transform: none !important; /* 取消任何位移 */
+        top: auto !important;
+        right: auto !important;
+        margin-left: auto; /* 將箭頭推到最右邊 */
+        margin-right: 0;
+        padding-right: 0; /* 清除箭頭自身不必要的內邊距 */
+        min-width: 1.5rem; /* 確保箭頭有最小寬度 */
+        width: 1.5rem !important; /* 強制箭頭圖示的寬度 */
+        height: 1.5rem !important; /* 強制箭頭圖示的高度 */
+    }
+
+    .footer-block--menu .footer-block__details-content {
+        padding-left: 0; /* 移除 ul 的預設 padding */
+        padding-right: 0;
+    }
+    .footer-block--menu .footer-block__details-content li {
+        padding-bottom: 0.6rem; /* 增加列表項的垂直間距，讓行距更舒適 */
+        padding-top: 0.2rem;
+    }
+    .footer-block--menu .footer-block__details-content li:last-child {
+        padding-bottom: 0; /* 最後一個列表項底部不留空間 */
+    }
+    .footer-block--menu .footer-block__details-content li a {
+        display: block; /* 讓連結佔據整個列表項，方便點擊 */
+        text-align: left; /* 確保列表內容左對齊 */
+        padding-left: 1.5rem; /* 列表項內容的左側內縮 */
+        padding-right: 1.5rem;
+    }
+
+    /* 支付圖示和社群媒體優化 */
+    .footer__column--localization,
+    .footer__column--payment,
+    .footer__column--social {
+        margin-bottom: 3rem; /* 增加區塊間距 */
+    }
+    .footer__payment .list-payment {
+        justify-content: center; /* 支付圖示居中 */
+        flex-wrap: wrap; /* 允許換行 */
+        gap: 0.8rem; /* 圖示之間更均勻的間距 */
+    }
+    .footer__payment .list-payment__item .icon {
+        height: 22px; /* 略微縮小圖示尺寸 */
+        width: auto;
+    }
+
+    .footer__list-social {
+        justify-content: center; /* 社群媒體圖示居中 */
+        gap: 1.2rem; /* 圖示間距 */
+    }
+    .footer__list-social .list-social__item a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px; /* 圓形背景大小 */
+        height: 42px;
+        background-color: rgba(255, 255, 255, 0.08); /* 淺色半透明背景 */
+        border-radius: 50%;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    .footer__list-social .list-social__item a:hover {
+        background-color: rgba(255, 255, 255, 0.15); /* 懸停效果 */
+        transform: scale(1.05);
+    }
+    .footer__list-social .list-social__item svg {
+        width: 22px; /* 圖示尺寸 */
+        height: 22px;
+        fill: #FFFFFF; /* 圖示顏色 */
+    }
+
+    /* 底部版權和政策連結 */
+    .footer__content-bottom-wrapper {
+        flex-direction: column; 
+        align-items: center; 
+        text-align: center; 
+        padding-left: 2rem; 
+        padding-right: 2rem;
+        box-sizing: border-box;
+    }
+    .footer__copyright,
+    .footer__menu-bottom,
+    .footer__policies {
+        width: 100%; 
+        margin-bottom: var(--spacing-xs); 
+    }
+    .footer__copyright {
+        margin-bottom: var(--spacing-base); 
+    }
+  }
+
+</style>
+
+{% schema %}
+{
+	"name": "頁尾",
+	"max_blocks": 9,
+	"blocks": [
+		{
+			"type": "link_list",
+			"name": "連結列表",
+			"settings": [
+				{
+					"type": "text",
+					"id": "heading",
+					"default": "快速連結",
+					"label": "標題",
+					"info": "為您的選單加上標題。若留空，則只會顯示連結。"
+				},
+				{
+					"type": "link_list",
+					"id": "menu",
+					"default": "footer",
+					"label": "選單",
+					"info": "此選單不會顯示包含下拉選單的項目。"
+				},
+				{
+					"type": "checkbox",
+					"id": "default_open",
+					"default": false,
+					"label": "預設展開 (手機版)"
+				}
+			]
+		},
+		{
+			"type": "logo_info",
+			"name": "Logo 與品牌資訊",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "image_picker",
+					"id": "logo",
+					"label": "Logo"
+				},
+				{
+					"type": "image_picker",
+					"id": "logo_2",
+					"label": "第二個 Logo (用於滑鼠懸停效果)",
+					"info": "可選。上傳第二個 Logo 以在滑鼠懸停時顯示不同效果。"
+				},
+				{
+					"type": "range",
+					"id": "logo_width",
+					"min": 50,
+					"max": 500,
+					"step": 10,
+					"default": 100,
+					"unit": "px",
+					"label": "Logo 寬度 (最大 500px)"
+				},
+				{
+					"type": "inline_richtext",
+					"id": "description",
+					"default": "在此分享關於您品牌的資訊，例如品牌故事或核心價值。",
+					"label": "說明文字"
+				},
+        {
+          "type": "range",
+          "id": "description_font_size",
+          "min": 10,
+          "max": 24,
+          "step": 1,
+          "unit": "px",
+          "label": "說明文字字體大小",
+          "default": 14
+        }
+			]
+		},
+		{
+			"type": "contacts",
+			"name": "聯絡資訊",
+			"settings": [
+				{
+					"type": "text",
+					"id": "heading",
+					"default": "聯絡我們",
+					"label": "標題"
+				},
+				{
+					"type": "richtext",
+					"id": "contact_info",
+					"default": "<p>地址：[您的地址]<br>電話：[您的電話]<br>Email：[您的Email]</p>",
+					"label": "聯絡資訊內容"
+				},
+				{
+					"type": "checkbox",
+					"id": "default_open",
+					"default": false,
+					"label": "預設展開 (手機版)"
+				}
+			]
+		},
+		{
+			"type": "subscribe",
+			"name": "電子報訂閱",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "text",
+					"id": "heading",
+					"default": "訂閱我們的電子報",
+					"label": "標題"
+				},
+				{
+					"type": "text",
+					"id": "text",
+					"default": "搶先獲得最新消息、優惠和獨家內容。",
+					"label": "說明文字"
+				},
+				{
+					"type": "inline_richtext",
+					"id": "additional_text",
+					"label": "附加說明文字"
+				}
+			]
+		}
+	],
+	"settings": [
+		{
+			"type": "color_scheme",
+			"id": "color_scheme",
+			"default": "background-2",
+			"label": "配色"
+		},
+    {
+      "type": "color",
+      "id": "background_color_override",
+      "label": "背景顏色覆寫",
+      "info": "可選。設定一個純色背景來覆寫上方的配色方案。設為純黑色請使用 #000000。"
+    },
+		{
+			"type": "text_alignment",
+			"id": "content_alignment",
+			"default": "left",
+			"label": "內容對齊"
+		},
+		{
+			"type": "header",
+			"content": "國家/地區選擇器",
+			"info": "若要新增市場，請前往 Shopify 管理介面的「設定 > 市場」。"
+		},
+		{
+			"type": "checkbox",
+			"id": "enable_country_selector",
+			"default": false,
+			"label": "啟用國家/地區選擇器"
+		},
+		{
+			"type": "header",
+			"content": "語言選擇器",
+			"info": "若要新增語言，請前往 Shopify 管理介面的「設定 > 語言」。"
+		},
+		{
+			"type": "checkbox",
+			"id": "enable_language_selector",
+			"default": true,
+			"label": "啟用語言選擇器"
+		},
+		{
+			"type": "header",
+			"content": "付款方式"
+		},
+		{
+			"type": "checkbox",
+			"id": "payment_enable",
+			"default": false,
+			"label": "顯示付款方式圖示"
+		},
+		{
+			"type": "header",
+			"content": "社群媒體與版權",
+			"info": "社群媒體連結可在「佈景主題設定 > 社群媒體」中設定。"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_social",
+			"default": false,
+			"label": "顯示社群媒體圖示"
+		},
+		{
+			"type": "checkbox",
+			"id": "enable_copyright_date",
+			"default": true,
+			"label": "在版權資訊中顯示年份"
+		},
+		{
+			"type": "checkbox",
+			"id": "enable_copyright_shopname",
+			"default": true,
+			"label": "在版權資訊中顯示商店名稱"
+		},
+		{
+			"type": "link_list",
+			"id": "menu_bottom",
+			"label": "頁尾底部選單"
+		},
+		{
+			"type": "header",
+			"content": "商店政策",
+			"info": "商店政策連結會自動從 Shopify 管理介面的「設定 > 政策」中抓取。"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_policy",
+			"default": false,
+			"label": "顯示商店政策連結"
+		},
+		{
+			"type": "checkbox",
+			"id": "enable_follow_on_shop",
+			"default": true,
+			"label": "啟用 Follow on Shop 按鈕"
+		}
+	],
+	"default": {
+		"blocks": [
+			{
+				"type": "logo_info"
+			},
+			{
+				"type": "link_list"
+			},
+			{
+				"type": "contacts"
+			}
+		]
+	}
+}
+{% endschema %}

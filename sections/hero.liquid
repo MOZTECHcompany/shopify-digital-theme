@@ -1,0 +1,1670 @@
+{{ 'component-subscription.css' | asset_url | stylesheet_tag }}
+{{ 'section-hero.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+	{% render 'section-padding' %}
+{%- endstyle -%}
+
+{%- liquid
+	assign image_ratio = section.settings.image_ratio
+-%}
+
+{%- if image_ratio == 'adapt' and section.settings.image != blank -%}
+	{% assign padding_bottom = 1
+		| divided_by: section.settings.image.aspect_ratio
+		| times: 100
+		| round: 2
+	%}
+	{% style %}
+		#Hero-{{ section.id }} .hero__image-inner::before {
+			content: '';
+			display: block;
+			padding-bottom: {{ padding_bottom }}%;
+		}
+
+		#Hero-{{ section.id }} .hero__outer--overlay::before {
+			content: '';
+			display: block;
+			padding-bottom: {{ padding_bottom }}%;
+		}
+	{% endstyle %}
+{%- elsif image_ratio == 'adapt' and section.settings.video != blank -%}
+	{% assign padding_bottom = 1
+		| divided_by: section.settings.video.aspect_ratio
+		| times: 100
+		| round: 2
+	%}
+	<style>
+		#Hero-{{ section.id }} .hero__image-inner::before {
+			content: '';
+			display: block;
+			padding-bottom: {{ padding_bottom }}%;
+		}
+
+		#Hero-{{ section.id }} .hero__outer--overlay::before {
+			content: '';
+			display: block;
+			padding-bottom: {{ padding_bottom }}%;
+		}
+	</style>
+{% else %}
+	{% liquid
+		assign aspect_ratio = section.settings.image_ratio | split: '/'
+		assign temp = aspect_ratio[0] | append: '.0'
+		assign padding_bottom = aspect_ratio[1] | divided_by: temp | times: 100 | round: 2
+	%}
+	{% style %}
+		#Hero-{{ section.id }} .hero__image-inner::before {
+			content: '';
+			display: block;
+			padding-bottom: {{ padding_bottom }}%;
+		}
+
+		#Hero-{{ section.id }} .hero__outer--overlay::before {
+			content: '';
+			display: block;
+			padding-bottom: {{ padding_bottom }}%;
+		}
+	{% endstyle %}
+{%- endif -%}
+
+{% if section.settings.overlay_opacity == 0 %}
+	{% style %}
+		[data-scheme="dark"] {
+		  #Hero-{{ section.id }} .hero__overlay {
+		    opacity: 0.4;
+		  }
+		}
+
+		@media (prefers-color-scheme: dark) {
+		  [data-scheme="auto"] {
+		    #Hero-{{ section.id }} .hero__overlay {
+		      opacity: 0.4;
+		    }
+		  }
+		}
+	{% endstyle %}
+{% endif %}
+
+<div
+	id='Hero-{{ section.id }}'
+	class='hero section-{{ section.id }}-padding {% if section.settings.layout == 'overlay' and section.settings.header_overlay %} section--has-overlay {% if section.settings.header_transparent %} section--header-light {% endif %} {% endif %}'
+>
+	<div class='{% if section.settings.layout == 'overlay' %}{% if section.settings.full_screen == false %}container{% endif %}{% else %}container{% endif %}'>
+		<div
+			class='
+				hero__outer hero__outer--{{ section.settings.layout }} {% if section.settings.layout == 'overlay' %}color-{{ section.settings.color_scheme }}{% endif %} {% if section.settings.layout == 'horizontal' %}hero__outer--{{ section.settings.block_type }}{% endif %}
+				{% if section.settings.full_screen %} hero__outer--full {% endif %}
+				{% if section.settings.desktop_image_position == 'before' %}hero__outer--desktop-order{% endif %}
+				{% if section.settings.mobile_image_position == 'before' %}hero__outer--mobile-order{% endif %}
+				{% if section.settings.layout == 'overlay' %}hero__outer--mobile-image-{{ section.settings.mobile_image_overlay }} {% endif %}
+			'
+		>
+			<div
+				class='
+					hero__content {% if section.settings.layout == 'overlay' %}container{% endif %}
+					{% if section.settings.layout == 'horizontal' or section.settings.layout == 'overlay' %}hero__content--{{ section.settings.vertical_alignment }}{% endif %}
+					{% if section.settings.layout == 'vertical' or section.settings.layout == 'overlay' %}hero__content--{{ section.settings.horizontal_alignment }}{% endif %}
+				'
+			>
+				{% for block in section.blocks %}
+					{% case block.type %}
+						{% when 'subtitle' %}
+							<div
+								class='hero__subtitle {{ block.settings.subheading_style }}'
+								{{ block.shopify_attributes }}
+							>
+								{% if block.settings.subheading_icon != 'none' %}
+									<i
+										class='icon icon-pack icon-{{ block.settings.subheading_icon }}'
+									></i>
+								{% endif %}
+								{{ block.settings.subheading }}
+							</div>
+						{% when 'title' %}
+							{% if block.settings.heading_line == 'rounded' %}
+								{% assign color = block.settings.line_color | remove: '#' %}
+								{% style %}
+									#Hero-{{ section.id }} .hero__title--rounded span[style*="text-decoration:underline"].title--rounded-xs {
+									  background-image: url('data:image/svg+xml,\
+									  <svg xmlns="http://www.w3.org/2000/svg" width="78" height="14" viewBox="0 0 78 14" fill="none">\
+									    <path d="M3 11C15.1361 4.50757 39.4887 -3.17051 75 11" stroke="%23{{ color }}" stroke-width="6" stroke-linecap="round"/>\
+									  </svg>');
+									}
+
+									#Hero-{{ section.id }} .hero__title--rounded span[style*="text-decoration:underline"].title--rounded-s {
+									  background-image: url('data:image/svg+xml,\
+									  <svg xmlns="http://www.w3.org/2000/svg" width="172" height="14" viewBox="0 0 172 14" fill="none">\
+									    <path d="M3 11C30.9803 4.50757 87.1267 -3.17051 169 11" stroke="%23{{ color }}" stroke-width="6" stroke-linecap="round"/>\
+									  </svg>');
+									}
+
+									#Hero-{{ section.id }} .hero__title--rounded span[style*="text-decoration:underline"].title--rounded-m {
+									  background-image: url('data:image/svg+xml,\
+									  <svg xmlns="http://www.w3.org/2000/svg" width="321" height="14" viewBox="0 0 321 14" fill="none">\
+									    <path d="M3 11C56.0952 4.50757 162.638 -3.17051 318 11" stroke="%23{{ color }}" stroke-width="6" stroke-linecap="round"/>\
+									  </svg>');
+									}
+
+									#Hero-{{ section.id }} .hero__title--rounded span[style*="text-decoration:underline"].title--rounded-l {
+									  background-image: url('data:image/svg+xml,\
+									  <svg xmlns="http://www.w3.org/2000/svg" width="373" height="14" viewBox="0 0 373 14" fill="none">\
+									    <path d="M3 11C64.8602 4.50757 188.991 -3.17051 370 11" stroke="%23{{ color }}" stroke-width="6" stroke-linecap="round"/>\
+									  </svg>');
+									}
+
+									#Hero-{{ section.id }} .hero__title--rounded span[style*="text-decoration:underline"].title--rounded-xl {
+									  background-image: url('data:image/svg+xml,\
+									  <svg xmlns="http://www.w3.org/2000/svg" width="568" height="14" viewBox="0 0 568 14" fill="none">\
+									    <path d="M3 11C97.7286 4.50757 287.814 -3.17051 565 11" stroke="%23{{ color }}" stroke-width="6" stroke-linecap="round"/>\
+									  </svg>');
+									}
+
+									#Hero-{{ section.id }} .hero__title--rounded span[style*="text-decoration:underline"].title--rounded-xxl {
+									  background-image: url('data:image/svg+xml,\
+									  <svg xmlns="http://www.w3.org/2000/svg" width="714" height="14" viewBox="0 0 714 14" fill="none">\
+									    <path d="M3 11C122.338 4.50757 361.805 -3.17051 711 11" stroke="%23{{ color }}" stroke-width="6" stroke-linecap="round"/>\
+									  </svg>');
+									}
+
+									[data-scheme="dark"] {
+									  #Hero-{{ section.id }} .hero__title--rounded span[style*="text-decoration:underline"].title--rounded-xs {
+									    background-image: url('data:image/svg+xml,\
+									    <svg xmlns="http://www.w3.org/2000/svg" width="78" height="14" viewBox="0 0 78 14" fill="none">\
+									      <path d="M3 11C15.1361 4.50757 39.4887 -3.17051 75 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+									    </svg>');
+									  }
+
+									  #Hero-{{ section.id }} .hero__title--rounded span[style*="text-decoration:underline"].title--rounded-s {
+									    background-image: url('data:image/svg+xml,\
+									    <svg xmlns="http://www.w3.org/2000/svg" width="172" height="14" viewBox="0 0 172 14" fill="none">\
+									      <path d="M3 11C30.9803 4.50757 87.1267 -3.17051 169 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+									    </svg>');
+									  }
+
+									  #Hero-{{ section.id }} .hero__title--rounded span[style*="text-decoration:underline"].title--rounded-m {
+									    background-image: url('data:image/svg+xml,\
+									    <svg xmlns="http://www.w3.org/2000/svg" width="321" height="14" viewBox="0 0 321 14" fill="none">\
+									      <path d="M3 11C56.0952 4.50757 162.638 -3.17051 318 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+									    </svg>');
+									  }
+
+									  #Hero-{{ section.id }} .hero__title--rounded span[style*="text-decoration:underline"].title--rounded-l {
+									    background-image: url('data:image/svg+xml,\
+									    <svg xmlns="http://www.w3.org/2000/svg" width="373" height="14" viewBox="0 0 373 14" fill="none">\
+									      <path d="M3 11C64.8602 4.50757 188.991 -3.17051 370 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+									    </svg>');
+									  }
+
+									  #Hero-{{ section.id }} .hero__title--rounded span[style*="text-decoration:underline"].title--rounded-xl {
+									    background-image: url('data:image/svg+xml,\
+									    <svg xmlns="http://www.w3.org/2000/svg" width="568" height="14" viewBox="0 0 568 14" fill="none">\
+									      <path d="M3 11C97.7286 4.50757 287.814 -3.17051 565 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+									    </svg>');
+									  }
+
+									  #Hero-{{ section.id }} .hero__title--rounded span[style*="text-decoration:underline"].title--rounded-xxl {
+									    background-image: url('data:image/svg+xml,\
+									    <svg xmlns="http://www.w3.org/2000/svg" width="714" height="14" viewBox="0 0 714 14" fill="none">\
+									      <path d="M3 11C122.338 4.50757 361.805 -3.17051 711 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+									    </svg>');
+									  }
+									}
+
+									@media (prefers-color-scheme: dark) {
+									 [data-scheme="auto"] {
+									    #Hero-{{ section.id }} .hero__title--rounded span[style*="text-decoration:underline"].title--rounded-xs {
+									      background-image: url('data:image/svg+xml,\
+									      <svg xmlns="http://www.w3.org/2000/svg" width="78" height="14" viewBox="0 0 78 14" fill="none">\
+									        <path d="M3 11C15.1361 4.50757 39.4887 -3.17051 75 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+									      </svg>');
+									    }
+
+									    #Hero-{{ section.id }} .hero__title--rounded span[style*="text-decoration:underline"].title--rounded-s {
+									      background-image: url('data:image/svg+xml,\
+									      <svg xmlns="http://www.w3.org/2000/svg" width="172" height="14" viewBox="0 0 172 14" fill="none">\
+									        <path d="M3 11C30.9803 4.50757 87.1267 -3.17051 169 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+									      </svg>');
+									    }
+
+									    #Hero-{{ section.id }} .hero__title--rounded span[style*="text-decoration:underline"].title--rounded-m {
+									      background-image: url('data:image/svg+xml,\
+									      <svg xmlns="http://www.w3.org/2000/svg" width="321" height="14" viewBox="0 0 321 14" fill="none">\
+									        <path d="M3 11C56.0952 4.50757 162.638 -3.17051 318 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+									      </svg>');
+									    }
+
+									    #Hero-{{ section.id }} .hero__title--rounded span[style*="text-decoration:underline"].title--rounded-l {
+									      background-image: url('data:image/svg+xml,\
+									      <svg xmlns="http://www.w3.org/2000/svg" width="373" height="14" viewBox="0 0 373 14" fill="none">\
+									        <path d="M3 11C64.8602 4.50757 188.991 -3.17051 370 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+									      </svg>');
+									    }
+
+									    #Hero-{{ section.id }} .hero__title--rounded span[style*="text-decoration:underline"].title--rounded-xl {
+									      background-image: url('data:image/svg+xml,\
+									      <svg xmlns="http://www.w3.org/2000/svg" width="568" height="14" viewBox="0 0 568 14" fill="none">\
+									        <path d="M3 11C97.7286 4.50757 287.814 -3.17051 565 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+									      </svg>');
+									    }
+
+									    #Hero-{{ section.id }} .hero__title--rounded span[style*="text-decoration:underline"].title--rounded-xxl {
+									      background-image: url('data:image/svg+xml,\
+									      <svg xmlns="http://www.w3.org/2000/svg" width="714" height="14" viewBox="0 0 714 14" fill="none">\
+									        <path d="M3 11C122.338 4.50757 361.805 -3.17051 711 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+									      </svg>');
+									    }
+									  }
+									}
+								{% endstyle %}
+							{% endif %}
+							{% assign heading_level = block.settings.heading_level %}
+							<{{ heading_level }}
+								class='
+									hero__title title {{ block.settings.heading_size }} hero__title--{{ block.settings.heading_line }}
+									title--{{ block.settings.heading_line }} js-anim-{{ block.settings.heading_animation }}
+									{% if block.settings.word_break and block.settings.heading_line != 'none' %} hero__title--word_break {% endif %}
+									{% if block.settings.word_break_an and block.settings.heading_animation != 'none' %} hero__title--word_break_an {% endif %}
+								'
+								data-content='{{ block.settings.heading | escape }}'
+								{{ block.shopify_attributes }}
+								style='--color-line: {{ block.settings.line_color }}'
+							>
+								{{ block.settings.heading }}
+							</{{ heading_level }}>
+						{% when 'description' %}
+							<div
+								class='hero__description description body-large'
+								{{ block.shopify_attributes }}
+							>
+								{{- block.settings.description -}}
+							</div>
+						{% when 'subscription' %}
+							<div
+								class='hero__subscription-wrapper'
+								{{ block.shopify_attributes }}
+							>
+								{% render 'subscription',
+									label: block.settings.subscription_button_label,
+									style: block.settings.subscription_button_style,
+									color_scheme: block.settings.color_scheme_subscribe,
+									enable_box_shadow: block.settings.enable_box_shadow,
+									class: 'hero'
+								%}
+							</div>
+						{% when 'buttons' %}
+							<div class='hero__buttons' {{ block.shopify_attributes }}>
+								{% if block.settings.show_button_1 != blank %}
+									{% render 'button',
+										link: block.settings.button_link_1,
+										label: block.settings.button_label_1,
+										style: block.settings.button_style_1
+									%}
+								{% endif %}
+								{% if block.settings.show_button_2 != blank %}
+									{% render 'button',
+										link: block.settings.button_link_2,
+										label: block.settings.button_label_2,
+										style: block.settings.button_style_2
+									%}
+								{% endif %}
+							</div>
+						{% when 'captions' %}
+							{% if block.settings.show_caption_1
+								or block.settings.show_caption_2
+								or block.settings.show_caption_3
+							%}
+								<div class='hero__captions' {{ block.shopify_attributes }}>
+									{% if block.settings.show_caption_1 %}
+										<div class='hero__captions-item'>
+											{% if block.settings.caption_icon_1 != 'none' %}
+												<i
+													class='icon icon-pack icon-{{ block.settings.caption_icon_1 }}'
+												></i>
+											{% endif %}
+											<span class='body-small'>
+												{{- block.settings.caption_text_1 -}}
+											</span>
+										</div>
+									{% endif %}
+									{% if block.settings.show_caption_2 %}
+										<div class='hero__captions-item'>
+											{% if block.settings.caption_icon_2 != 'none' %}
+												<i
+													class='icon icon-pack icon-{{ block.settings.caption_icon_2 }}'
+												></i>
+											{% endif %}
+											<span class='body-small'>
+												{{- block.settings.caption_text_2 -}}
+											</span>
+										</div>
+									{% endif %}
+									{% if block.settings.show_caption_3 %}
+										<div class='hero__captions-item'>
+											{% if block.settings.caption_icon_3 != 'none' %}
+												<i
+													class='icon icon-pack icon-{{ block.settings.caption_icon_3 }}'
+												></i>
+											{% endif %}
+											<span class='body-small'>
+												{{- block.settings.caption_text_3 -}}
+											</span>
+										</div>
+									{% endif %}
+								</div>
+							{% endif %}
+						{% when 'users' %}
+							<div class='hero__users' {{ block.shopify_attributes }}>
+								{% if block.settings.user_image_1 != blank %}
+									<div class='hero__users-image'>
+										{{
+											block.settings.user_image_1
+											| image_url: width: block.settings.user_image_1.width
+											| image_tag: loading: 'lazy', widths: '70, 140'
+										}}
+									</div>
+								{% endif %}
+
+								{% if block.settings.user_image_2 != blank %}
+									<div class='hero__users-image'>
+										{{
+											block.settings.user_image_2
+											| image_url: width: block.settings.user_image_2.width
+											| image_tag: loading: 'lazy', widths: '70, 140'
+										}}
+									</div>
+								{% endif %}
+
+								{% if block.settings.user_image_3 != blank %}
+									<div class='hero__users-image'>
+										{{
+											block.settings.user_image_3
+											| image_url: width: block.settings.user_image_3.width
+											| image_tag: loading: 'lazy', widths: '70, 140'
+										}}
+									</div>
+								{% endif %}
+
+								{% if block.settings.user_image_4 != blank %}
+									<div class='hero__users-image'>
+										{{
+											block.settings.user_image_4
+											| image_url: width: block.settings.user_image_4.width
+											| image_tag: loading: 'lazy', widths: '70, 140'
+										}}
+									</div>
+								{% endif %}
+
+								{% if block.settings.user_image_5 != blank %}
+									<div class='hero__users-image'>
+										{{
+											block.settings.user_image_5
+											| image_url: width: block.settings.user_image_5.width
+											| image_tag: loading: 'lazy', widths: '70, 140'
+										}}
+									</div>
+								{% endif %}
+
+								{% if block.settings.user_text != blank %}
+									<span class='body-small'>{{- block.settings.user_text -}}</span>
+								{% endif %}
+							</div>
+					{% endcase %}
+				{% endfor %}
+			</div>
+			{% if section.settings.video != blank %}
+				<div class='hero__image'>
+					<div class='hero__image-inner hero__image-inner--{{ section.settings.object_fit }}'>
+						{% if section.settings.layout == 'overlay' %}
+							<span
+								class='hero__overlay'
+								style='--overlay-opacity: {{ section.settings.overlay_opacity }};'
+							></span>
+						{% endif %}
+						{%- capture style -%}object-fit: {{ section.settings.object_fit }};{%- endcapture -%}
+						{{
+							section.settings.video
+							| video_tag:
+								image_size: '1920x',
+								autoplay: true,
+								loop: true,
+								muted: true,
+								controls: false,
+								style: style
+						}}
+					</div>
+				</div>
+			{% elsif section.settings.image != blank %}
+				<div class='hero__image'>
+					<div class='hero__image-inner'>
+						{% if section.settings.layout == 'overlay' %}
+							<span
+								class='hero__overlay'
+								style='--overlay-opacity: {{ section.settings.overlay_opacity }};'
+							></span>
+						{% endif %}
+
+						{% liquid
+							assign width_ratio = 1
+							if image_ratio != 'adapt'
+								assign aspect_ratio_img = section.settings.image.aspect_ratio | round: 2
+								assign aspect_ratio_settings = aspect_ratio[0] | plus: 0.0 | divided_by: aspect_ratio[1] | round: 2
+
+								if aspect_ratio_img > aspect_ratio_settings
+									assign width_ratio = aspect_ratio_img | divided_by: aspect_ratio_settings | round: 2
+								endif
+							endif
+
+							if section.settings.image.width > section.settings.image.height
+								assign width_adapt_ratio = 320 | times: section.settings.image.aspect_ratio | round: 2
+							endif
+						%}
+
+						{% capture sizes %}
+              {% if section.settings.layout == 'horizontal' %}
+                (min-width: 1200px) calc((40vw - 40px) * {{ width_ratio }}),
+                (min-width: 990px) calc((50vw - 40px) * {{ width_ratio }}),
+              {% else %}
+                (min-width: 990px) calc((100vw - 40px) * {{ width_ratio }}),
+              {% endif %}
+              {% if section.settings.image.width > section.settings.image.height %}
+                {{ width_adapt_ratio }}px
+              {% else %}
+                calc((100vw - 40px) * {{ width_ratio }})
+              {% endif %}
+            {% endcapture %}
+
+						{% liquid
+							assign height = section.settings.image.height
+							assign width = section.settings.image.width
+						%}
+
+						{%- capture style -%}object-fit: {{ section.settings.object_fit }};{%- endcapture -%}
+
+						{{
+							section.settings.image
+							| image_url: width: section.settings.image.width
+							| image_tag:
+								loading: 'lazy',
+								sizes: sizes,
+								widths: '360, 533, 720, 940, 1066, 1200, 1400, 1600, 1800, 2000, 2200, 2400, 2600, 2800, 3000, 3264, 3400, 3584, 3800, 4000, 4200, 4400, 4600, 4800, 5000, 5200, 5400, 5600',
+								height: height,
+								width: width,
+								style: style
+						}}
+					</div>
+				</div>
+			{% else %}
+				<div class='hero__image'>
+					<div class='hero__image-inner hero__image-inner--{{ section.settings.object_fit }}'>
+						{% if section.settings.layout == 'overlay' %}
+							<span
+								class='hero__overlay'
+								style='--overlay-opacity: {{ section.settings.overlay_opacity }};'
+							></span>
+						{% endif %}
+						{{ 'hero-apparel-3' | placeholder_svg_tag: 'placeholder-svg' }}
+					</div>
+				</div>
+			{% endif %}
+		</div>
+	</div>
+</div>
+
+{%- if section.settings.header_overlay == true %}
+	{% render 'section-overlay', section: section %}
+{% endif -%}
+
+{% schema %}
+{
+	"name": "主要橫幅",
+	"tag": "section",
+	"class": "section-hero spaced-section",
+	"enabled_on": {
+		"templates": ["*"]
+	},
+	"settings": [
+		{
+			"type": "select",
+			"id": "layout",
+			"options": [
+				{ "value": "horizontal", "label": "水平" },
+				{ "value": "vertical", "label": "垂直" },
+				{ "value": "overlay", "label": "疊加層" }
+			],
+			"default": "horizontal",
+			"label": "版面配置"
+		},
+		{
+			"type": "checkbox",
+			"id": "header_overlay",
+			"default": false,
+			"label": "啟用頁首疊加",
+			"info": "僅適用於「疊加層」版面配置。"
+		},
+		{
+			"type": "checkbox",
+			"id": "header_transparent",
+			"label": "啟用透明頁首",
+			"info": "僅適用於「啟用頁首疊加」選項。",
+			"default": false
+		},
+		{
+			"type": "select",
+			"id": "block_type",
+			"options": [
+				{ "value": "plain", "label": "簡潔" },
+				{ "value": "subtle", "label": "精緻" }
+			],
+			"default": "subtle",
+			"label": "區塊樣式",
+			"info": "僅適用於「水平」版面配置。"
+		},
+		{
+			"type": "color_scheme",
+			"id": "color_scheme",
+			"default": "background-3",
+			"label": "色彩配置",
+			"info": "僅適用於包含內容的區塊。"
+		},
+		{
+			"type": "checkbox",
+			"id": "full_screen",
+			"default": false,
+			"label": "全螢幕顯示",
+			"info": "僅適用於「疊加層」版面配置。"
+		},
+		{
+			"type": "header",
+			"content": "圖片設定"
+		},
+		{
+			"type": "image_picker",
+			"id": "image",
+			"label": "圖片"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_video",
+			"label": "顯示影片",
+			"default": false
+		},
+		{
+			"type": "video",
+			"id": "video",
+			"label": "影片"
+		},
+		{
+			"type": "range",
+			"id": "overlay_opacity",
+			"min": 0,
+			"max": 1,
+			"step": 0.1,
+			"default": 0.5,
+			"label": "疊加層不透明度",
+			"info": "僅適用於「疊加層」版面配置。"
+		},
+		{
+			"type": "select",
+			"id": "image_ratio",
+			"options": [
+				{ "value": "1/1", "label": "正方形 (1:1)" },
+				{ "value": "2/1", "label": "橫向 (2:1)" },
+				{ "value": "3/2", "label": "橫向 (3:2)" },
+				{ "value": "4/3", "label": "橫向 (4:3)" },
+				{ "value": "16/9", "label": "寬螢幕 (16:9)" },
+				{ "value": "21/9", "label": "超寬螢幕 (21:9)" },
+				{ "value": "adapt", "label": "適應圖片大小" }
+			],
+			"default": "1/1",
+			"label": "圖片比例"
+		},
+		{
+			"type": "select",
+			"id": "object_fit",
+			"options": [
+				{ "value": "contain", "label": "等比例縮放 (Contain)" },
+				{ "value": "cover", "label": "裁切填滿 (Cover)" }
+			],
+			"default": "cover",
+			"label": "圖片縮放模式"
+		},
+		{
+			"type": "select",
+			"id": "desktop_image_position",
+			"options": [
+				{ "value": "before", "label": "在內容前方" },
+				{ "value": "after", "label": "在內容後方" }
+			],
+			"default": "after",
+			"label": "桌面版圖片位置",
+			"info": "僅適用於「水平」版面配置。"
+		},
+		{
+			"type": "select",
+			"id": "mobile_image_position",
+			"options": [
+				{ "value": "before", "label": "在內容前方" },
+				{ "value": "after", "label": "在內容後方" }
+			],
+			"default": "after",
+			"label": "行動裝置圖片位置",
+			"info": "僅適用於「水平」版面配置。"
+		},
+		{
+			"type": "select",
+			"id": "mobile_image_overlay",
+			"options": [
+				{ "value": "before", "label": "圖片在內容上方" },
+				{ "value": "after", "label": "圖片在內容下方" },
+				{ "value": "overlay", "label": "內容疊加在圖片上" }
+			],
+			"default": "overlay",
+			"label": "行動裝置圖片版面"
+		},
+		{
+			"type": "header",
+			"content": "內容設定"
+		},
+		{
+			"type": "select",
+			"id": "horizontal_alignment",
+			"label": "水平對齊",
+			"info": "僅適用於「垂直」和「疊加層」版面配置。",
+			"default": "center",
+			"options": [
+				{ "value": "left", "label": "靠左" },
+				{ "value": "center", "label": "置中" },
+				{ "value": "right", "label": "靠右" }
+			]
+		},
+		{
+			"type": "select",
+			"id": "vertical_alignment",
+			"label": "垂直對齊",
+			"info": "僅適用於「水平」和「疊加層」版面配置。",
+			"default": "bottom",
+			"options": [
+				{ "value": "top", "label": "靠上" },
+				{ "value": "middle", "label": "置中" },
+				{ "value": "bottom", "label": "靠下" }
+			]
+		},
+		{
+			"type": "header",
+			"content": "區塊內距 (Padding)"
+		},
+		{
+			"type": "select",
+			"id": "padding_top",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "超小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "超大" }
+			],
+			"default": "xs",
+			"label": "頂部內距"
+		},
+		{
+			"type": "select",
+			"id": "padding_bottom",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "超小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "超大" }
+			],
+			"default": "m",
+			"label": "底部內距"
+		}
+	],
+	"blocks": [
+		{
+			"type": "subtitle",
+			"name": "副標題",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "text",
+					"id": "subheading",
+					"label": "副標題",
+					"default": "我們的新品系列"
+				},
+				{
+					"type": "select",
+					"id": "subheading_style",
+					"options": [
+						{ "value": "subtitle", "label": "副標題" },
+						{ "value": "subtitle subtitle--secondary", "label": "副標題 (次要)" }
+					],
+					"default": "subtitle subtitle--secondary",
+					"label": "副標題樣式"
+				},
+				{
+					"type": "select",
+					"id": "subheading_icon",
+					"options": [
+						{ "value": "none", "label": "無" },
+						{ "value": "arrow-bar", "label": "箭頭條" },
+						{ "value": "bag-1", "label": "提袋 1" },
+						{ "value": "bag-2", "label": "提袋 2" },
+						{ "value": "bag-3", "label": "提袋 3" },
+						{ "value": "bar-chart", "label": "長條圖" },
+						{ "value": "bars-upward", "label": "向上長條" },
+						{ "value": "baseball", "label": "棒球" },
+						{ "value": "battery-1", "label": "電池 1" },
+						{ "value": "battery-2", "label": "電池 2" },
+						{ "value": "battery-3", "label": "電池 3" },
+						{ "value": "book", "label": "書本" },
+						{ "value": "card", "label": "卡片" },
+						{ "value": "card-holder", "label": "名片夾" },
+						{ "value": "chart", "label": "圖表" },
+						{ "value": "chart-2", "label": "圖表 2" },
+						{ "value": "chart-3", "label": "圖表 3" },
+						{ "value": "chats", "label": "對話" },
+						{ "value": "check-1", "label": "勾號 1" },
+						{ "value": "check-2", "label": "勾號 2" },
+						{ "value": "check-3", "label": "勾號 3" },
+						{ "value": "check-4", "label": "勾號 4" },
+						{ "value": "circle", "label": "圓圈" },
+						{ "value": "circles", "label": "多個圓圈" },
+						{ "value": "clock-1", "label": "時鐘 1" },
+						{ "value": "clock-2", "label": "時鐘 2" },
+						{ "value": "close", "label": "關閉" },
+						{ "value": "cloud-server", "label": "雲端伺服器" },
+						{ "value": "computer", "label": "電腦" },
+						{ "value": "computer-mouse", "label": "滑鼠" },
+						{ "value": "confetti", "label": "彩紙" },
+						{ "value": "delivery", "label": "運送" },
+						{ "value": "delivery-box", "label": "包裹" },
+						{ "value": "devices", "label": "裝置" },
+						{ "value": "directions", "label": "方向" },
+						{ "value": "dumbbell", "label": "啞鈴" },
+						{ "value": "eye", "label": "眼睛" },
+						{ "value": "facebook", "label": "Facebook" },
+						{ "value": "file-1", "label": "檔案 1" },
+						{ "value": "file-2", "label": "檔案 2" },
+						{ "value": "flag", "label": "旗幟" },
+						{ "value": "folder-1", "label": "資料夾 1" },
+						{ "value": "folder-2", "label": "資料夾 2" },
+						{ "value": "food", "label": "食物" },
+						{ "value": "hand-1", "label": "手 1" },
+						{ "value": "hand-2", "label": "手 2" },
+						{ "value": "hand-3", "label": "手 3" },
+						{ "value": "headphones", "label": "耳機" },
+						{ "value": "instagram", "label": "Instagram" },
+						{ "value": "laptop-1", "label": "筆電 1" },
+						{ "value": "laptop-2", "label": "筆電 2" },
+						{ "value": "leaf", "label": "葉子" },
+						{ "value": "lightning-bolt-1", "label": "閃電 1" },
+						{ "value": "lightning-bolt-2", "label": "閃電 2" },
+						{ "value": "like", "label": "讚" },
+						{ "value": "link", "label": "連結" },
+						{ "value": "lock-1", "label": "鎖 1" },
+						{ "value": "lock-2", "label": "鎖 2" },
+						{ "value": "logout", "label": "登出" },
+						{ "value": "luggage", "label": "行李" },
+						{ "value": "mark", "label": "標記" },
+						{ "value": "medicine", "label": "藥品" },
+						{ "value": "microphone", "label": "麥克風" },
+						{ "value": "moon", "label": "月亮" },
+						{ "value": "pencil", "label": "鉛筆" },
+						{ "value": "phone-1", "label": "電話 1" },
+						{ "value": "phone-2", "label": "電話 2" },
+						{ "value": "phone-3", "label": "電話 3" },
+						{ "value": "phone-4", "label": "電話 4" },
+						{ "value": "pinterest", "label": "Pinterest" },
+						{ "value": "plug", "label": "插頭" },
+						{ "value": "presentation-1", "label": "簡報 1" },
+						{ "value": "presentation-2", "label": "簡報 2" },
+						{ "value": "pulse", "label": "脈搏" },
+						{ "value": "recycle", "label": "回收" },
+						{ "value": "rocket", "label": "火箭" },
+						{ "value": "search", "label": "搜尋" },
+						{ "value": "sending", "label": "傳送" },
+						{ "value": "server-1", "label": "伺服器 1" },
+						{ "value": "server-2", "label": "伺服器 2" },
+						{ "value": "settings", "label": "設定" },
+						{ "value": "shield", "label": "盾牌" },
+						{ "value": "shopping-basket", "label": "購物籃" },
+						{ "value": "shuffle", "label": "隨機播放" },
+						{ "value": "snapchat", "label": "Snapchat" },
+						{ "value": "sound-waves", "label": "聲波" },
+						{ "value": "speaker", "label": "喇叭" },
+						{ "value": "squares-1", "label": "方塊 1" },
+						{ "value": "squares-2", "label": "方塊 2" },
+						{ "value": "stack", "label": "堆疊" },
+						{ "value": "star", "label": "星星" },
+						{ "value": "stopwatch", "label": "碼錶" },
+						{ "value": "sun", "label": "太陽" },
+						{ "value": "tag", "label": "標籤" },
+						{ "value": "telephone-tower", "label": "電信塔" },
+						{ "value": "tik-tok", "label": "TikTok" },
+						{ "value": "tree", "label": "樹" },
+						{ "value": "trend", "label": "趨勢" },
+						{ "value": "trophy", "label": "獎盃" },
+						{ "value": "tumblr", "label": "Tumblr" },
+						{ "value": "tv", "label": "電視" },
+						{ "value": "twitter", "label": "Twitter" },
+						{ "value": "user-1", "label": "使用者 1" },
+						{ "value": "user-2", "label": "使用者 2" },
+						{ "value": "user-3", "label": "使用者 3" },
+						{ "value": "user-4", "label": "使用者 4" },
+						{ "value": "user-5", "label": "使用者 5" },
+						{ "value": "video", "label": "影片" },
+						{ "value": "vimeo", "label": "Vimeo" },
+						{ "value": "wallet", "label": "錢包" },
+						{ "value": "watch", "label": "手錶" },
+						{ "value": "water-1", "label": "水 1" },
+						{ "value": "water-2", "label": "水 2" },
+						{ "value": "water-3", "label": "水 3" },
+						{ "value": "wave-1", "label": "波浪 1" },
+						{ "value": "wave-2", "label": "波浪 2" },
+						{ "value": "wifi-1", "label": "Wi-Fi 1" },
+						{ "value": "wifi-2", "label": "Wi-Fi 2" },
+						{ "value": "window", "label": "視窗" },
+						{ "value": "youtube", "label": "YouTube" }
+					],
+					"default": "star",
+					"label": "副標題圖示"
+				}
+			]
+		},
+		{
+			"type": "title",
+			"name": "標題",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "inline_richtext",
+					"id": "heading",
+					"default": "為您打造的獨特風格",
+					"label": "標題",
+					"info": "使用方括號 `[文字]` 來突顯標題中的特定單字。"
+				},
+				{
+					"type": "select",
+					"id": "heading_size",
+					"options": [
+						{ "value": "h3", "label": "中" },
+						{ "value": "h2", "label": "大" },
+						{ "value": "h1", "label": "最大" }
+					],
+					"default": "h1",
+					"label": "標題大小"
+				},
+				{
+					"type": "select",
+					"id": "heading_level",
+					"options": [
+						{ "value": "h1", "label": "H1" },
+						{ "value": "h2", "label": "H2" },
+						{ "value": "h3", "label": "H3" }
+					],
+					"default": "h2",
+					"label": "標題層級 (HTML 標籤)"
+				},
+				{
+					"type": "select",
+					"id": "heading_line",
+					"options": [
+						{ "value": "simple", "label": "簡潔線條" },
+						{ "value": "rounded", "label": "圓角線條" },
+						{ "value": "background", "label": "背景色塊" },
+						{ "value": "none", "label": "無" }
+					],
+					"default": "simple",
+					"label": "標題線條樣式"
+				},
+				{
+					"type": "color",
+					"id": "line_color",
+					"label": "線條顏色",
+					"default": "#1566E0"
+				},
+				{
+					"type": "checkbox",
+					"id": "word_break",
+					"label": "啟用標題自動換行",
+					"default": false
+				},
+				{
+					"type": "select",
+					"id": "heading_animation",
+					"options": [
+						{ "value": "typewriter", "label": "打字機" },
+						{ "value": "rolling", "label": "滾動" },
+						{ "value": "appearing", "label": "浮現" },
+						{ "value": "none", "label": "無" }
+					],
+					"default": "none",
+					"label": "標題動畫",
+					"info": "此動畫僅在頁面首次載入時播放一次。"
+				},
+				{
+					"type": "checkbox",
+					"id": "word_break_an",
+					"label": "啟用動畫文字自動換行",
+					"default": false
+				}
+			]
+		},
+		{
+			"type": "description",
+			"name": "描述",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "textarea",
+					"id": "description",
+					"default": "用一段文字描述您的品牌、產品或促銷活動。選擇與您品牌風格和調性相符的內容。",
+					"label": "內文"
+				}
+			]
+		},
+		{
+			"type": "subscription",
+			"name": "訂閱表單",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "text",
+					"id": "subscription_button_label",
+					"default": "按鈕文字",
+					"label": "按鈕文字"
+				},
+				{
+					"type": "color_scheme",
+					"id": "color_scheme_subscribe",
+					"default": "background-2",
+					"label": "色彩配置"
+				},
+				{
+					"type": "checkbox",
+					"id": "enable_box_shadow",
+					"default": true,
+					"label": "啟用方塊陰影"
+				},
+				{
+					"type": "select",
+					"id": "subscription_button_style",
+					"options": [
+						{ "value": "primary", "label": "主要" },
+						{ "value": "secondary", "label": "次要" },
+						{ "value": "tertiary", "label": "第三" }
+					],
+					"default": "primary",
+					"label": "按鈕樣式"
+				}
+			]
+		},
+		{
+			"type": "buttons",
+			"name": "按鈕",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "header",
+					"content": "按鈕 1"
+				},
+				{
+					"type": "checkbox",
+					"id": "show_button_1",
+					"default": true,
+					"label": "顯示按鈕"
+				},
+				{
+					"type": "text",
+					"id": "button_label_1",
+					"default": "按鈕文字",
+					"label": "按鈕文字"
+				},
+				{
+					"type": "url",
+					"id": "button_link_1",
+					"label": "按鈕連結"
+				},
+				{
+					"type": "select",
+					"id": "button_style_1",
+					"options": [
+						{
+							"group": "實心按鈕",
+							"value": "primary",
+							"label": "主要"
+						},
+						{
+							"group": "實心按鈕",
+							"value": "secondary",
+							"label": "次要"
+						},
+						{
+							"group": "實心按鈕",
+							"value": "tertiary",
+							"label": "第三"
+						},
+						{
+							"group": "外框/連結按鈕",
+							"value": "simple",
+							"label": "簡潔"
+						},
+						{
+							"group": "外框/連結按鈕",
+							"value": "simple_secondary",
+							"label": "簡潔 (次要)"
+						},
+						{
+							"group": "外框/連結按鈕",
+							"value": "simple_link",
+							"label": "簡潔 (連結樣式)"
+						}
+					],
+					"default": "primary",
+					"label": "按鈕樣式"
+				},
+				{
+					"type": "header",
+					"content": "按鈕 2"
+				},
+				{
+					"type": "checkbox",
+					"id": "show_button_2",
+					"default": true,
+					"label": "顯示按鈕"
+				},
+				{
+					"type": "text",
+					"id": "button_label_2",
+					"default": "按鈕文字",
+					"label": "按鈕文字"
+				},
+				{
+					"type": "url",
+					"id": "button_link_2",
+					"label": "按鈕連結"
+				},
+				{
+					"type": "select",
+					"id": "button_style_2",
+					"options": [
+						{
+							"group": "實心按鈕",
+							"value": "primary",
+							"label": "主要"
+						},
+						{
+							"group": "實心按鈕",
+							"value": "secondary",
+							"label": "次要"
+						},
+						{
+							"group": "實心按鈕",
+							"value": "tertiary",
+							"label": "第三"
+						},
+						{
+							"group": "外框/連結按鈕",
+							"value": "simple",
+							"label": "簡潔"
+						},
+						{
+							"group": "外框/連結按鈕",
+							"value": "simple_secondary",
+							"label": "簡潔 (次要)"
+						},
+						{
+							"group": "外框/連結按鈕",
+							"value": "simple_link",
+							"label": "簡潔 (連結樣式)"
+						}
+					],
+					"default": "simple",
+					"label": "按鈕樣式"
+				}
+			]
+		},
+		{
+			"type": "captions",
+			"name": "說明文字",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "header",
+					"content": "說明文字 1"
+				},
+				{
+					"type": "paragraph",
+					"content": "每個說明文字都包含圖示和文字。"
+				},
+				{
+					"type": "checkbox",
+					"id": "show_caption_1",
+					"default": true,
+					"label": "顯示說明文字"
+				},
+				{
+					"type": "text",
+					"id": "caption_text_1",
+					"default": "按鈕文字",
+					"label": "文字內容"
+				},
+				{
+					"type": "select",
+					"id": "caption_icon_1",
+					"options": [
+						{ "value": "none", "label": "無" },
+						{ "value": "arrow-bar", "label": "箭頭條" },
+						{ "value": "bag-1", "label": "提袋 1" },
+						{ "value": "bag-2", "label": "提袋 2" },
+						{ "value": "bag-3", "label": "提袋 3" },
+						{ "value": "bar-chart", "label": "長條圖" },
+						{ "value": "bars-upward", "label": "向上長條" },
+						{ "value": "baseball", "label": "棒球" },
+						{ "value": "battery-1", "label": "電池 1" },
+						{ "value": "battery-2", "label": "電池 2" },
+						{ "value": "battery-3", "label": "電池 3" },
+						{ "value": "book", "label": "書本" },
+						{ "value": "card", "label": "卡片" },
+						{ "value": "card-holder", "label": "名片夾" },
+						{ "value": "chart", "label": "圖表" },
+						{ "value": "chart-2", "label": "圖表 2" },
+						{ "value": "chart-3", "label": "圖表 3" },
+						{ "value": "chats", "label": "對話" },
+						{ "value": "check-1", "label": "勾號 1" },
+						{ "value": "check-2", "label": "勾號 2" },
+						{ "value": "check-3", "label": "勾號 3" },
+						{ "value": "check-4", "label": "勾號 4" },
+						{ "value": "circle", "label": "圓圈" },
+						{ "value": "circles", "label": "多個圓圈" },
+						{ "value": "clock-1", "label": "時鐘 1" },
+						{ "value": "clock-2", "label": "時鐘 2" },
+						{ "value": "close", "label": "關閉" },
+						{ "value": "cloud-server", "label": "雲端伺服器" },
+						{ "value": "computer", "label": "電腦" },
+						{ "value": "computer-mouse", "label": "滑鼠" },
+						{ "value": "confetti", "label": "彩紙" },
+						{ "value": "delivery", "label": "運送" },
+						{ "value": "delivery-box", "label": "包裹" },
+						{ "value": "devices", "label": "裝置" },
+						{ "value": "directions", "label": "方向" },
+						{ "value": "dumbbell", "label": "啞鈴" },
+						{ "value": "eye", "label": "眼睛" },
+						{ "value": "facebook", "label": "Facebook" },
+						{ "value": "file-1", "label": "檔案 1" },
+						{ "value": "file-2", "label": "檔案 2" },
+						{ "value": "flag", "label": "旗幟" },
+						{ "value": "folder-1", "label": "資料夾 1" },
+						{ "value": "folder-2", "label": "資料夾 2" },
+						{ "value": "food", "label": "食物" },
+						{ "value": "hand-1", "label": "手 1" },
+						{ "value": "hand-2", "label": "手 2" },
+						{ "value": "hand-3", "label": "手 3" },
+						{ "value": "headphones", "label": "耳機" },
+						{ "value": "instagram", "label": "Instagram" },
+						{ "value": "laptop-1", "label": "筆電 1" },
+						{ "value": "laptop-2", "label": "筆電 2" },
+						{ "value": "leaf", "label": "葉子" },
+						{ "value": "lightning-bolt-1", "label": "閃電 1" },
+						{ "value": "lightning-bolt-2", "label": "閃電 2" },
+						{ "value": "like", "label": "讚" },
+						{ "value": "link", "label": "連結" },
+						{ "value": "lock-1", "label": "鎖 1" },
+						{ "value": "lock-2", "label": "鎖 2" },
+						{ "value": "logout", "label": "登出" },
+						{ "value": "luggage", "label": "行李" },
+						{ "value": "mark", "label": "標記" },
+						{ "value": "medicine", "label": "藥品" },
+						{ "value": "microphone", "label": "麥克風" },
+						{ "value": "moon", "label": "月亮" },
+						{ "value": "pencil", "label": "鉛筆" },
+						{ "value": "phone-1", "label": "電話 1" },
+						{ "value": "phone-2", "label": "電話 2" },
+						{ "value": "phone-3", "label": "電話 3" },
+						{ "value": "phone-4", "label": "電話 4" },
+						{ "value": "pinterest", "label": "Pinterest" },
+						{ "value": "plug", "label": "插頭" },
+						{ "value": "presentation-1", "label": "簡報 1" },
+						{ "value": "presentation-2", "label": "簡報 2" },
+						{ "value": "pulse", "label": "脈搏" },
+						{ "value": "recycle", "label": "回收" },
+						{ "value": "rocket", "label": "火箭" },
+						{ "value": "search", "label": "搜尋" },
+						{ "value": "sending", "label": "傳送" },
+						{ "value": "server-1", "label": "伺服器 1" },
+						{ "value": "server-2", "label": "伺服器 2" },
+						{ "value": "settings", "label": "設定" },
+						{ "value": "shield", "label": "盾牌" },
+						{ "value": "shopping-basket", "label": "購物籃" },
+						{ "value": "shuffle", "label": "隨機播放" },
+						{ "value": "snapchat", "label": "Snapchat" },
+						{ "value": "sound-waves", "label": "聲波" },
+						{ "value": "speaker", "label": "喇叭" },
+						{ "value": "squares-1", "label": "方塊 1" },
+						{ "value": "squares-2", "label": "方塊 2" },
+						{ "value": "stack", "label": "堆疊" },
+						{ "value": "star", "label": "星星" },
+						{ "value": "stopwatch", "label": "碼錶" },
+						{ "value": "sun", "label": "太陽" },
+						{ "value": "tag", "label": "標籤" },
+						{ "value": "telephone-tower", "label": "電信塔" },
+						{ "value": "tik-tok", "label": "TikTok" },
+						{ "value": "tree", "label": "樹" },
+						{ "value": "trend", "label": "趨勢" },
+						{ "value": "trophy", "label": "獎盃" },
+						{ "value": "tumblr", "label": "Tumblr" },
+						{ "value": "tv", "label": "電視" },
+						{ "value": "twitter", "label": "Twitter" },
+						{ "value": "user-1", "label": "使用者 1" },
+						{ "value": "user-2", "label": "使用者 2" },
+						{ "value": "user-3", "label": "使用者 3" },
+						{ "value": "user-4", "label": "使用者 4" },
+						{ "value": "user-5", "label": "使用者 5" },
+						{ "value": "video", "label": "影片" },
+						{ "value": "vimeo", "label": "Vimeo" },
+						{ "value": "wallet", "label": "錢包" },
+						{ "value": "watch", "label": "手錶" },
+						{ "value": "water-1", "label": "水 1" },
+						{ "value": "water-2", "label": "水 2" },
+						{ "value": "water-3", "label": "水 3" },
+						{ "value": "wave-1", "label": "波浪 1" },
+						{ "value": "wave-2", "label": "波浪 2" },
+						{ "value": "wifi-1", "label": "Wi-Fi 1" },
+						{ "value": "wifi-2", "label": "Wi-Fi 2" },
+						{ "value": "window", "label": "視窗" },
+						{ "value": "youtube", "label": "YouTube" }
+					],
+					"default": "check-2",
+					"label": "圖示"
+				},
+				{
+					"type": "header",
+					"content": "說明文字 2"
+				},
+				{
+					"type": "checkbox",
+					"id": "show_caption_2",
+					"default": true,
+					"label": "顯示說明文字"
+				},
+				{
+					"type": "text",
+					"id": "caption_text_2",
+					"default": "按鈕文字",
+					"label": "文字內容"
+				},
+				{
+					"type": "select",
+					"id": "caption_icon_2",
+					"options": [
+						{ "value": "none", "label": "無" },
+						{ "value": "arrow-bar", "label": "箭頭條" },
+						{ "value": "bag-1", "label": "提袋 1" },
+						{ "value": "bag-2", "label": "提袋 2" },
+						{ "value": "bag-3", "label": "提袋 3" },
+						{ "value": "bar-chart", "label": "長條圖" },
+						{ "value": "bars-upward", "label": "向上長條" },
+						{ "value": "baseball", "label": "棒球" },
+						{ "value": "battery-1", "label": "電池 1" },
+						{ "value": "battery-2", "label": "電池 2" },
+						{ "value": "battery-3", "label": "電池 3" },
+						{ "value": "book", "label": "書本" },
+						{ "value": "card", "label": "卡片" },
+						{ "value": "card-holder", "label": "名片夾" },
+						{ "value": "chart", "label": "圖表" },
+						{ "value": "chart-2", "label": "圖表 2" },
+						{ "value": "chart-3", "label": "圖表 3" },
+						{ "value": "chats", "label": "對話" },
+						{ "value": "check-1", "label": "勾號 1" },
+						{ "value": "check-2", "label": "勾號 2" },
+						{ "value": "check-3", "label": "勾號 3" },
+						{ "value": "check-4", "label": "勾號 4" },
+						{ "value": "circle", "label": "圓圈" },
+						{ "value": "circles", "label": "多個圓圈" },
+						{ "value": "clock-1", "label": "時鐘 1" },
+						{ "value": "clock-2", "label": "時鐘 2" },
+						{ "value": "close", "label": "關閉" },
+						{ "value": "cloud-server", "label": "雲端伺服器" },
+						{ "value": "computer", "label": "電腦" },
+						{ "value": "computer-mouse", "label": "滑鼠" },
+						{ "value": "confetti", "label": "彩紙" },
+						{ "value": "delivery", "label": "運送" },
+						{ "value": "delivery-box", "label": "包裹" },
+						{ "value": "devices", "label": "裝置" },
+						{ "value": "directions", "label": "方向" },
+						{ "value": "dumbbell", "label": "啞鈴" },
+						{ "value": "eye", "label": "眼睛" },
+						{ "value": "facebook", "label": "Facebook" },
+						{ "value": "file-1", "label": "檔案 1" },
+						{ "value": "file-2", "label": "檔案 2" },
+						{ "value": "flag", "label": "旗幟" },
+						{ "value": "folder-1", "label": "資料夾 1" },
+						{ "value": "folder-2", "label": "資料夾 2" },
+						{ "value": "food", "label": "食物" },
+						{ "value": "hand-1", "label": "手 1" },
+						{ "value": "hand-2", "label": "手 2" },
+						{ "value": "hand-3", "label": "手 3" },
+						{ "value": "headphones", "label": "耳機" },
+						{ "value": "instagram", "label": "Instagram" },
+						{ "value": "laptop-1", "label": "筆電 1" },
+						{ "value": "laptop-2", "label": "筆電 2" },
+						{ "value": "leaf", "label": "葉子" },
+						{ "value": "lightning-bolt-1", "label": "閃電 1" },
+						{ "value": "lightning-bolt-2", "label": "閃電 2" },
+						{ "value": "like", "label": "讚" },
+						{ "value": "link", "label": "連結" },
+						{ "value": "lock-1", "label": "鎖 1" },
+						{ "value": "lock-2", "label": "鎖 2" },
+						{ "value": "logout", "label": "登出" },
+						{ "value": "luggage", "label": "行李" },
+						{ "value": "mark", "label": "標記" },
+						{ "value": "medicine", "label": "藥品" },
+						{ "value": "microphone", "label": "麥克風" },
+						{ "value": "moon", "label": "月亮" },
+						{ "value": "pencil", "label": "鉛筆" },
+						{ "value": "phone-1", "label": "電話 1" },
+						{ "value": "phone-2", "label": "電話 2" },
+						{ "value": "phone-3", "label": "電話 3" },
+						{ "value": "phone-4", "label": "電話 4" },
+						{ "value": "pinterest", "label": "Pinterest" },
+						{ "value": "plug", "label": "插頭" },
+						{ "value": "presentation-1", "label": "簡報 1" },
+						{ "value": "presentation-2", "label": "簡報 2" },
+						{ "value": "pulse", "label": "脈搏" },
+						{ "value": "recycle", "label": "回收" },
+						{ "value": "rocket", "label": "火箭" },
+						{ "value": "search", "label": "搜尋" },
+						{ "value": "sending", "label": "傳送" },
+						{ "value": "server-1", "label": "伺服器 1" },
+						{ "value": "server-2", "label": "伺服器 2" },
+						{ "value": "settings", "label": "設定" },
+						{ "value": "shield", "label": "盾牌" },
+						{ "value": "shopping-basket", "label": "購物籃" },
+						{ "value": "shuffle", "label": "隨機播放" },
+						{ "value": "snapchat", "label": "Snapchat" },
+						{ "value": "sound-waves", "label": "聲波" },
+						{ "value": "speaker", "label": "喇叭" },
+						{ "value": "squares-1", "label": "方塊 1" },
+						{ "value": "squares-2", "label": "方塊 2" },
+						{ "value": "stack", "label": "堆疊" },
+						{ "value": "star", "label": "星星" },
+						{ "value": "stopwatch", "label": "碼錶" },
+						{ "value": "sun", "label": "太陽" },
+						{ "value": "tag", "label": "標籤" },
+						{ "value": "telephone-tower", "label": "電信塔" },
+						{ "value": "tik-tok", "label": "TikTok" },
+						{ "value": "tree", "label": "樹" },
+						{ "value": "trend", "label": "趨勢" },
+						{ "value": "trophy", "label": "獎盃" },
+						{ "value": "tumblr", "label": "Tumblr" },
+						{ "value": "tv", "label": "電視" },
+						{ "value": "twitter", "label": "Twitter" },
+						{ "value": "user-1", "label": "使用者 1" },
+						{ "value": "user-2", "label": "使用者 2" },
+						{ "value": "user-3", "label": "使用者 3" },
+						{ "value": "user-4", "label": "使用者 4" },
+						{ "value": "user-5", "label": "使用者 5" },
+						{ "value": "video", "label": "影片" },
+						{ "value": "vimeo", "label": "Vimeo" },
+						{ "value": "wallet", "label": "錢包" },
+						{ "value": "watch", "label": "手錶" },
+						{ "value": "water-1", "label": "水 1" },
+						{ "value": "water-2", "label": "水 2" },
+						{ "value": "water-3", "label": "水 3" },
+						{ "value": "wave-1", "label": "波浪 1" },
+						{ "value": "wave-2", "label": "波浪 2" },
+						{ "value": "wifi-1", "label": "Wi-Fi 1" },
+						{ "value": "wifi-2", "label": "Wi-Fi 2" },
+						{ "value": "window", "label": "視窗" },
+						{ "value": "youtube", "label": "YouTube" }
+					],
+					"default": "check-2",
+					"label": "圖示"
+				},
+				{
+					"type": "header",
+					"content": "說明文字 3"
+				},
+				{
+					"type": "checkbox",
+					"id": "show_caption_3",
+					"default": true,
+					"label": "顯示說明文字"
+				},
+				{
+					"type": "text",
+					"id": "caption_text_3",
+					"default": "按鈕文字",
+					"label": "文字內容"
+				},
+				{
+					"type": "select",
+					"id": "caption_icon_3",
+					"options": [
+						{ "value": "none", "label": "無" },
+						{ "value": "arrow-bar", "label": "箭頭條" },
+						{ "value": "bag-1", "label": "提袋 1" },
+						{ "value": "bag-2", "label": "提袋 2" },
+						{ "value": "bag-3", "label": "提袋 3" },
+						{ "value": "bar-chart", "label": "長條圖" },
+						{ "value": "bars-upward", "label": "向上長條" },
+						{ "value": "baseball", "label": "棒球" },
+						{ "value": "battery-1", "label": "電池 1" },
+						{ "value": "battery-2", "label": "電池 2" },
+						{ "value": "battery-3", "label": "電池 3" },
+						{ "value": "book", "label": "書本" },
+						{ "value": "card", "label": "卡片" },
+						{ "value": "card-holder", "label": "名片夾" },
+						{ "value": "chart", "label": "圖表" },
+						{ "value": "chart-2", "label": "圖表 2" },
+						{ "value": "chart-3", "label": "圖表 3" },
+						{ "value": "chats", "label": "對話" },
+						{ "value": "check-1", "label": "勾號 1" },
+						{ "value": "check-2", "label": "勾號 2" },
+						{ "value": "check-3", "label": "勾號 3" },
+						{ "value": "check-4", "label": "勾號 4" },
+						{ "value": "circle", "label": "圓圈" },
+						{ "value": "circles", "label": "多個圓圈" },
+						{ "value": "clock-1", "label": "時鐘 1" },
+						{ "value": "clock-2", "label": "時鐘 2" },
+						{ "value": "close", "label": "關閉" },
+						{ "value": "cloud-server", "label": "雲端伺服器" },
+						{ "value": "computer", "label": "電腦" },
+						{ "value": "computer-mouse", "label": "滑鼠" },
+						{ "value": "confetti", "label": "彩紙" },
+						{ "value": "delivery", "label": "運送" },
+						{ "value": "delivery-box", "label": "包裹" },
+						{ "value": "devices", "label": "裝置" },
+						{ "value": "directions", "label": "方向" },
+						{ "value": "dumbbell", "label": "啞鈴" },
+						{ "value": "eye", "label": "眼睛" },
+						{ "value": "facebook", "label": "Facebook" },
+						{ "value": "file-1", "label": "檔案 1" },
+						{ "value": "file-2", "label": "檔案 2" },
+						{ "value": "flag", "label": "旗幟" },
+						{ "value": "folder-1", "label": "資料夾 1" },
+						{ "value": "folder-2", "label": "資料夾 2" },
+						{ "value": "food", "label": "食物" },
+						{ "value": "hand-1", "label": "手 1" },
+						{ "value": "hand-2", "label": "手 2" },
+						{ "value": "hand-3", "label": "手 3" },
+						{ "value": "headphones", "label": "耳機" },
+						{ "value": "instagram", "label": "Instagram" },
+						{ "value": "laptop-1", "label": "筆電 1" },
+						{ "value": "laptop-2", "label": "筆電 2" },
+						{ "value": "leaf", "label": "葉子" },
+						{ "value": "lightning-bolt-1", "label": "閃電 1" },
+						{ "value": "lightning-bolt-2", "label": "閃電 2" },
+						{ "value": "like", "label": "讚" },
+						{ "value": "link", "label": "連結" },
+						{ "value": "lock-1", "label": "鎖 1" },
+						{ "value": "lock-2", "label": "鎖 2" },
+						{ "value": "logout", "label": "登出" },
+						{ "value": "luggage", "label": "行李" },
+						{ "value": "mark", "label": "標記" },
+						{ "value": "medicine", "label": "藥品" },
+						{ "value": "microphone", "label": "麥克風" },
+						{ "value": "moon", "label": "月亮" },
+						{ "value": "pencil", "label": "鉛筆" },
+						{ "value": "phone-1", "label": "電話 1" },
+						{ "value": "phone-2", "label": "電話 2" },
+						{ "value": "phone-3", "label": "電話 3" },
+						{ "value": "phone-4", "label": "電話 4" },
+						{ "value": "pinterest", "label": "Pinterest" },
+						{ "value": "plug", "label": "插頭" },
+						{ "value": "presentation-1", "label": "簡報 1" },
+						{ "value": "presentation-2", "label": "簡報 2" },
+						{ "value": "pulse", "label": "脈搏" },
+						{ "value": "recycle", "label": "回收" },
+						{ "value": "rocket", "label": "火箭" },
+						{ "value": "search", "label": "搜尋" },
+						{ "value": "sending", "label": "傳送" },
+						{ "value": "server-1", "label": "伺服器 1" },
+						{ "value": "server-2", "label": "伺服器 2" },
+						{ "value": "settings", "label": "設定" },
+						{ "value": "shield", "label": "盾牌" },
+						{ "value": "shopping-basket", "label": "購物籃" },
+						{ "value": "shuffle", "label": "隨機播放" },
+						{ "value": "snapchat", "label": "Snapchat" },
+						{ "value": "sound-waves", "label": "聲波" },
+						{ "value": "speaker", "label": "喇叭" },
+						{ "value": "squares-1", "label": "方塊 1" },
+						{ "value": "squares-2", "label": "方塊 2" },
+						{ "value": "stack", "label": "堆疊" },
+						{ "value": "star", "label": "星星" },
+						{ "value": "stopwatch", "label": "碼錶" },
+						{ "value": "sun", "label": "太陽" },
+						{ "value": "tag", "label": "標籤" },
+						{ "value": "telephone-tower", "label": "電信塔" },
+						{ "value": "tik-tok", "label": "TikTok" },
+						{ "value": "tree", "label": "樹" },
+						{ "value": "trend", "label": "趨勢" },
+						{ "value": "trophy", "label": "獎盃" },
+						{ "value": "tumblr", "label": "Tumblr" },
+						{ "value": "tv", "label": "電視" },
+						{ "value": "twitter", "label": "Twitter" },
+						{ "value": "user-1", "label": "使用者 1" },
+						{ "value": "user-2", "label": "使用者 2" },
+						{ "value": "user-3", "label": "使用者 3" },
+						{ "value": "user-4", "label": "使用者 4" },
+						{ "value": "user-5", "label": "使用者 5" },
+						{ "value": "video", "label": "影片" },
+						{ "value": "vimeo", "label": "Vimeo" },
+						{ "value": "wallet", "label": "錢包" },
+						{ "value": "watch", "label": "手錶" },
+						{ "value": "water-1", "label": "水 1" },
+						{ "value": "water-2", "label": "水 2" },
+						{ "value": "water-3", "label": "水 3" },
+						{ "value": "wave-1", "label": "波浪 1" },
+						{ "value": "wave-2", "label": "波浪 2" },
+						{ "value": "wifi-1", "label": "Wi-Fi 1" },
+						{ "value": "wifi-2", "label": "Wi-Fi 2" },
+						{ "value": "window", "label": "視窗" },
+						{ "value": "youtube", "label": "YouTube" }
+					],
+					"default": "check-2",
+					"label": "圖示"
+				}
+			]
+		},
+		{
+			"type": "users",
+			"name": "使用者頭像",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "header",
+					"content": "使用者 1"
+				},
+				{
+					"type": "image_picker",
+					"id": "user_image_1",
+					"label": "圖片"
+				},
+				{
+					"type": "header",
+					"content": "使用者 2"
+				},
+				{
+					"type": "image_picker",
+					"id": "user_image_2",
+					"label": "圖片"
+				},
+				{
+					"type": "header",
+					"content": "使用者 3"
+				},
+				{
+					"type": "image_picker",
+					"id": "user_image_3",
+					"label": "圖片"
+				},
+				{
+					"type": "header",
+					"content": "使用者 4"
+				},
+				{
+					"type": "image_picker",
+					"id": "user_image_4",
+					"label": "圖片"
+				},
+				{
+					"type": "header",
+					"content": "使用者 5"
+				},
+				{
+					"type": "image_picker",
+					"id": "user_image_5",
+					"label": "圖片"
+				},
+				{
+					"type": "textarea",
+					"id": "user_text",
+					"default": "超過 5000+ 位顧客",
+					"label": "文字"
+				}
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "主要橫幅",
+			"blocks": [
+				{
+					"type": "subtitle",
+					"settings": {
+						"subheading_icon": "star"
+					}
+				},
+				{
+					"type": "title",
+					"settings": {
+						"heading_size": "h1",
+						"heading_animation": "none"
+					}
+				},
+				{
+					"type": "description"
+				},
+				{
+					"type": "buttons",
+					"settings": {
+						"show_button_1": true,
+						"button_label_1": "探索",
+						"button_link_1": "",
+						"button_style_1": "primary",
+						"show_button_2": true,
+						"button_label_2": "了解更多",
+						"button_link_2": "",
+						"button_style_2": "simple"
+					}
+				}
+			]
+		}
+	]
+}
+{% endschema %}

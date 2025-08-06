@@ -1,0 +1,892 @@
+{{ 'section-case-studies.css' | asset_url | stylesheet_tag }}
+
+<script src='{{ 'case-studies.js' | asset_url }}' defer='defer'></script>
+
+{%- style -%}
+	 {% render 'section-padding' %}
+	{% render 'section-margin' %}
+{%- endstyle -%}
+
+<div class='case-studies color-{{ section.settings.color_scheme }} background section-{{ section.id }}-padding'>
+	<div class='container'>
+		{% render 'section-text',
+			section: section,
+			class: 'case-studies',
+			text_align: section.settings.text_align,
+			heading_level: section.settings.heading_level
+		%}
+
+		<div class='case-studies__content content case-studies__content--{{ section.settings.layout }}'>
+			{% liquid
+				assign logos = false
+				if section.settings.layout == 'tabs_bottom'
+					for block in section.blocks
+						if block.settings.logo != blank or block.settings.logo_dm != blank
+							assign logos = true
+							break
+						endif
+					endfor
+				endif
+			%}
+
+			<div class='case-studies__slider-wrapper'>
+				<div
+					class='case-studies__slider swiper'
+					data-navigation='{{ section.settings.enable_navigation }}'
+					data-pagination='{%- if logos -%} false {%- else -%} true {%- endif -%}'
+					data-layout='{{ section.settings.layout }}'
+				>
+					<div class='swiper-wrapper'>
+						{%- for block in section.blocks -%}
+							{% liquid
+								if block.settings.quote_size == 'recommended'
+									case section.settings.layout
+										when 'tabs_bottom'
+											assign quote_size = 'h3'
+										when 'tabs_left'
+											assign quote_size = 'h4'
+										when 'overlay'
+											assign quote_size = 'h2'
+									endcase
+								endif
+							%}
+							<div
+								class='
+									case-studies__slide swiper-slide color-{{ section.settings.slide_color_scheme }}
+									{% if block.settings.image != blank %} case-studies__slide--{{ section.settings.image_ratio }} {% endif %}
+								'
+								{{ block.shopify_attributes }}
+							>
+								<div class='case-studies__slide-content'>
+									{% if block.settings.heading != blank
+										or block.settings.text != blank
+									%}
+										<div class='case-studies__column'>
+											{% if block.settings.heading != blank %}
+												<div class='case-studies__column-heading h1'>
+													{{ block.settings.heading }}
+												</div>
+											{% endif %}
+											{% if block.settings.text != blank %}
+												<div class='case-studies__column-text body-large'>
+													{{ block.settings.text }}
+												</div>
+											{% endif %}
+										</div>
+									{% endif %}
+									{% if block.settings.quote != blank %}
+										<p class='case-studies__quote {{ block.settings.quote_size }} {% if block.settings.quote_size == 'recommended' %} {{ quote_size }} {% endif %}'>
+											{{- block.settings.quote -}}
+										</p>
+									{% endif %}
+
+									<div class='case-studies__bottom'>
+										<div class='case-studies__bottom-wrapper'>
+											{% if block.settings.author_image != blank
+												or block.settings.author_name != blank
+												or block.settings.author_position != blank
+											%}
+												<div class='case-studies__author'>
+													{% if block.settings.author_image != blank %}
+														<div class='case-studies__author-icon'>
+															{% if block.settings.author_image != blank %}
+																{{
+																	block.settings.author_image
+																	| image_url:
+																		width: block.settings.author_image.width
+																	| image_tag:
+																		loading: 'lazy',
+																		widths: '60, 120'
+																}}
+															{% endif %}
+														</div>
+													{% endif %}
+
+													{% if block.settings.author_name != blank
+														or block.settings.author_position != blank
+													%}
+														<div class='case-studies__author-info'>
+															{% if block.settings.author_name != blank %}
+																<div class='case-studies__author-name body-large'>
+																	{{ block.settings.author_name }}
+																</div>
+															{% endif %}
+															{% if block.settings.author_position != blank %}
+																<div class='case-studies__author-position'>
+																	{{ block.settings.author_position }}
+																</div>
+															{% endif %}
+														</div>
+													{% endif %}
+												</div>
+											{% endif %}
+											{% if section.settings.layout == 'overlay' %}
+												{% capture style_logo %}
+													--width-adapt: {{ block.settings.logo_width | times: 0.8 | round: 2 }}px
+												{% endcapture %}
+												{%- if block.settings.logo != blank
+													or block.settings.logo_dm != blank
+												-%}
+													<div class='case-studies__slide-logo-overlay'>
+														{%- if block.settings.logo != blank -%}
+															{% assign width_2x = block.settings.logo_width
+																| times: 2
+															%}
+															<img
+																srcset='{{ block.settings.logo | image_url: width: block.settings.logo_width }} 1x, {{ block.settings.logo_width | image_url: width: width_2x }} 2x'
+																src='{{ block.settings.logo | image_url: width: block.settings.logo_width }}'
+																width='{{ block.settings.logo_width }}'
+																height='auto'
+																loading='lazy'
+																class='case-studies__logo'
+																style='{{ style_logo }}'
+															>
+															{%- if block.settings.logo_dm != blank -%}
+																<img
+																	srcset='{{ block.settings.logo_dm | image_url: width: block.settings.logo_width }} 1x, {{ block.settings.logo_width | image_url: width: width_2x }} 2x'
+																	src='{{ block.settings.logo_dm | image_url: width: block.settings.logo_width }}'
+																	width='{{ block.settings.logo_width }}'
+																	height='auto'
+																	loading='lazy'
+																	class='case-studies__logo case-studies__logo--dark'
+																	style='{{ style_logo }}'
+																>
+															{% endif %}
+														{%- elsif block.settings.logo_dm != blank -%}
+															<img
+																srcset='{{ block.settings.logo_dm | image_url: width: block.settings.logo_width }} 1x, {{ block.settings.logo_width | image_url: width: width_2x }} 2x'
+																src='{{ block.settings.logo_dm | image_url: width: block.settings.logo_width }}'
+																width='{{ block.settings.logo_width }}'
+																height='auto'
+																loading='lazy'
+																class='case-studies__logo case-studies__logo--dark'
+																style='{{ style_logo }}'
+															>
+														{%- endif -%}
+													</div>
+												{% endif %}
+											{% endif %}
+
+											{% if section.settings.layout == 'tabs_left' %}
+												{% if block.settings.logo != blank
+													or block.settings.logo_dm != blank
+												%}
+													{% capture style %}
+                            --width-adapt: {{ block.settings.logo_width | times: 0.8 | round: 2 }}px
+                          {% endcapture %}
+													<div class='case-studies__slide-logo'>
+														<div class='case-studies__slide-logo-wrapper'>
+															{% if block.settings.logo != blank %}
+																{% assign width_2x = block.settings.logo_width
+																	| times: 2
+																%}
+																<img
+																	srcset='{{ block.settings.logo | image_url: width: block.settings.logo_width }} 1x, {{ block.settings.logo_width | image_url: width: width_2x }} 2x'
+																	src='{{ block.settings.logo | image_url: width: block.settings.logo_width }}'
+																	width='{{ block.settings.logo_width }}'
+																	height='auto'
+																	loading='lazy'
+																	class='case-studies__logo case-studies__logo--light'
+																	style='{{ style }}'
+																>
+																{%- if block.settings.logo_dm != blank -%}
+																	<img
+																		srcset='{{ block.settings.logo_dm | image_url: width: block.settings.logo_width }} 1x, {{ block.settings.logo_width | image_url: width: width_2x }} 2x'
+																		src='{{ block.settings.logo_dm | image_url: width: block.settings.logo_width }}'
+																		width='{{ block.settings.logo_width }}'
+																		height='auto'
+																		loading='lazy'
+																		class='case-studies__logo case-studies__logo--dark'
+																		style='{{ style }}'
+																	>
+																{% endif %}
+															{% elsif block.settings.logo_dm != blank %}
+																<img
+																	srcset='{{ block.settings.logo_dm | image_url: width: block.settings.logo_width }} 1x, {{ block.settings.logo_width | image_url: width: width_2x }} 2x'
+																	src='{{ block.settings.logo_dm | image_url: width: block.settings.logo_width }}'
+																	width='{{ block.settings.logo_width }}'
+																	height='auto'
+																	loading='lazy'
+																	class='case-studies__logo case-studies__logo--dark'
+																	style='{{ style }}'
+																>
+															{% endif %}
+														</div>
+													</div>
+												{% endif %}
+											{% endif %}
+										</div>
+
+										{% if block.settings.show_button
+											and block.settings.button_label != blank
+										%}
+											{% render 'button',
+												link: block.settings.button_link,
+												label: block.settings.button_label,
+												style: block.settings.button_style,
+												class: 'case-studies'
+											%}
+										{% endif %}
+									</div>
+								</div>
+								{% if block.settings.image != blank %}
+									{% liquid
+										if section.settings.layout == 'overlay'
+											assign width_adapt_ratio = 1
+											if block.settings.image.width > block.settings.image.height
+												assign width_adapt_ratio = 550 | times: block.settings.image.aspect_ratio | round: 2
+											endif
+										endif
+									%}
+									{% capture sizes %}
+                    {% if section.settings.layout == 'overlay' %}
+                      (min-width: 1200px) calc(100vw - 128px), 
+                      {% if width_adapt_ratio != 1 %}
+										    {{ width_adapt_ratio }}px
+                      {% else %}
+                        calc((100vw - 40px));
+                      {% endif %}
+                    {% else %}
+                      (min-width: 990px) 600px, 
+										  calc(100vw - 40px)
+                    {% endif %}
+									{% endcapture %}
+									<div class='case-studies__slide-image case-studies__slide-image--{{ section.settings.image_ratio }}'>
+										<div
+											class='case-studies__overlay'
+											style='opacity: {{ block.settings.overlay_opacity }}'
+										></div>
+										{{
+											block.settings.image
+											| image_url: width: block.settings.image.width
+											| image_tag:
+												loading: 'lazy',
+												widths: '550, 720, 940, 1066, 1200, 1400, 1632, 1800, 1900, 2200, 2500, 2800, 3100, 3264, 3400, 3700, 3900',
+												sizes: sizes
+										}}
+									</div>
+								{% endif %}
+							</div>
+						{%- endfor -%}
+					</div>
+				</div>
+				{% if section.settings.layout == 'tabs_left' %}
+					<div
+						class='
+							case-studies__pagination no-js-hidden
+							swiper-pagination color-{{ section.settings.navigation_color_scheme }}
+						'
+					></div>
+				{% endif %}
+				{% if section.settings.enable_navigation %}
+					{% if section.settings.layout == 'tabs_bottom'
+						or section.settings.layout == 'overlay'
+					%}
+						<div class='case-studies__navigation swiper-navigation no-js-hidden case-studies__navigation--mobile-hidden'>
+							<div class='case-studies__button-prev swiper-button-prev color-{{ section.settings.navigation_color_scheme }}'>
+								{% render 'icon-caret-left' %}
+							</div>
+							<div class='case-studies__button-next swiper-button-next color-{{ section.settings.navigation_color_scheme }}'>
+								{% render 'icon-caret-right' %}
+							</div>
+						</div>
+					{% endif %}
+				{% endif %}
+			</div>
+			{% if logos == false %}
+				<div
+					class='
+						case-studies__pagination no-js-hidden
+						swiper-pagination color-{{ section.settings.navigation_color_scheme }}
+					'
+				></div>
+			{% endif %}
+			{% if logos == true or section.settings.layout == 'tabs_left' %}
+				<div
+					class='case-studies__thumbs swiper case-studies__thumbs--{{ section.settings.layout }}'
+					data-layout='{{ section.settings.layout }}'
+				>
+					<div class='case-studies__thumbs-wrapper swiper-wrapper'>
+						{% for block in section.blocks %}
+							<div
+								class='swiper-slide color-{{ section.settings.tabs_color_scheme }} swiper-slide--{{ block.id }}'
+								style='width: {{ block.settings.logo_width }}px'
+							>
+								{% style %}
+									.case-studies__thumbs--tabs_bottom .swiper-slide--{{ block.id }} {
+										width: {{ block.settings.logo_width }}px;
+									}
+
+									@media screen and (max-width: 989px) {
+										.case-studies__thumbs--tabs_bottom .swiper-slide--{{ block.id }} {
+											width: {{ block.settings.logo_width | times: 0.8 | round: 2 }}px!important;
+										}
+									}
+								{% endstyle %}
+								<div
+									class='case-studies__thumbs-slide'
+									{{ block.shopify_attributes }}
+								>
+									{% if block.settings.logo != blank %}
+										{% assign width_2x = block.settings.logo_width | times: 2 %}
+										{% capture style %}
+											--width-adapt: {{ block.settings.logo_width | times: 0.8 | round: 2 }}px
+										{% endcapture %}
+
+										<img
+											srcset='{{ block.settings.logo | image_url: width: block.settings.logo_width }} 1x, {{ block.settings.logo_width | image_url: width: width_2x }} 2x'
+											src='{{ block.settings.logo | image_url: width: block.settings.logo_width }}'
+											width='{{ block.settings.logo_width }}'
+											height='auto'
+											loading='lazy'
+											class='case-studies__logo case-studies__logo--light'
+											style='{{ style }}'
+										>
+										{%- if block.settings.logo_dm != blank -%}
+											<img
+												srcset='{{ block.settings.logo_dm | image_url: width: block.settings.logo_width }} 1x, {{ block.settings.logo_width | image_url: width: width_2x }} 2x'
+												src='{{ block.settings.logo_dm | image_url: width: block.settings.logo_width }}'
+												width='{{ block.settings.logo_width }}'
+												height='auto'
+												loading='lazy'
+												class='case-studies__logo case-studies__logo--dark'
+												style='{{ style }}'
+											>
+										{% endif %}
+									{% elsif block.settings.logo_dm != blank %}
+										<img
+											srcset='{{ block.settings.logo_dm | image_url: width: block.settings.logo_width }} 1x, {{ block.settings.logo_width | image_url: width: width_2x }} 2x'
+											src='{{ block.settings.logo_dm | image_url: width: block.settings.logo_width }}'
+											width='{{ block.settings.logo_width }}'
+											height='auto'
+											loading='lazy'
+											class='case-studies__logo case-studies__logo--dark'
+											style='{{ style }}'
+										>
+									{% elsif logos == true %}
+										<div class='case-studies__thumbs-svg h6'>
+											{{ forloop.index }}
+										</div>
+									{% elsif section.settings.layout == 'tabs_left' %}
+										<div class='case-studies__thumbs-number h4'>
+											{{ forloop.index }}
+										</div>
+									{% endif %}
+								</div>
+							</div>
+						{% endfor %}
+					</div>
+				</div>
+			{% endif %}
+		</div>
+	</div>
+</div>
+
+{% schema %}
+{
+	"name": "客戶案例",
+	"tag": "section",
+	"class": "case-studies-section",
+	"enabled_on": {
+		"templates": ["*"]
+	},
+	"settings": [
+		{
+			"type": "select",
+			"id": "layout",
+			"label": "版面配置",
+			"options": [
+				{ "value": "tabs_bottom", "label": "頁籤在下方" },
+				{ "value": "tabs_left", "label": "頁籤在左側" },
+				{ "value": "overlay", "label": "疊加層" }
+			],
+			"default": "tabs_bottom"
+		},
+		{
+			"type": "color_scheme",
+			"id": "color_scheme",
+			"default": "background-1",
+			"label": "色彩配置"
+		},
+		{
+			"type": "text",
+			"id": "subheading",
+			"label": "副標題"
+		},
+		{
+			"type": "select",
+			"id": "subheading_style",
+			"options": [
+				{ "value": "subtitle", "label": "副標題" },
+				{ "value": "subtitle subtitle--secondary", "label": "副標題 (次要)" }
+			],
+			"default": "subtitle",
+			"label": "副標題樣式"
+		},
+		{
+			"type": "select",
+			"id": "subheading_icon",
+			"options": [
+				{ "value": "none", "label": "無" },
+				{ "value": "arrow-bar", "label": "箭頭條" },
+				{ "value": "bag-1", "label": "提袋 1" },
+				{ "value": "bag-2", "label": "提袋 2" },
+				{ "value": "bag-3", "label": "提袋 3" },
+				{ "value": "bar-chart", "label": "長條圖" },
+				{ "value": "bars-upward", "label": "向上長條" },
+				{ "value": "baseball", "label": "棒球" },
+				{ "value": "battery-1", "label": "電池 1" },
+				{ "value": "battery-2", "label": "電池 2" },
+				{ "value": "battery-3", "label": "電池 3" },
+				{ "value": "book", "label": "書本" },
+				{ "value": "card", "label": "卡片" },
+				{ "value": "card-holder", "label": "名片夾" },
+				{ "value": "chart", "label": "圖表" },
+				{ "value": "chart-2", "label": "圖表 2" },
+				{ "value": "chart-3", "label": "圖表 3" },
+				{ "value": "chats", "label": "對話" },
+				{ "value": "check-1", "label": "勾號 1" },
+				{ "value": "check-2", "label": "勾號 2" },
+				{ "value": "check-3", "label": "勾號 3" },
+				{ "value": "check-4", "label": "勾號 4" },
+				{ "value": "circle", "label": "圓圈" },
+				{ "value": "circles", "label": "多個圓圈" },
+				{ "value": "clock-1", "label": "時鐘 1" },
+				{ "value": "clock-2", "label": "時鐘 2" },
+				{ "value": "close", "label": "關閉" },
+				{ "value": "cloud-server", "label": "雲端伺服器" },
+				{ "value": "computer", "label": "電腦" },
+				{ "value": "computer-mouse", "label": "滑鼠" },
+				{ "value": "confetti", "label": "彩紙" },
+				{ "value": "delivery", "label": "運送" },
+				{ "value": "delivery-box", "label": "包裹" },
+				{ "value": "devices", "label": "裝置" },
+				{ "value": "directions", "label": "方向" },
+				{ "value": "dumbbell", "label": "啞鈴" },
+				{ "value": "eye", "label": "眼睛" },
+				{ "value": "facebook", "label": "Facebook" },
+				{ "value": "file-1", "label": "檔案 1" },
+				{ "value": "file-2", "label": "檔案 2" },
+				{ "value": "flag", "label": "旗幟" },
+				{ "value": "folder-1", "label": "資料夾 1" },
+				{ "value": "folder-2", "label": "資料夾 2" },
+				{ "value": "food", "label": "食物" },
+				{ "value": "hand-1", "label": "手 1" },
+				{ "value": "hand-2", "label": "手 2" },
+				{ "value": "hand-3", "label": "手 3" },
+				{ "value": "headphones", "label": "耳機" },
+				{ "value": "instagram", "label": "Instagram" },
+				{ "value": "laptop-1", "label": "筆電 1" },
+				{ "value": "laptop-2", "label": "筆電 2" },
+				{ "value": "leaf", "label": "葉子" },
+				{ "value": "lightning-bolt-1", "label": "閃電 1" },
+				{ "value": "lightning-bolt-2", "label": "閃電 2" },
+				{ "value": "like", "label": "讚" },
+				{ "value": "link", "label": "連結" },
+				{ "value": "lock-1", "label": "鎖 1" },
+				{ "value": "lock-2", "label": "鎖 2" },
+				{ "value": "logout", "label": "登出" },
+				{ "value": "luggage", "label": "行李" },
+				{ "value": "mark", "label": "標記" },
+				{ "value": "medicine", "label": "藥品" },
+				{ "value": "microphone", "label": "麥克風" },
+				{ "value": "moon", "label": "月亮" },
+				{ "value": "pencil", "label": "鉛筆" },
+				{ "value": "phone-1", "label": "電話 1" },
+				{ "value": "phone-2", "label": "電話 2" },
+				{ "value": "phone-3", "label": "電話 3" },
+				{ "value": "phone-4", "label": "電話 4" },
+				{ "value": "pinterest", "label": "Pinterest" },
+				{ "value": "plug", "label": "插頭" },
+				{ "value": "presentation-1", "label": "簡報 1" },
+				{ "value": "presentation-2", "label": "簡報 2" },
+				{ "value": "pulse", "label": "脈搏" },
+				{ "value": "recycle", "label": "回收" },
+				{ "value": "rocket", "label": "火箭" },
+				{ "value": "search", "label": "搜尋" },
+				{ "value": "sending", "label": "傳送" },
+				{ "value": "server-1", "label": "伺服器 1" },
+				{ "value": "server-2", "label": "伺服器 2" },
+				{ "value": "settings", "label": "設定" },
+				{ "value": "shield", "label": "盾牌" },
+				{ "value": "shopping-basket", "label": "購物籃" },
+				{ "value": "shuffle", "label": "隨機播放" },
+				{ "value": "snapchat", "label": "Snapchat" },
+				{ "value": "sound-waves", "label": "聲波" },
+				{ "value": "speaker", "label": "喇叭" },
+				{ "value": "squares-1", "label": "方塊 1" },
+				{ "value": "squares-2", "label": "方塊 2" },
+				{ "value": "stack", "label": "堆疊" },
+				{ "value": "star", "label": "星星" },
+				{ "value": "stopwatch", "label": "碼錶" },
+				{ "value": "sun", "label": "太陽" },
+				{ "value": "tag", "label": "標籤" },
+				{ "value": "telephone-tower", "label": "電信塔" },
+				{ "value": "tik-tok", "label": "TikTok" },
+				{ "value": "tree", "label": "樹" },
+				{ "value": "trend", "label": "趨勢" },
+				{ "value": "trophy", "label": "獎盃" },
+				{ "value": "tumblr", "label": "Tumblr" },
+				{ "value": "tv", "label": "電視" },
+				{ "value": "twitter", "label": "Twitter" },
+				{ "value": "user-1", "label": "使用者 1" },
+				{ "value": "user-2", "label": "使用者 2" },
+				{ "value": "user-3", "label": "使用者 3" },
+				{ "value": "user-4", "label": "使用者 4" },
+				{ "value": "user-5", "label": "使用者 5" },
+				{ "value": "video", "label": "影片" },
+				{ "value": "vimeo", "label": "Vimeo" },
+				{ "value": "wallet", "label": "錢包" },
+				{ "value": "watch", "label": "手錶" },
+				{ "value": "water-1", "label": "水 1" },
+				{ "value": "water-2", "label": "水 2" },
+				{ "value": "water-3", "label": "水 3" },
+				{ "value": "wave-1", "label": "波浪 1" },
+				{ "value": "wave-2", "label": "波浪 2" },
+				{ "value": "wifi-1", "label": "Wi-Fi 1" },
+				{ "value": "wifi-2", "label": "Wi-Fi 2" },
+				{ "value": "window", "label": "視窗" },
+				{ "value": "youtube", "label": "YouTube" }
+			],
+			"default": "none",
+			"label": "副標題圖示"
+		},
+		{
+			"type": "inline_richtext",
+			"id": "heading",
+			"label": "標題",
+			"info": "使用方括號 `[文字]` 來突顯標題中的特定單字。"
+		},
+		{
+			"type": "select",
+			"id": "heading_size",
+			"options": [
+				{ "value": "h3", "label": "中" },
+				{ "value": "h2", "label": "大" }
+			],
+			"default": "h2",
+			"label": "標題大小"
+		},
+		{
+			"type": "select",
+			"id": "heading_level",
+			"options": [
+				{ "value": "h1", "label": "H1" },
+				{ "value": "h2", "label": "H2" },
+				{ "value": "h3", "label": "H3" }
+			],
+			"default": "h2",
+			"label": "標題層級 (HTML 標籤)"
+		},
+		{
+			"type": "select",
+			"id": "heading_line",
+			"options": [
+				{ "value": "simple", "label": "簡潔線條" },
+				{ "value": "rounded", "label": "圓角線條" },
+				{ "value": "background", "label": "背景色塊" },
+				{ "value": "none", "label": "無" }
+			],
+			"default": "simple",
+			"label": "標題線條樣式"
+		},
+		{
+			"type": "color",
+			"id": "line_color",
+			"label": "線條顏色",
+			"default": "#1566E0"
+		},
+		{
+			"type": "checkbox",
+			"id": "word_break",
+			"label": "啟用標題自動換行",
+			"default": false
+		},
+		{
+			"type": "select",
+			"id": "heading_animation",
+			"options": [
+				{ "value": "typewriter", "label": "打字機" },
+				{ "value": "rolling", "label": "滾動" },
+				{ "value": "appearing", "label": "浮現" },
+				{ "value": "none", "label": "無" }
+			],
+			"default": "none",
+			"label": "標題動畫",
+			"info": "此動畫僅在頁面首次載入時播放一次。"
+		},
+		{
+			"type": "checkbox",
+			"id": "word_break_an",
+			"label": "啟用動畫文字自動換行",
+			"default": false
+		},
+		{
+			"type": "textarea",
+			"id": "text",
+			"label": "內文"
+		},
+		{
+			"type": "select",
+			"id": "text_align",
+			"label": "文字對齊",
+			"options": [
+				{ "value": "left", "label": "靠左" },
+				{ "value": "center", "label": "置中" }
+			],
+			"default": "left"
+		},
+		{
+			"type": "select",
+			"id": "image_ratio",
+			"options": [
+				{ "value": "landscape", "label": "橫向" },
+				{ "value": "portrait", "label": "直向" },
+				{ "value": "square", "label": "正方形" }
+			],
+			"default": "square",
+			"label": "圖片比例"
+		},
+		{
+			"type": "color_scheme",
+			"id": "slide_color_scheme",
+			"default": "background-2",
+			"label": "投影片色彩配置"
+		},
+		{
+			"type": "color_scheme",
+			"id": "tabs_color_scheme",
+			"default": "background-2",
+			"label": "頁籤色彩配置",
+			"info": "僅適用於「頁籤在下方」和「頁籤在左側」版面。"
+		},
+		{
+			"type": "checkbox",
+			"id": "enable_navigation",
+			"default": true,
+			"label": "啟用導覽箭頭",
+			"info": "不適用於「頁籤在左側」版面。"
+		},
+		{
+			"type": "color_scheme",
+			"id": "navigation_color_scheme",
+			"default": "background-1",
+			"label": "導覽箭頭色彩配置"
+		},
+		{
+			"type": "header",
+			"content": "區塊內距 (Padding)"
+		},
+		{
+			"type": "select",
+			"id": "padding_top",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "超小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "超大" }
+			],
+			"default": "l",
+			"label": "頂部內距"
+		},
+		{
+			"type": "select",
+			"id": "padding_bottom",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "超小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "超大" }
+			],
+			"default": "l",
+			"label": "底部內距"
+		},
+		{
+			"type": "header",
+			"content": "區塊外距 (Margin)"
+		},
+		{
+			"type": "select",
+			"id": "margin_top",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "超小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "超大" }
+			],
+			"default": "no-indent",
+			"label": "頂部外距"
+		},
+		{
+			"type": "select",
+			"id": "margin_bottom",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "超小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "超大" }
+			],
+			"default": "no-indent",
+			"label": "底部外距"
+		}
+	],
+	"blocks": [
+		{
+			"type": "case_slide",
+			"name": "案例項目",
+			"settings": [
+				{
+					"type": "image_picker",
+					"id": "image",
+					"label": "圖片"
+				},
+				{
+					"type": "range",
+					"id": "overlay_opacity",
+					"min": 0,
+					"max": 1,
+					"step": 0.1,
+					"label": "疊加層不透明度",
+					"default": 0
+				},
+				{
+					"type": "text",
+					"id": "heading",
+					"label": "標題",
+					"default": "+32%"
+				},
+				{
+					"type": "text",
+					"id": "text",
+					"label": "內文",
+					"default": "轉換率"
+				},
+				{
+					"type": "textarea",
+					"id": "quote",
+					"label": "引言",
+					"default": "在此分享您的客戶案例或成功故事。"
+				},
+				{
+					"type": "select",
+					"id": "quote_size",
+					"label": "引言文字大小",
+					"options": [
+						{ "value": "recommended", "label": "建議大小" },
+						{ "value": "h4", "label": "小" },
+						{ "value": "h3", "label": "中" },
+						{ "value": "h2", "label": "大" }
+					],
+					"default": "recommended"
+				},
+				{
+					"type": "image_picker",
+					"id": "author_image",
+					"label": "推薦人圖片"
+				},
+				{
+					"type": "text",
+					"id": "author_name",
+					"default": "姓名",
+					"label": "推薦人姓名"
+				},
+				{
+					"type": "text",
+					"id": "author_position",
+					"default": "職稱, 公司",
+					"label": "推薦人職稱/地點"
+				},
+				{
+					"type": "checkbox",
+					"id": "show_button",
+					"default": true,
+					"label": "顯示按鈕"
+				},
+				{
+					"type": "select",
+					"id": "button_style",
+					"options": [
+						{
+							"group": "外框/連結按鈕",
+							"value": "simple",
+							"label": "簡潔"
+						},
+						{
+							"group": "外框/連結按鈕",
+							"value": "simple_secondary",
+							"label": "簡潔 (次要)"
+						},
+						{
+							"group": "外框/連結按鈕",
+							"value": "simple_link",
+							"label": "簡潔 (連結樣式)"
+						}
+					],
+					"default": "simple",
+					"label": "按鈕樣式"
+				},
+				{
+					"type": "text",
+					"id": "button_label",
+					"default": "閱讀完整故事",
+					"label": "按鈕文字"
+				},
+				{
+					"type": "url",
+					"id": "button_link",
+					"label": "按鈕連結"
+				},
+				{
+					"type": "image_picker",
+					"id": "logo",
+					"label": "Logo (用於淺色背景)",
+					"info": "顯示於頁籤導覽中。"
+				},
+				{
+					"type": "image_picker",
+					"id": "logo_dm",
+					"label": "Logo (用於深色背景)",
+					"info": "選填。在深色色彩配置上顯示。"
+				},
+				{
+					"type": "range",
+					"min": 50,
+					"max": 220,
+					"default": 130,
+					"step": 5,
+					"unit": "px",
+					"id": "logo_width",
+					"label": "Logo 寬度"
+				}
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "客戶案例",
+			"blocks": [
+				{
+					"type": "case_slide"
+				},
+				{
+					"type": "case_slide"
+				},
+				{
+					"type": "case_slide"
+				},
+				{
+					"type": "case_slide"
+				}
+			]
+		}
+	]
+}
+{% endschema %}

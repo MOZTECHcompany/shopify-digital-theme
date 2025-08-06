@@ -1,0 +1,50 @@
+/*
+ * jQuery.Marquee - scrolling text like old marquee element
+ * Copyright (c) 2011 Aamir Afridi - aamirafridi(at)gmail(dot)com | http://www.aamirafridi.com/jquery/jquery-marquee-plugin
+ * Licensed under the MIT license
+ */
+(function($){$.fn.marquee=function(options){return this.each(function(){var o=$.extend({},$.fn.marquee.defaults,options),$this=$(this),$marqueeWrapper,containerWidth,animationCss,verticalDir,elWidth,loopCount=3,playState='running',css3AnimationIsSupported=false,v,i,supports3d=false,vendor=['webkit','moz','o','ms'];for(i=0;i<vendor.length;i++){if(typeof document.body.style[vendor[i]+'Animation']!=='undefined'){v=vendor[i];css3AnimationIsSupported=true;break}}var css3Animation=function(el,direction,speed){if(css3AnimationIsSupported){var animationName=$this.attr('class')+'-animation';var keyframeString='@-KEYFRAMES-@ '+animationName+' { from { -KEYFRAMES-transform:translateX(0); } to { -KEYFRAMES-transform:translateX(-DIRECTION-); } }';var animationString=animationName+' '+speed/1000+'s linear infinite';if(o.pauseOnHover){animationString+=' paused'}var _animationCss={};_animationCss[v+'Animation']=animationString;_animationCss.animation=animationString;var keyframePrefix='-'+v+'-';var keyframeCss=keyframeString.replace(/@-KEYFRAMES-@/g,keyframePrefix+'keyframes').replace(/-KEYFRAMES-/g,keyframePrefix).replace(/DIRECTION/g,direction);if(o.pauseOnHover){keyframeCss+='@-KEYFRAMES-@ '+animationName+' { 100% { -KEYFRAMES-transform:translateX(-DIRECTION-); } }'}var $style=$this.find('style');if($style.length===0){$style=$('<style type="text/css"></style>').appendTo($this)}else{$style.empty()}$style.html(keyframeCss);$this.css(_animationCss);if(o.pauseOnHover){$this.on('mouseenter',function(){$this.css(v+'AnimationPlayState','paused');$this.css('AnimationPlayState','paused')}).on('mouseleave',function(){$this.css(v+'AnimationPlayState','running');$this.css('AnimationPlayState','running')})}}else{var animate=function(){$this.css('transform','translateX(-'+direction+')');el.animate({'transform':'translateX(0)'},speed,'linear',function(){animate()})};animate()}};var _width=$this.width();var _height=$this.height();if(o.duplicated){loopCount=o.gap/o.speed*1000}var $lis=$this.find('> *').clone().appendTo($this);$this.find('> *').clone().appendTo($this);$this.wrapInner('<div style="width:100000px" class="js-marquee"></div>');var $el=$this.find('.js-marquee');if(o.direction==='up'||o.direction==='down'){var innerHeight=$this.height();$el.find('> *').css({'float':'none','display':'block'});$el.css('height',innerHeight);$this.height(innerHeight);var $innerEl=$el.find('> *:first');var elHeight=$innerEl.height();if(o.duplicated){elHeight+=(parseInt($innerEl.css('margin-bottom'))+parseInt($innerEl.css('margin-top')))}$el.find('> *').each(function(){elHeight+=$(this).height()});$el.height(elHeight);verticalDir=o.direction==='up'?'-'+elHeight+'px':'0';animationCss={'transform':'translateY('+verticalDir+')'};css3Animation($el,elHeight,o.speed)}else{elWidth=$this.width();$el.find('> *').css({'float':'left','margin-right':o.gap});$el.width(100000);var $innerEl=$el.find('> *:first');containerWidth=$innerEl.width()+(parseInt($innerEl.css('margin-right'))||0);$el.find('> *').each(function(){containerWidth+=$(this).width()+(parseInt($(this).css('margin-right'))||0)});$el.width(containerWidth);var direction=o.direction==='left'?containerWidth+'px':'0';if(o.startVisible){var startPos=0;var $visEl=$el.find('> *:lt('+Math.ceil(_width/containerWidth*loopCount)+')');if($visEl.length>0){startPos=$visEl.last().position().left+$visEl.last().outerWidth(true)}$this.scrollLeft(startPos)}animationCss={'transform':'translateX(-'+direction+')'};css3Animation($this,direction,o.speed)}}})};$.fn.marquee.defaults={direction:'left',duration:5000,speed:50,gap:20,delayBeforeStart:0,duplicated:false,pauseOnHover:false,startVisible:false}})(jQuery);
+
+// Main Animated Image Collage Logic
+class AnimatedImageCollage {
+	constructor(section) {
+		this.section = section;
+		this.marquees = this.section.querySelectorAll('.aic__marquee');
+		this.marqueesHorizontal = this.section.querySelectorAll(
+			'.aic__marquee-horizontal'
+		);
+
+		this.initSlider();
+	}
+
+	initSlider() {
+		if (this.marquees) {
+			this.marquees.forEach((marquee) => {
+				const slides = marquee.dataset.slides;
+
+				$(marquee).marquee({
+					speed: 130 * slides,
+					direction: 'up',
+					duplicated: true,
+					gap: 0,
+				});
+			});
+		}
+
+		if (this.marqueesHorizontal) {
+			this.marqueesHorizontal.forEach((marquee) => {
+				$(marquee).marquee({
+					speed: 40000,
+					direction: 'left',
+					duplicated: true,
+					gap: 24,
+				});
+			});
+		}
+	}
+}
+
+const aicSections = document.querySelectorAll('.aic-section');
+aicSections.forEach((section) => {
+	new AnimatedImageCollage(section);
+});

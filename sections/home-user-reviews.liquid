@@ -1,0 +1,766 @@
+{% comment %}
+============================================================
+ 主題：星軌引力場 v8.5 (品牌化星星顏色)
+ 特色：
+ - [✨ 新功能] 評價的星星顏色現在會自動採用設定的品牌色，提升視覺一致性。
+ - [視覺優化] 在每個頭像下方新增了直觀的星級評分標籤 (例如 ⭐ 5.00)，提升資訊清晰度。
+ - [視覺優化] 評分標籤採用玻璃擬態風格，與整體科幻美學完美融合。
+ - [互動增強] 評分標籤會隨頭像的懸停效果一起產生微妙的互動動畫。
+ - [JSON修復] 保留 v8.3 的 JSON 格式修正。
+============================================================
+{% endcomment %}
+
+<style>
+  :root {
+    --sgw-brand-color: {{ section.settings.brand_color | default: '#2BB9ED' }};
+    --sgw-brand-color-rgb-values: {{ section.settings.brand_color.red }}, {{ section.settings.brand_color.green }}, {{ section.settings.brand_color.blue }};
+    --sgw-bg-dark: #0a0a0c;
+    --sgw-text-light: #f0f0f0;
+    --sgw-text-muted: #bbb;
+    /* ✨ [已修改] 將星星顏色直接關聯到品牌顏色變數 */
+    --sgw-star-color: var(--sgw-brand-color);
+  }
+
+  .star-gravitas-wall-section {
+    padding: clamp(60px, 8vw, 120px) 0;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+    position: relative;
+    background: var(--sgw-bg-dark);
+  }
+
+  #sgw-particle-canvas-{{ section.id }} {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%; z-index: 0;
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .star-gravitas-wall__header {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto clamp(50px, 8vw, 70px) auto;
+    padding: 0 clamp(20px, 5vw, 40px);
+    position: relative; z-index: 1;
+  }
+  .star-gravitas-wall__title {
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 700;
+    color: var(--sgw-text-light);
+    margin: 0;
+  }
+  .star-gravitas-wall__description {
+    font-size: clamp(15px, 1.8vw, 18px);
+    color: var(--sgw-text-muted);
+    margin-top: 15px;
+    line-height: 1.6;
+  }
+
+  .star-gravitas-wall__perspective-wrapper {
+    perspective: 1500px;
+    position: relative; z-index: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 clamp(20px, 4vw, 40px);
+  }
+  
+  .star-gravitas-wall__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+    gap: 28px;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  
+  .star-gravitas-wall__item {
+    aspect-ratio: 1 / 1;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    position: relative;
+    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+
+  .star-gravitas-wall__item:hover {
+    transform: scale(1.12) translateZ(50px);
+    z-index: 10; /* ✨ 優化: 讓懸停的項目在最上層 */
+  }
+  .star-gravitas-wall__item img {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    pointer-events: none;
+    filter: grayscale(90%) brightness(0.85);
+    transition: all 0.3s ease-out;
+    border: 2px solid rgba(255,255,255,0.08);
+  }
+
+  .star-gravitas-wall__item:hover img {
+    filter: grayscale(0%) brightness(1.1);
+    box-shadow: 0 0 30px -8px hsla(var(--sgw-brand-color-rgb-values), 0.8),
+                0 0 50px -15px hsla(var(--sgw-brand-color-rgb-values), 0.6);
+    border-color: hsla(var(--sgw-brand-color-rgb-values), 0.6);
+  }
+  
+  /* ✨ --- 新增：頭像評分標籤樣式 --- ✨ */
+  .sgw-item__rating-pill {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(50%);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(20, 20, 24, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sgw-text-light);
+    z-index: 2;
+    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+    white-space: nowrap;
+  }
+  .sgw-item__rating-pill .icon-star {
+    width: 14px;
+    height: 14px;
+    color: var(--sgw-star-color);
+  }
+  .star-gravitas-wall__item:hover .sgw-item__rating-pill {
+    transform: translateX(-50%) translateY(50%) scale(1.08);
+    background: hsla(var(--sgw-brand-color-rgb-values), 0.2);
+    box-shadow: 0 0 12px hsla(var(--sgw-brand-color-rgb-values), 0.4);
+    border-color: hsla(var(--sgw-brand-color-rgb-values), 0.4);
+  }
+  /* ✨ --- 評分標籤樣式結束 --- ✨ */
+
+
+  .star-gravitas-wall__modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(10, 10, 12, 0.5);
+    -webkit-backdrop-filter: blur(20px) saturate(120%);
+    backdrop-filter: blur(20px) saturate(120%);
+    z-index: 1000;
+    display: flex; align-items: center; justify-content: center;
+    padding: 30px; box-sizing: border-box;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+  .star-gravitas-wall__modal-overlay.is-visible {
+    opacity: 1; pointer-events: auto;
+  }
+  
+  .star-gravitas-wall__modal-card {
+    width: 90%; max-width: 550px;
+    background: rgba(30, 30, 36, 0.9);
+    border-radius: 20px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 30px 100px -25px rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--sgw-text-light);
+    position: relative;
+    padding: clamp(30px, 6vw, 40px);
+    opacity: 0;
+    transform: scale(0.9);
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.4s ease;
+    transition-delay: 0.1s;
+  }
+  .star-gravitas-wall__modal-overlay.is-visible .star-gravitas-wall__modal-card {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  .sgw-modal__close-button {
+    position: absolute; top: 18px; right: 18px; width: 36px; height: 36px; cursor: pointer;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%; border: none;
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    line-height: 1;
+    transition: transform 0.3s, background 0.3s;
+  }
+  .sgw-modal__close-button:hover {
+    transform: scale(1.15) rotate(90deg);
+    background: rgba(255,255,255,0.25);
+  }
+
+  .sgw-modal__user-wrapper { display: flex; align-items: center; gap: 18px; margin-bottom: 25px; }
+  .sgw-modal__user-photo { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; }
+  .sgw-modal__user-details { display: flex; flex-direction: column; }
+  .sgw-modal__user-name { font-weight: 600; font-size: 19px; }
+  
+  .sgw-modal__stars { display: flex; gap: 4px; margin-top: 6px; }
+  .sgw-modal__stars .icon-star { width: 18px; height: 18px; color: var(--sgw-star-color); opacity: 0; transform: scale(0); }
+  .star-gravitas-wall__modal-overlay.is-visible .sgw-modal__stars .icon-star {
+    animation: star-pop-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+  @keyframes star-pop-in {
+    from { opacity: 0; transform: scale(0); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .sgw-modal__review-content { 
+    font-size: clamp(1rem, 1.2vw, 1.1rem);
+    line-height: 1.7;
+    margin: 0 0 35px 0;
+    color: #e0e0e5;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  }
+  
+  .sgw-modal__product-area {
+    margin-top: 25px; padding-top: 25px; border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex; gap: 18px; align-items: center;
+  }
+  .sgw-modal__product-image-wrapper {
+    width: 75px; height: 75px; background: rgba(0,0,0,0.3); border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .sgw-modal__product-image { max-width: 90%; max-height: 90%; object-fit: contain; }
+  .sgw-modal__product-info { display: flex; flex-direction: column; }
+  
+  .sgw-modal__product-title { 
+    font-weight: 600; 
+    font-size: clamp(1rem, 1.2vw, 1.05rem);
+    margin-bottom: 8px; 
+    color: #FFFFFF;
+  }
+  
+  .sgw-modal__product-button a {
+    background: var(--sgw-brand-color);
+    color: #fff; text-decoration: none; padding: 11px 20px;
+    border-radius: 10px;
+    font-weight: 600; font-size: 14px;
+    display: inline-block; transition: all 0.3s ease;
+    box-shadow: 0 0 15px -5px hsla(var(--sgw-brand-color-rgb-values), 0.5);
+  }
+  .sgw-modal__product-button a:hover {
+    background: rgba(var(--sgw-brand-color-rgb-values), 0.9);
+    box-shadow: 0 0 28px -5px hsla(var(--sgw-brand-color-rgb-values), 0.8);
+    transform: translateY(-3px);
+  }
+
+  @media (max-width: 768px) {
+    .star-gravitas-wall-section {
+      padding: clamp(30px, 8vw, 60px) 0;
+    }
+
+    .star-gravitas-wall__header {
+      margin-bottom: 25px;
+      padding: 0 15px;
+    }
+    .star-gravitas-wall__title {
+      font-size: clamp(26px, 7vw, 32px);
+    }
+    .star-gravitas-wall__description {
+      font-size: clamp(13px, 3.5vw, 15px);
+      margin-top: 10px;
+    }
+
+    .star-gravitas-wall__perspective-wrapper {
+        perspective: none;
+    }
+
+    .star-gravitas-wall__grid {
+      grid-template-columns: repeat(auto-fit, minmax(clamp(45px, 12vw, 60px), 1fr));
+      gap: 12px; /* ✨ 優化: 調整手機版間距以容納標籤 */
+      padding: 0 12px;
+      transform-style: flat;
+      transform: none !important;
+    }
+
+    .star-gravitas-wall__item {
+      transform-style: flat;
+      transform: none !important;
+    }
+
+    .star-gravitas-wall__item:active,
+    .star-gravitas-wall__item:focus {
+      transform: scale(1.15);
+      transition: transform 0.15s ease-out;
+    }
+    .star-gravitas-wall__item:hover {
+      transform: scale(1.05);
+    }
+
+    .star-gravitas-wall__item img {
+      border: 2px solid rgba(255,255,255,0.03);
+      box-shadow: none;
+    }
+    .star-gravitas-wall__item:active img,
+    .star-gravitas-wall__item:focus img,
+    .star-gravitas-wall__item:hover img {
+      filter: grayscale(0%) brightness(1.05);
+      box-shadow: 0 0 10px -3px hsla(var(--sgw-brand-color-rgb-values), 0.35),
+                  0 0 20px -8px hsla(var(--sgw-brand-color-rgb-values), 0.25);
+      border-color: hsla(var(--sgw-brand-color-rgb-values), 0.25);
+    }
+
+    /* ✨ --- 新增：手機版評分標籤樣式 --- ✨ */
+    .sgw-item__rating-pill {
+      font-size: 10px;
+      padding: 3px 7px;
+      gap: 3px;
+    }
+    .sgw-item__rating-pill .icon-star {
+      width: 11px;
+      height: 11px;
+    }
+    /* ✨ --- 手機版樣式結束 --- ✨ */
+
+
+    .star-gravitas-wall__modal-overlay {
+      align-items: flex-end;
+    }
+
+    .star-gravitas-wall__modal-card {
+      padding: clamp(25px, 6vw, 30px);
+      border-radius: 16px 16px 0 0;
+      width: 100%;
+      max-width: none;
+      transform: translateY(100%);
+      opacity: 1;
+      transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .star-gravitas-wall__modal-overlay.is-visible .star-gravitas-wall__modal-card {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .sgw-modal__close-button {
+      top: 15px; right: 15px;
+      width: 36px; height: 36px; 
+      font-size: 22px; 
+      z-index: 10;
+    }
+
+    .sgw-modal__user-wrapper { margin-bottom: 15px; }
+    .sgw-modal__user-name { font-size: 15px; }
+    .sgw-modal__user-photo { width: 36px; height: 36px; }
+    .sgw-modal__stars .icon-star { width: 13px; height: 13px; }
+    .sgw-modal__review-content { 
+      font-size: clamp(0.9rem, 4vw, 1rem);
+      margin-bottom: 18px;
+      line-height: 1.6;
+    }
+    .sgw-modal__product-area {
+      gap: 6px;
+      padding-top: 12px;
+    }
+    .sgw-modal__product-image-wrapper {
+      width: 45px; height: 45px;
+      border-radius: 8px;
+    }
+    .sgw-modal__product-title {
+      font-size: clamp(0.8rem, 3.8vw, 0.9rem);
+      margin-bottom: 4px;
+    }
+    .sgw-modal__product-button a {
+      padding: 7px 14px;
+      font-size: 12px;
+    }
+  }
+</style>
+
+<div class="star-gravitas-wall-section">
+  <canvas id="sgw-particle-canvas-{{ section.id }}"></canvas>
+
+  <div class="star-gravitas-wall__header">
+    {% if section.settings.home_reviews_title != blank %}
+      <h2 class="star-gravitas-wall__title">{{ section.settings.home_reviews_title }}</h2>
+    {% endif %}
+    {% if section.settings.home_reviews_description != blank %}
+      <p class="star-gravitas-wall__description">{{ section.settings.home_reviews_description }}</p>
+    {% endif %}
+  </div>
+  
+  {% if section.blocks.size > 0 %}
+    <div class="star-gravitas-wall__perspective-wrapper">
+      <div class="star-gravitas-wall__grid" id="star-gravitas-wall-grid-{{ section.id }}">
+        {% for block in section.blocks %}
+          
+          {%- assign related_product = block.settings.product_handle -%}
+          {%- assign has_product = false -%}
+          {%- if related_product != blank and related_product.url != blank -%}
+            {%- assign has_product = true -%}
+          {%- endif -%}
+
+          <div class="star-gravitas-wall__item"
+               data-review-content="{{ block.settings.user_reviews_content | escape }}"
+               data-user-name="{{ block.settings.reviews_user_name | escape }}"
+               data-user-photo="{{ block.settings.reviews_user_photo | image_url: width: 240, height: 240, crop: 'center' }}"
+               data-star-rating="{{ block.settings.star_rating }}"
+               data-has-product="{{ has_product }}"
+               {% if has_product %}
+                 data-product-title="{{ related_product.title | escape }}"
+                 data-product-url="{{ related_product.url }}"
+                 data-product-image="{{ related_product.featured_image | image_url: width: 140, height: 140, crop: 'center' }}"
+               {% endif %}
+               role="button" tabindex="0" aria-label="View review by {{ block.settings.reviews_user_name | escape }}"
+               >
+            {% if block.settings.reviews_user_photo != blank %}
+              <img src="{{ block.settings.reviews_user_photo | image_url: width: 240, height: 240, crop: 'center' }}" alt="{{ block.settings.reviews_user_name | escape }}'s profile picture" loading="lazy">
+            {% else %}
+              {{ 'avatar-1' | placeholder_svg_tag: 'placeholder-svg placeholder-svg--small' }}
+            {% endif %}
+
+            <!-- ✨ --- 新增：評分標籤 HTML --- ✨ -->
+            <div class="sgw-item__rating-pill">
+              <svg class="icon-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+              <span>{{ block.settings.star_rating | number_with_precision: 2 }}</span>
+            </div>
+            <!-- ✨ --- 評分標籤 HTML 結束 --- ✨ -->
+
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% else %}
+    <p class="sgw-no-reviews-message" style="text-align:center;">No reviews yet.</p>
+  {% endif %}
+</div>
+
+<!-- Modal and Script remain unchanged -->
+<div class="star-gravitas-wall__modal-overlay" id="star-gravitas-wall-modal-{{ section.id }}">
+  <div class="star-gravitas-wall__modal-card" role="dialog" aria-modal="true" aria-labelledby="sgw-modal-user-name-{{ section.id }}">
+    <button class="sgw-modal__close-button" aria-label="Close review modal">×</button>
+    <div class="sgw-modal__user-wrapper">
+      <img id="sgw-modal-user-photo-{{ section.id }}" src="" class="sgw-modal__user-photo" alt="Reviewer's profile photo">
+      <div class="sgw-modal__user-details">
+        <span id="sgw-modal-user-name-{{ section.id }}" class="sgw-modal__user-name"></span>
+        <div id="sgw-modal-stars-{{ section.id }}" class="sgw-modal__stars" role="img" aria-label="Star rating"></div>
+      </div>
+    </div>
+    <blockquote id="sgw-modal-review-content-{{ section.id }}" class="sgw-modal__review-content"></blockquote>
+    <div id="sgw-modal-product-area-{{ section.id }}" class="sgw-modal__product-area" style="display:none;">
+      <div class="sgw-modal__product-image-wrapper">
+        <img id="sgw-modal-product-image-{{ section.id }}" src="" class="sgw-modal__product-image" alt="Related product image">
+      </div>
+      <div class="sgw-modal__product-info">
+        <h4 id="sgw-modal-product-title-{{ section.id }}" class="sgw-modal__product-title"></h4>
+        <div id="sgw-modal-product-button-{{ section.id }}" class="sgw-modal__product-button"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // The existing JavaScript does not need any changes for this visual enhancement.
+  // It will continue to function as before.
+  document.addEventListener('DOMContentLoaded', () => {
+    const sectionId = '{{ section.id }}';
+    const sectionEl = document.querySelector('.star-gravitas-wall-section');
+    const grid = document.getElementById(`star-gravitas-wall-grid-${sectionId}`);
+    const modalOverlay = document.getElementById(`star-gravitas-wall-modal-${sectionId}`);
+    
+    if (!sectionEl || !modalOverlay) {
+      console.warn('Star Gravitas Wall: Essential section elements not found.');
+      return;
+    }
+
+    const debounce = (func, delay) => {
+      let timeout;
+      return function(...args) {
+        const context = this;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(context, args), delay);
+      };
+    };
+
+    const canvas = document.getElementById(`sgw-particle-canvas-${sectionId}`);
+    let particlesArray;
+    let animationFrameId;
+
+    const mouse = { x: null, y: null, radius: 0 };
+
+    class Particle {
+      constructor(x, y, dirX, dirY, size, color) {
+        this.x = x;
+        this.y = y;
+        this.directionX = dirX;
+        this.directionY = dirY;
+        this.size = size;
+        this.color = color;
+      }
+
+      draw(ctx) {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
+
+      update(ctx, canvasWidth, canvasHeight) {
+        if (this.x > canvasWidth || this.x < 0) this.directionX = -this.directionX;
+        if (this.y > canvasHeight || this.y < 0) this.directionY = -this.directionY;
+
+        if (mouse.x !== null && mouse.y !== null) {
+          const dx = mouse.x - this.x;
+          const dy = mouse.y - this.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < mouse.radius + this.size) {
+            const forceDirectionX = dx / distance;
+            const forceDirectionY = dy / distance;
+            const repulsionStrength = mouse.radius / distance;
+            
+            if (this.x < canvasWidth - this.size * 5 && this.x > this.size * 5) {
+              this.x -= forceDirectionX * repulsionStrength * 0.5;
+            }
+            if (this.y < canvasHeight - this.size * 5 && this.y > this.size * 5) {
+              this.y -= forceDirectionY * repulsionStrength * 0.5;
+            }
+          }
+        }
+        
+        this.x += this.directionX;
+        this.y += this.directionY;
+        this.draw(ctx);
+      }
+    }
+
+    const updateCanvasSize = () => {
+      if (!canvas || !sectionEl) return;
+      canvas.width = sectionEl.offsetWidth;
+      canvas.height = sectionEl.offsetHeight;
+      mouse.radius = Math.max((canvas.height / 80) * (canvas.width / 80), 50);
+    };
+
+    const initParticles = () => {
+      if (!canvas) return;
+      particlesArray = [];
+      const particleDensity = window.innerWidth > 768 ? 9000 : 18000;
+      const numParticles = (canvas.height * canvas.width) / particleDensity;
+
+      for (let i = 0; i < numParticles; i++) {
+        let size = Math.random() * 2 + 1;
+        let x = Math.random() * (canvas.width - size * 4) + size * 2;
+        let y = Math.random() * (canvas.height - size * 4) + size * 2;
+        let dirX = Math.random() * .4 - .2;
+        let dirY = Math.random() * .4 - .2;
+        
+        let color;
+        if (Math.random() < 0.3) {
+          color = `hsla(0, 0%, 100%, ${(Math.random() * 0.7) + 0.2})`;
+        } else {
+          color = `hsla({{ section.settings.brand_color.hue }}, {{ section.settings.brand_color.saturation }}%, {{ section.settings.brand_color.lightness }}%, ${(Math.random() * 0.4) + 0.1})`;
+        }
+
+        particlesArray.push(new Particle(x, y, dirX, dirY, size, color));
+      }
+    };
+
+    const animateParticles = () => {
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < particlesArray.length; i++) {
+        particlesArray[i].update(ctx, canvas.width, canvas.height);
+      }
+      animationFrameId = requestAnimationFrame(animateParticles);
+    };
+
+    if (canvas) {
+      updateCanvasSize();
+      initParticles();
+      animateParticles();
+
+      window.addEventListener('mousemove', (event) => {
+        const rect = canvas.getBoundingClientRect();
+        mouse.x = event.clientX - rect.left;
+        mouse.y = event.clientY - rect.top;
+      });
+
+      canvas.addEventListener('mouseleave', () => {
+        mouse.x = null;
+        mouse.y = null;
+      });
+
+      window.addEventListener('resize', debounce(() => {
+        updateCanvasSize();
+        initParticles();
+      }, 250));
+    }
+
+    if (grid) {
+      const handleGridMouseMove = (e) => {
+        const rect = grid.getBoundingClientRect(),
+              x = e.clientX - rect.left,
+              y = e.clientY - rect.top,
+              rotateX = (y / rect.height - .5) * -8, 
+              rotateY = (x / rect.width - .5) * 8;
+        grid.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03, 1.03, 1.03)`;
+      };
+
+      const handleGridMouseLeave = () => {
+        grid.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+      };
+
+      const setupGridInteraction = () => {
+        if (window.innerWidth > 768) {
+          grid.addEventListener('mousemove', handleGridMouseMove);
+          grid.addEventListener('mouseleave', handleGridMouseLeave);
+          grid.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+          grid.style.transformStyle = 'preserve-3d';
+        } else {
+          grid.removeEventListener('mousemove', handleGridMouseMove);
+          grid.removeEventListener('mouseleave', handleGridMouseLeave);
+          grid.style.transform = 'none';
+          grid.style.transformStyle = 'flat';
+        }
+      };
+      
+      setupGridInteraction();
+      window.addEventListener('resize', debounce(setupGridInteraction, 250));
+    }
+
+
+    const items = grid ? grid.querySelectorAll('.star-gravitas-wall__item') : [];
+    const modalContent = {
+      photo: document.getElementById(`sgw-modal-user-photo-${sectionId}`),
+      name: document.getElementById(`sgw-modal-user-name-${sectionId}`),
+      stars: document.getElementById(`sgw-modal-stars-${sectionId}`),
+      review: document.getElementById(`sgw-modal-review-content-${sectionId}`),
+      productArea: document.getElementById(`sgw-modal-product-area-${sectionId}`),
+      productImage: document.getElementById(`sgw-modal-product-image-${sectionId}`),
+      productTitle: document.getElementById(`sgw-modal-product-title-${sectionId}`),
+      productButton: document.getElementById(`sgw-modal-product-button-${sectionId}`)
+    };
+    
+    items.forEach(item => {
+      item.addEventListener('click', (e) => {
+        const data = e.currentTarget.dataset;
+        
+        if (!data.userName || !data.reviewContent) {
+          console.warn('Star Gravitas Wall: Missing review data for item click.');
+          return;
+        }
+        
+        modalContent.photo.src = data.userPhoto || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23ccc\'%3E%3Cpath d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/%3E%3C/svg%3E';
+        modalContent.photo.alt = data.userName ? `${data.userName}'s profile picture` : 'Profile picture';
+        modalContent.name.textContent = data.userName;
+        modalContent.review.textContent = data.reviewContent;
+
+        const rating = parseInt(data.starRating, 10) || 0;
+        const starsHTML = Array(5).fill(0).map((_, i) =>
+          `<svg class="icon-star" style="animation-delay:${i * 0.05}s; color:${i < rating ? 'var(--sgw-star-color)' : 'rgba(255,255,255,0.2)'};" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`
+        ).join('');
+        modalContent.stars.innerHTML = starsHTML;
+
+        if (data.hasProduct === 'true' && data.productImage && data.productTitle && data.productUrl) {
+          modalContent.productImage.src = data.productImage;
+          modalContent.productImage.alt = `${data.productTitle} product image`;
+          modalContent.productTitle.textContent = data.productTitle;
+          modalContent.productButton.innerHTML = `<a href="${data.productUrl}" target="_blank" rel="noopener noreferrer">View Product</a>`;
+          modalContent.productArea.style.display = 'flex';
+        } else {
+          modalContent.productArea.style.display = 'none';
+        }
+        
+        document.body.style.overflow = 'hidden';
+        modalOverlay.classList.add('is-visible');
+        modalOverlay.focus();
+      });
+    });
+
+    const closeModal = () => {
+      modalOverlay.classList.remove('is-visible');
+      document.body.style.overflow = '';
+    };
+
+    modalOverlay.querySelector('.sgw-modal__close-button').addEventListener('click', closeModal);
+    
+    modalOverlay.addEventListener('click', (e) => {
+      if(e.target === modalOverlay) closeModal();
+    });
+    
+    document.addEventListener('keydown', (e) => {
+      if(e.key === 'Escape' && modalOverlay.classList.contains('is-visible')) {
+        closeModal();
+      }
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "星軌引力場評論牆 v8.4",
+  "settings": [
+    {
+      "type": "header",
+      "content": "區塊整體樣式"
+    },
+    {
+      "type": "text",
+      "id": "home_reviews_title",
+      "label": "區塊標題",
+      "default": "Loved by Everyday Explorers"
+    },
+    {
+      "type": "textarea",
+      "id": "home_reviews_description",
+      "label": "區塊描述 (引導文案)",
+      "default": "Click an avatar to explore their story.",
+      "info": "明確引導用戶可以點擊頭像。"
+    },
+    {
+      "type": "color",
+      "id": "brand_color",
+      "label": "品牌強調色 (光暈、粒子、星星)",
+      "default": "#2BB9ED"
+    }
+  ],
+  "blocks": [
+    {
+      "name": "評論故事",
+      "type": "review",
+      "settings": [
+        {
+          "type": "header",
+          "content": "評論者資訊"
+        },
+        {
+          "type": "image_picker",
+          "id": "reviews_user_photo",
+          "label": "評論者頭像"
+        },
+        {
+          "type": "text",
+          "id": "reviews_user_name",
+          "label": "評論者姓名",
+          "default": "Liam Sanders"
+        },
+        {
+          "type": "range",
+          "id": "star_rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "label": "星級評分",
+          "default": 5
+        },
+        {
+          "type": "textarea",
+          "id": "user_reviews_content",
+          "label": "評論內容",
+          "default": "This Magnetic Charging Cooler is a travel gem. Used it on my road trips—chilled my cans and wirelessly charged my camera's batteries. Zero cable hassle."
+        },
+        {
+          "type": "header",
+          "content": "關聯產品 (可選)"
+        },
+        {
+          "type": "product",
+          "id": "product_handle",
+          "label": "選擇評論的產品"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "星軌引力場評論牆 v8.4"
+    }
+  ]
+}
+{% endschema %}

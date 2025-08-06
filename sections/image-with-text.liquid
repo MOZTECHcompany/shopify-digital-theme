@@ -1,0 +1,1229 @@
+{{ 'section-image-with-text.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+	{% render 'section-padding' %}
+	{% render 'section-margin' %}
+
+	.section-{{ section.id }}-padding .image-with-text__media::before {
+	  background-color: rgba(var(--color-overlay), {{ section.settings.overlay_opacity }});
+	}
+
+	{% if section.settings.image != blank %}
+	  .section-{{ section.id }}-padding .image-with-text__media--adapt,
+	  .section-{{ section.id }}-padding .image-with-text__media--all-height-adapt {
+	    padding-bottom: {{ 1 | divided_by: section.settings.image.aspect_ratio | times: 100 | round: 2 }}%;
+	  }
+	{% endif %}
+{%- endstyle -%}
+
+{% if section.settings.inner_heading_line == 'rounded' %}
+	{% assign color = section.settings.inner_line_color | remove: '#' %}
+	{% style %}
+		 #shopify-section-{{ section.id }} .image-with-text__inner-heading.title--rounded span[style*="text-decoration:underline"].title--rounded-xs {
+		  background-image: url('data:image/svg+xml,\
+		  <svg xmlns="http://www.w3.org/2000/svg" width="78" height="14" viewBox="0 0 78 14" fill="none">\
+		    <path d="M3 11C15.1361 4.50757 39.4887 -3.17051 75 11" stroke="%23{{ color }}" stroke-width="6" stroke-linecap="round"/>\
+		  </svg>');
+		 }
+
+		 #shopify-section-{{ section.id }} .image-with-text__inner-heading.title--rounded span[style*="text-decoration:underline"].title--rounded-s {
+		  background-image: url('data:image/svg+xml,\
+		  <svg xmlns="http://www.w3.org/2000/svg" width="172" height="14" viewBox="0 0 172 14" fill="none">\
+		    <path d="M3 11C30.9803 4.50757 87.1267 -3.17051 169 11" stroke="%23{{ color }}" stroke-width="6" stroke-linecap="round"/>\
+		  </svg>');
+		 }
+
+		 #shopify-section-{{ section.id }} .image-with-text__inner-heading.title--rounded span[style*="text-decoration:underline"].title--rounded-m {
+		  background-image: url('data:image/svg+xml,\
+		  <svg xmlns="http://www.w3.org/2000/svg" width="321" height="14" viewBox="0 0 321 14" fill="none">\
+		    <path d="M3 11C56.0952 4.50757 162.638 -3.17051 318 11" stroke="%23{{ color }}" stroke-width="6" stroke-linecap="round"/>\
+		  </svg>');
+		 }
+
+		 #shopify-section-{{ section.id }} .image-with-text__inner-heading.title--rounded span[style*="text-decoration:underline"].title--rounded-l {
+		  background-image: url('data:image/svg+xml,\
+		  <svg xmlns="http://www.w3.org/2000/svg" width="373" height="14" viewBox="0 0 373 14" fill="none">\
+		    <path d="M3 11C64.8602 4.50757 188.991 -3.17051 370 11" stroke="%23{{ color }}" stroke-width="6" stroke-linecap="round"/>\
+		  </svg>');
+		 }
+
+		 #shopify-section-{{ section.id }} .image-with-text__inner-heading.title--rounded span[style*="text-decoration:underline"].title--rounded-xl {
+		  background-image: url('data:image/svg+xml,\
+		  <svg xmlns="http://www.w3.org/2000/svg" width="568" height="14" viewBox="0 0 568 14" fill="none">\
+		    <path d="M3 11C97.7286 4.50757 287.814 -3.17051 565 11" stroke="%23{{ color }}" stroke-width="6" stroke-linecap="round"/>\
+		  </svg>');
+		 }
+
+		 #shopify-section-{{ section.id }} .image-with-text__inner-heading.title--rounded span[style*="text-decoration:underline"].title--rounded-xxl {
+		  background-image: url('data:image/svg+xml,\
+		  <svg xmlns="http://www.w3.org/2000/svg" width="714" height="14" viewBox="0 0 714 14" fill="none">\
+		    <path d="M3 11C122.338 4.50757 361.805 -3.17051 711 11" stroke="%23{{ color }}" stroke-width="6" stroke-linecap="round"/>\
+		  </svg>');
+		 }
+
+		 [data-scheme="dark"] {
+		  #shopify-section-{{ section.id }} .image-with-text__inner-heading.title--rounded span[style*="text-decoration:underline"].title--rounded-xs {
+		    background-image: url('data:image/svg+xml,\
+		    <svg xmlns="http://www.w3.org/2000/svg" width="78" height="14" viewBox="0 0 78 14" fill="none">\
+		      <path d="M3 11C15.1361 4.50757 39.4887 -3.17051 75 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+		    </svg>');
+		  }
+
+		  #shopify-section-{{ section.id }} .image-with-text__inner-heading.title--rounded span[style*="text-decoration:underline"].title--rounded-s {
+		    background-image: url('data:image/svg+xml,\
+		    <svg xmlns="http://www.w3.org/2000/svg" width="172" height="14" viewBox="0 0 172 14" fill="none">\
+		      <path d="M3 11C30.9803 4.50757 87.1267 -3.17051 169 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+		    </svg>');
+		  }
+
+		  #shopify-section-{{ section.id }} .image-with-text__inner-heading.title--rounded span[style*="text-decoration:underline"].title--rounded-m {
+		    background-image: url('data:image/svg+xml,\
+		    <svg xmlns="http://www.w3.org/2000/svg" width="321" height="14" viewBox="0 0 321 14" fill="none">\
+		      <path d="M3 11C56.0952 4.50757 162.638 -3.17051 318 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+		    </svg>');
+		  }
+
+		  #shopify-section-{{ section.id }} .image-with-text__inner-heading.title--rounded span[style*="text-decoration:underline"].title--rounded-l {
+		    background-image: url('data:image/svg+xml,\
+		    <svg xmlns="http://www.w3.org/2000/svg" width="373" height="14" viewBox="0 0 373 14" fill="none">\
+		      <path d="M3 11C64.8602 4.50757 188.991 -3.17051 370 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+		    </svg>');
+		  }
+
+		  #shopify-section-{{ section.id }} .image-with-text__inner-heading.title--rounded span[style*="text-decoration:underline"].title--rounded-xl {
+		    background-image: url('data:image/svg+xml,\
+		    <svg xmlns="http://www.w3.org/2000/svg" width="568" height="14" viewBox="0 0 568 14" fill="none">\
+		      <path d="M3 11C97.7286 4.50757 287.814 -3.17051 565 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+		    </svg>');
+		  }
+
+		  #shopify-section-{{ section.id }} .image-with-text__inner-heading.title--rounded span[style*="text-decoration:underline"].title--rounded-xxl {
+		    background-image: url('data:image/svg+xml,\
+		    <svg xmlns="http://www.w3.org/2000/svg" width="714" height="14" viewBox="0 0 714 14" fill="none">\
+		      <path d="M3 11C122.338 4.50757 361.805 -3.17051 711 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+		    </svg>');
+		  }
+		 }
+
+		 @media (prefers-color-scheme: dark) {
+		[data-scheme="auto"] {
+		  #shopify-section-{{ section.id }} .image-with-text__inner-heading.title--rounded span[style*="text-decoration:underline"].title--rounded-xs {
+		    background-image: url('data:image/svg+xml,\
+		    <svg xmlns="http://www.w3.org/2000/svg" width="78" height="14" viewBox="0 0 78 14" fill="none">\
+		      <path d="M3 11C15.1361 4.50757 39.4887 -3.17051 75 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+		    </svg>');
+		  }
+
+		  #shopify-section-{{ section.id }} .image-with-text__inner-heading.title--rounded span[style*="text-decoration:underline"].title--rounded-s {
+		    background-image: url('data:image/svg+xml,\
+		    <svg xmlns="http://www.w3.org/2000/svg" width="172" height="14" viewBox="0 0 172 14" fill="none">\
+		      <path d="M3 11C30.9803 4.50757 87.1267 -3.17051 169 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+		    </svg>');
+		  }
+
+		  #shopify-section-{{ section.id }} .image-with-text__inner-heading.title--rounded span[style*="text-decoration:underline"].title--rounded-m {
+		    background-image: url('data:image/svg+xml,\
+		    <svg xmlns="http://www.w3.org/2000/svg" width="321" height="14" viewBox="0 0 321 14" fill="none">\
+		      <path d="M3 11C56.0952 4.50757 162.638 -3.17051 318 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+		    </svg>');
+		  }
+
+		  #shopify-section-{{ section.id }} .image-with-text__inner-heading.title--rounded span[style*="text-decoration:underline"].title--rounded-l {
+		    background-image: url('data:image/svg+xml,\
+		    <svg xmlns="http://www.w3.org/2000/svg" width="373" height="14" viewBox="0 0 373 14" fill="none">\
+		      <path d="M3 11C64.8602 4.50757 188.991 -3.17051 370 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+		    </svg>');
+		  }
+
+		  #shopify-section-{{ section.id }} .image-with-text__inner-heading.title--rounded span[style*="text-decoration:underline"].title--rounded-xl {
+		    background-image: url('data:image/svg+xml,\
+		    <svg xmlns="http://www.w3.org/2000/svg" width="568" height="14" viewBox="0 0 568 14" fill="none">\
+		      <path d="M3 11C97.7286 4.50757 287.814 -3.17051 565 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+		    </svg>');
+		  }
+
+		  #shopify-section-{{ section.id }} .image-with-text__inner-heading.title--rounded span[style*="text-decoration:underline"].title--rounded-xxl {
+		    background-image: url('data:image/svg+xml,\
+		    <svg xmlns="http://www.w3.org/2000/svg" width="714" height="14" viewBox="0 0 714 14" fill="none">\
+		      <path d="M3 11C122.338 4.50757 361.805 -3.17051 711 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/>\
+		    </svg>');
+		  }
+		 }
+		 }
+	{% endstyle %}
+{% endif %}
+
+<div class='image-with-text color-{{ section.settings.color_scheme }} background section-{{ section.id }}-padding'>
+	<div class='container'>
+		{% render 'section-text',
+			section: section,
+			class: 'image-with-text',
+			text_align: section.settings.text_align,
+			heading_level: section.settings.heading_level
+		%}
+
+		<div class='image-with-text__content content'>
+			<div class='image-with-text__grid image-with-text__grid--{{ section.settings.layout }} {% if section.settings.layout == 'text_last' %} image-with-text__grid--reverse{% endif %} image-with-text__grid--{{ section.settings.text_align_inner }}'>
+				{% if section.settings.layout == 'image_center' %}
+					{% if section.blocks.size > 0 %}
+						<div class='image-with-text__columns image-with-text__columns--image_center'>
+							{% for block in section.blocks %}
+								{% assign mod = forloop.index | modulo: 2 %}
+								{% if mod == 1 %}
+									<div
+										class='image-with-text__column'
+										{{ block.shopify_attributes }}
+									>
+										{% if block.settings.icon != 'none' %}
+											<div
+												class='
+													image-with-text__column-icon
+													image-with-text__column-icon--{{- section.settings.icon_size }}
+													{% if section.settings.box_shadow %}image-with-text__column-icon--shadow {% endif %}
+													image-with-text__column-icon--{{- section.settings.icon_style }}
+													image-with-text__column-icon--{{- block.settings.icon_fill_type }}
+												'
+											>
+												<i
+													class='icon icon-pack icon-{{ block.settings.icon }} {% if section.settings.icon_style == 'colored' and block.settings.icon_fill_type == 'gradient' %} text-gradient {% endif %}'
+												></i>
+											</div>
+										{% endif %}
+										{% if block.settings.heading != blank %}
+											<div class='image-with-text__column-title h5'>
+												{{ block.settings.heading }}
+											</div>
+										{% endif %}
+										{% if block.settings.text %}
+											<div class='image-with-text__column-text'>
+												{{ block.settings.text }}
+											</div>
+										{% endif %}
+									</div>
+								{% endif %}
+							{% endfor %}
+						</div>
+					{% endif %}
+				{% endif %}
+				<div class='image-with-text__left image-with-text__left--{{ section.settings.height }}'>
+					<div
+						class='
+							image-with-text__media
+							image-with-text__media--{{ section.settings.height }}
+							{% if section.settings.height == 'all-height' and section.settings.layout == 'image_center' %}
+							  {% if section.settings.inner_heading != blank or section.settings.description != blank
+							    or section.settings.show_button or section.settings.show_button_2 %}
+							    image-with-text__media--all-height-adapt
+							  {% endif %}
+							{% endif %}
+							{% if section.settings.image != blank %}
+							{% else %}image-with-text__media--placeholder placeholder{% endif %}
+						'
+					>
+						<div class='image-with-text__top color-{{ section.settings.author_color_scheme }}'>
+							{% if section.settings.logo != blank
+								or section.settings.logo_dm
+							%}
+								{%- assign width = section.settings.logo_width -%}
+								{%- assign width_adapt = section.settings.logo_width
+									| times: 0.8
+									| round: 2
+								-%}
+
+								{% capture sizes %}
+                  (min-width: 1100px) {{ width }}px, 
+                  (min-width: 750px) {{ width_adapt }}px
+                {% endcapture %}
+
+								{% capture widths %}
+                  {{ width | times: 2 }}, {{ width_adapt | times: 2 }}
+                {% endcapture %}
+
+								{% capture style %}
+                  --width-adapt: {{ width_adapt }}px
+                {% endcapture %}
+
+								<div class='image-with-text__logos'>
+									{%- if section.settings.logo_dm != blank -%}
+										{{
+											section.settings.logo_dm
+											| image_url: width: width
+											| image_tag:
+												loading: 'lazy',
+												sizes: sizes,
+												widths: widths,
+												height: 'auto',
+												width: width,
+												class: ' image-with-text__logo image-with-text__logo--dark',
+												style: style
+										}}
+									{%- endif -%}
+									{%- if section.settings.logo != blank -%}
+										{{
+											section.settings.logo
+											| image_url: width: width
+											| image_tag:
+												loading: 'lazy',
+												sizes: sizes,
+												widths: widths,
+												height: 'auto',
+												width: width,
+												class: ' image-with-text__logo image-with-text__logo--light',
+												style: style
+										}}
+									{%- endif -%}
+								</div>
+							{% endif %}
+							{% if section.settings.add_text %}
+								<div class='image-with-text__add-text subtitle'>
+									{{ section.settings.add_text }}
+								</div>
+							{% endif %}
+						</div>
+
+						{%- if section.settings.image != blank -%}
+							{% capture sizes %}
+                (min-width: 990px) 50vw - 40px, 
+                calc((100vw - 40px))
+              {% endcapture %}
+							{{
+								section.settings.image
+								| image_url: width: section.settings.image.width
+								| image_tag:
+									loading: 'lazy',
+									sizes: sizes,
+									widths: '360, 535, 720, 940, 1070, 1200, 1400, 1600, 1800, 2000, 2200'
+							}}
+						{%- else -%}
+							{{ 'hero-apparel-3' | placeholder_svg_tag: 'placeholder-svg' }}
+						{%- endif -%}
+					</div>
+				</div>
+				{% if section.settings.layout == 'image_center' %}
+					{% if section.blocks.size > 0 %}
+						<div class='image-with-text__columns image-with-text__columns--image_center'>
+							{% for block in section.blocks %}
+								{% assign mod = forloop.index | modulo: 2 %}
+								{% if mod == 0 %}
+									<div
+										class='image-with-text__column'
+										{{ block.shopify_attributes }}
+									>
+										{% if block.settings.icon != 'none' %}
+											<div
+												class='
+													image-with-text__column-icon
+													image-with-text__column-icon--{{- section.settings.icon_size }}
+													{% if section.settings.box_shadow %}image-with-text__column-icon--shadow {% endif %}
+													image-with-text__column-icon--{{- section.settings.icon_style }}
+													image-with-text__column-icon--{{- block.settings.icon_fill_type }}
+												'
+											>
+												<i
+													class='icon icon-pack icon-{{ block.settings.icon }} {% if section.settings.icon_style == 'colored' and block.settings.icon_fill_type == 'gradient' %} text-gradient {% endif %}'
+												></i>
+											</div>
+										{% endif %}
+										{% if block.settings.heading != blank %}
+											<div class='image-with-text__column-title h5'>
+												{{ block.settings.heading }}
+											</div>
+										{% endif %}
+										{% if block.settings.text %}
+											<div class='image-with-text__column-text'>
+												{{ block.settings.text }}
+											</div>
+										{% endif %}
+									</div>
+								{% endif %}
+							{% endfor %}
+						</div>
+					{% endif %}
+				{% endif %}
+				{% if section.settings.layout != 'image_center' %}
+					<div class='image-with-text__right'>
+						{%- if section.settings.inner_subheading != blank -%}
+							<div class='image-with-text__inner-subheading subtitle'>
+								{{ section.settings.inner_subheading }}
+							</div>
+						{%- endif -%}
+						{%- if section.settings.inner_heading != blank -%}
+							<{{ section.settings.inner_heading_level }}
+								class='
+									image-with-text__inner-heading title--section title--{{ section.settings.inner_heading_line }} {{ section.settings.inner_heading_size }}
+									{% if section.settings.inner_word_break and section.settings.inner_heading_line != 'none' %} title--word_break {% endif %}
+								'
+								style='--color-line-inner: {{ section.settings.inner_line_color }}'
+							>
+								{{ section.settings.inner_heading }}
+							</{{ section.settings.inner_heading_level }}>
+						{%- endif -%}
+						{% if section.settings.description != blank %}
+							<div class='image-with-text__text body-large'>
+								{{ section.settings.description }}
+							</div>
+						{% endif %}
+
+						{% if section.blocks.size > 0 %}
+							<div class='image-with-text__columns'>
+								{% for block in section.blocks %}
+									<div
+										class='image-with-text__column'
+										{{ block.shopify_attributes }}
+									>
+										{% if block.settings.icon != 'none' %}
+											<div
+												class='
+													image-with-text__column-icon
+													image-with-text__column-icon--{{- section.settings.icon_size }}
+													{% if section.settings.box_shadow %}image-with-text__column-icon--shadow {% endif %}
+													image-with-text__column-icon--{{- section.settings.icon_style }}
+													image-with-text__column-icon--{{- block.settings.icon_fill_type }}
+												'
+											>
+												<i
+													class='icon icon-pack icon-{{ block.settings.icon }} {% if section.settings.icon_style == 'colored' and block.settings.icon_fill_type == 'gradient' %} text-gradient {% endif %}'
+												></i>
+											</div>
+										{% endif %}
+										{% if block.settings.heading != blank %}
+											<div class='image-with-text__column-title h5'>
+												{{ block.settings.heading }}
+											</div>
+										{% endif %}
+										{% if block.settings.text %}
+											<div class='image-with-text__column-text'>
+												{{ block.settings.text }}
+											</div>
+										{% endif %}
+									</div>
+								{% endfor %}
+							</div>
+						{% endif %}
+
+						{%- if section.settings.show_button
+							or section.settings.show_button_2
+						-%}
+							<div class='image-with-text__buttons'>
+								{%- if section.settings.show_button -%}
+									{% render 'button',
+										link: section.settings.button_link,
+										label: section.settings.button_label,
+										style: section.settings.button_style,
+										class: 'image-with-text'
+									%}
+								{%- endif -%}
+								{%- if section.settings.show_button_2 -%}
+									{% render 'button',
+										link: section.settings.button_link_2,
+										label: section.settings.button_label_2,
+										style: section.settings.button_style_2,
+										class: 'image-with-text'
+									%}
+								{%- endif -%}
+							</div>
+						{% endif %}
+					</div>
+				{% endif %}
+			</div>
+
+			{% if section.settings.layout == 'image_center' %}
+				{%- if section.settings.inner_subheading != blank
+					or section.settings.inner_heading != blank
+					or section.settings.description != blank
+				-%}
+					<div class='image-with-text__text-center'>
+						{%- if section.settings.inner_subheading != blank -%}
+							<div class='image-with-text__inner-subheading subtitle'>
+								{{ section.settings.inner_subheading }}
+							</div>
+						{%- endif -%}
+						{%- if section.settings.inner_heading != blank -%}
+							<h2 class='image-with-text__inner-heading {{ section.settings.inner_heading_size }}'>
+								{{ section.settings.inner_heading }}
+							</h2>
+						{%- endif -%}
+						{% if section.settings.description != blank %}
+							<div class='image-with-text__text body-large'>
+								{{ section.settings.description }}
+							</div>
+						{% endif %}
+					</div>
+				{% endif %}
+				{%- if section.settings.show_button
+					or section.settings.show_button_2
+				-%}
+					<div class='image-with-text__buttons image-with-text__buttons--center'>
+						{%- if section.settings.show_button -%}
+							{% render 'button',
+								link: section.settings.button_link,
+								label: section.settings.button_label,
+								style: section.settings.button_style,
+								class: 'image-with-text'
+							%}
+						{%- endif -%}
+						{%- if section.settings.show_button_2 -%}
+							{% render 'button',
+								link: section.settings.button_link_2,
+								label: section.settings.button_label_2,
+								style: section.settings.button_style_2,
+								class: 'image-with-text'
+							%}
+						{%- endif -%}
+					</div>
+				{% endif %}
+			{% endif %}
+		</div>
+	</div>
+</div>
+
+{% schema %}
+{
+	"name": "圖片與文字",
+	"class": "image-with-text-section spaced-section",
+	"enabled_on": {
+		"templates": ["*"]
+	},
+	"settings": [
+		{
+			"type": "select",
+			"id": "layout",
+			"options": [
+				{
+					"value": "image_last",
+					"label": "圖片在左，文字在右"
+				},
+				{
+					"value": "text_last",
+					"label": "文字在左，圖片在右"
+				},
+				{
+					"value": "image_center",
+					"label": "圖片在中間"
+				}
+			],
+			"default": "image_last",
+			"label": "區塊版面配置"
+		},
+		{
+			"type": "color_scheme",
+			"id": "color_scheme",
+			"default": "background-1",
+			"label": "色彩配置"
+		},
+		{
+			"type": "text",
+			"id": "subheading",
+			"label": "副標題"
+		},
+		{
+			"type": "select",
+			"id": "subheading_style",
+			"options": [
+				{
+					"value": "subtitle",
+					"label": "樣式 1"
+				},
+				{
+					"value": "subtitle subtitle--secondary",
+					"label": "樣式 2"
+				}
+			],
+			"default": "subtitle",
+			"label": "副標題樣式"
+		},
+		{
+			"type": "select",
+			"id": "subheading_icon",
+			"options": [
+				{ "value": "none", "label": "無" },
+				{ "value": "arrow-bar", "label": "箭頭列" },
+				{ "value": "bag-1", "label": "提袋 1" },
+				{ "value": "bag-2", "label": "提袋 2" },
+				{ "value": "bag-3", "label": "提袋 3" },
+				{ "value": "bar-chart", "label": "長條圖" },
+				{ "value": "bars-upward", "label": "向上箭頭" },
+				{ "value": "baseball", "label": "棒球" },
+				{ "value": "battery-1", "label": "電池 1" },
+				{ "value": "battery-2", "label": "電池 2" },
+				{ "value": "battery-3", "label": "電池 3" },
+				{ "value": "book", "label": "書本" },
+				{ "value": "card", "label": "卡片" },
+				{ "value": "card-holder", "label": "名片夾" },
+				{ "value": "chart", "label": "圖表" },
+				{ "value": "chart-2", "label": "圖表 2" },
+				{ "value": "chart-3", "label": "圖表 3" },
+				{ "value": "chats", "label": "對話" },
+				{ "value": "check-1", "label": "勾選 1" },
+				{ "value": "check-2", "label": "勾選 2" },
+				{ "value": "check-3", "label": "勾選 3" },
+				{ "value": "check-4", "label": "勾選 4" },
+				{ "value": "circle", "label": "圓圈" },
+				{ "value": "circles", "label": "多個圓圈" },
+				{ "value": "clock-1", "label": "時鐘 1" },
+				{ "value": "clock-2", "label": "時鐘 2" },
+				{ "value": "close", "label": "關閉" },
+				{ "value": "cloud-server", "label": "雲端伺服器" },
+				{ "value": "computer", "label": "電腦" },
+				{ "value": "computer-mouse", "label": "滑鼠" },
+				{ "value": "confetti", "label": "彩紙" },
+				{ "value": "delivery", "label": "貨車" },
+				{ "value": "delivery-box", "label": "包裹" },
+				{ "value": "devices", "label": "多裝置" },
+				{ "value": "directions", "label": "方向" },
+				{ "value": "dumbbell", "label": "啞鈴" },
+				{ "value": "eye", "label": "眼睛" },
+				{ "value": "facebook", "label": "Facebook" },
+				{ "value": "file-1", "label": "檔案 1" },
+				{ "value": "file-2", "label": "檔案 2" },
+				{ "value": "flag", "label": "旗幟" },
+				{ "value": "folder-1", "label": "資料夾 1" },
+				{ "value": "folder-2", "label": "資料夾 2" },
+				{ "value": "food", "label": "食物" },
+				{ "value": "hand-1", "label": "手 1" },
+				{ "value": "hand-2", "label": "手 2" },
+				{ "value": "hand-3", "label": "手 3" },
+				{ "value": "headphones", "label": "耳機" },
+				{ "value": "instagram", "label": "Instagram" },
+				{ "value": "laptop-1", "label": "筆電 1" },
+				{ "value": "laptop-2", "label": "筆電 2" },
+				{ "value": "leaf", "label": "葉子" },
+				{ "value": "lightning-bolt-1", "label": "閃電 1" },
+				{ "value": "lightning-bolt-2", "label": "閃電 2" },
+				{ "value": "like", "label": "讚" },
+				{ "value": "link", "label": "連結" },
+				{ "value": "lock-1", "label": "鎖 1" },
+				{ "value": "lock-2", "label": "鎖 2" },
+				{ "value": "logout", "label": "登出" },
+				{ "value": "luggage", "label": "行李" },
+				{ "value": "mark", "label": "標記" },
+				{ "value": "medicine", "label": "藥物" },
+				{ "value": "microphone", "label": "麥克風" },
+				{ "value": "moon", "label": "月亮" },
+				{ "value": "pencil", "label": "鉛筆" },
+				{ "value": "phone-1", "label": "手機 1" },
+				{ "value": "phone-2", "label": "手機 2" },
+				{ "value": "phone-3", "label": "手機 3" },
+				{ "value": "phone-4", "label": "手機 4" },
+				{ "value": "pinterest", "label": "Pinterest" },
+				{ "value": "plug", "label": "插頭" },
+				{ "value": "presentation-1", "label": "簡報 1" },
+				{ "value": "presentation-2", "label": "簡報 2" },
+				{ "value": "pulse", "label": "脈搏" },
+				{ "value": "recycle", "label": "回收" },
+				{ "value": "rocket", "label": "火箭" },
+				{ "value": "search", "label": "搜尋" },
+				{ "value": "sending", "label": "傳送" },
+				{ "value": "server-1", "label": "伺服器 1" },
+				{ "value": "server-2", "label": "伺服器 2" },
+				{ "value": "settings", "label": "設定" },
+				{ "value": "shield", "label": "盾牌" },
+				{ "value": "shopping-basket", "label": "購物籃" },
+				{ "value": "shuffle", "label": "隨機播放" },
+				{ "value": "snapchat", "label": "Snapchat" },
+				{ "value": "sound-waves", "label": "聲波" },
+				{ "value": "speaker", "label": "喇叭" },
+				{ "value": "squares-1", "label": "方塊 1" },
+				{ "value": "squares-2", "label": "方塊 2" },
+				{ "value": "stack", "label": "堆疊" },
+				{ "value": "star", "label": "星星" },
+				{ "value": "stopwatch", "label": "碼錶" },
+				{ "value": "sun", "label": "太陽" },
+				{ "value": "tag", "label": "標籤" },
+				{ "value": "telephone-tower", "label": "電塔" },
+				{ "value": "tik-tok", "label": "TikTok" },
+				{ "value": "tree", "label": "樹木" },
+				{ "value": "trend", "label": "趨勢" },
+				{ "value": "trophy", "label": "獎盃" },
+				{ "value": "tumblr", "label": "Tumblr" },
+				{ "value": "tv", "label": "電視" },
+				{ "value": "twitter", "label": "Twitter" },
+				{ "value": "user-1", "label": "使用者 1" },
+				{ "value": "user-2", "label": "使用者 2" },
+				{ "value": "user-3", "label": "使用者 3" },
+				{ "value": "user-4", "label": "使用者 4" },
+				{ "value": "user-5", "label": "使用者 5" },
+				{ "value": "video", "label": "影片" },
+				{ "value": "vimeo", "label": "Vimeo" },
+				{ "value": "wallet", "label": "錢包" },
+				{ "value": "watch", "label": "手錶" },
+				{ "value": "water-1", "label": "水 1" },
+				{ "value": "water-2", "label": "水 2" },
+				{ "value": "water-3", "label": "水 3" },
+				{ "value": "wave-1", "label": "波浪 1" },
+				{ "value": "wave-2", "label": "波浪 2" },
+				{ "value": "wifi-1", "label": "Wi-Fi 1" },
+				{ "value": "wifi-2", "label": "Wi-Fi 2" },
+				{ "value": "window", "label": "視窗" },
+				{ "value": "youtube", "label": "YouTube" }
+			],
+			"default": "none",
+			"label": "副標題圖示"
+		},
+		{
+			"type": "inline_richtext",
+			"id": "heading",
+			"label": "主標題",
+			"info": "使用 [ ] 來標示要加上底線的文字。"
+		},
+		{
+			"type": "select",
+			"id": "heading_size",
+			"options": [
+				{ "value": "h3", "label": "小" },
+				{ "value": "h2", "label": "中" },
+				{ "value": "h1", "label": "大" }
+			],
+			"default": "h2",
+			"label": "主標題尺寸"
+		},
+		{
+			"type": "select",
+			"id": "heading_level",
+			"options": [
+				{ "value": "h1", "label": "H1" },
+				{ "value": "h2", "label": "H2" },
+				{ "value": "h3", "label": "H3" }
+			],
+			"default": "h2",
+			"label": "主標題的 HTML 標籤"
+		},
+		{
+			"type": "select",
+			"id": "heading_line",
+			"options": [
+				{ "value": "simple", "label": "簡潔線條" },
+				{ "value": "rounded", "label": "圓弧線條" },
+				{ "value": "background", "label": "背景色塊" },
+				{ "value": "none", "label": "無" }
+			],
+			"default": "simple",
+			"label": "標題底線樣式"
+		},
+		{
+			"type": "color",
+			"id": "line_color",
+			"label": "線條顏色",
+			"default": "#1566E0"
+		},
+		{
+			"type": "checkbox",
+			"id": "word_break",
+			"label": "標題文字自動換行",
+			"default": false
+		},
+		{
+			"type": "select",
+			"id": "heading_animation",
+			"options": [
+				{ "value": "typewriter", "label": "打字機效果" },
+				{ "value": "rolling", "label": "滾動效果" },
+				{ "value": "appearing", "label": "浮現效果" },
+				{ "value": "none", "label": "無" }
+			],
+			"default": "none",
+			"label": "標題動畫",
+			"info": "僅適用於使用 [ ] 標示的文字。"
+		},
+		{
+			"type": "checkbox",
+			"id": "word_break_an",
+			"label": "動畫文字自動換行",
+			"default": false
+		},
+		{
+			"type": "textarea",
+			"id": "text",
+			"label": "文字"
+		},
+		{
+			"type": "select",
+			"id": "text_align",
+			"label": "文字對齊",
+			"options": [
+				{ "value": "left", "label": "靠左" },
+				{ "value": "center", "label": "置中" }
+			],
+			"default": "left"
+		},
+		{
+			"type": "text",
+			"id": "inner_subheading",
+			"label": "區塊內副標題"
+		},
+		{
+			"type": "inline_richtext",
+			"id": "inner_heading",
+			"default": "圖片與文字",
+			"label": "區塊內主標題",
+			"info": "使用 [ ] 來標示要加上底線的文字。"
+		},
+		{
+			"type": "select",
+			"id": "inner_heading_size",
+			"options": [
+				{ "value": "h3", "label": "小" },
+				{ "value": "h2", "label": "中" },
+				{ "value": "h1", "label": "大" }
+			],
+			"default": "h2",
+			"label": "區塊內主標題尺寸"
+		},
+		{
+			"type": "select",
+			"id": "inner_heading_level",
+			"options": [
+				{ "value": "h1", "label": "H1" },
+				{ "value": "h2", "label": "H2" },
+				{ "value": "h3", "label": "H3" }
+			],
+			"default": "h2",
+			"label": "區塊內主標題的 HTML 標籤"
+		},
+		{
+			"type": "select",
+			"id": "inner_heading_line",
+			"options": [
+				{ "value": "simple", "label": "簡潔線條" },
+				{ "value": "rounded", "label": "圓弧線條" },
+				{ "value": "background", "label": "背景色塊" },
+				{ "value": "none", "label": "無" }
+			],
+			"default": "simple",
+			"label": "標題底線樣式"
+		},
+		{
+			"type": "color",
+			"id": "inner_line_color",
+			"label": "線條顏色",
+			"default": "#1566E0"
+		},
+		{
+			"type": "checkbox",
+			"id": "inner_word_break",
+			"label": "標題文字自動換行",
+			"default": false
+		},
+		{
+			"type": "richtext",
+			"id": "description",
+			"default": "<p>您可以在此描述您的內容，強調產品或服務的特色。</p>",
+			"label": "內文描述"
+		},
+		{
+			"type": "select",
+			"id": "text_align_inner",
+			"options": [
+				{ "value": "top", "label": "靠上" },
+				{ "value": "center", "label": "置中" },
+				{ "value": "bottom", "label": "靠下" }
+			],
+			"default": "top",
+			"label": "內容垂直對齊"
+		},
+		{
+			"type": "image_picker",
+			"id": "image",
+			"label": "圖片"
+		},
+		{
+			"type": "select",
+			"id": "height",
+			"options": [
+				{ "value": "landscape", "label": "橫向" },
+				{ "value": "square", "label": "正方形" },
+				{ "value": "portrait", "label": "直向" },
+				{ "value": "adapt", "label": "符合圖片原始比例" },
+				{ "value": "all-height", "label": "填滿區塊高度" }
+			],
+			"default": "square",
+			"label": "圖片高度"
+		},
+		{
+			"type": "range",
+			"id": "overlay_opacity",
+			"min": 0,
+			"max": 1,
+			"step": 0.1,
+			"default": 0.2,
+			"label": "圖片遮罩不透明度"
+		},
+		{
+			"type": "image_picker",
+			"id": "logo",
+			"label": "Logo"
+		},
+		{
+			"type": "image_picker",
+			"id": "logo_dm",
+			"label": "Logo (深色模式)"
+		},
+		{
+			"type": "range",
+			"id": "logo_width",
+			"min": 50,
+			"max": 350,
+			"step": 5,
+			"default": 75,
+			"unit": "px",
+			"label": "Logo 寬度"
+		},
+		{
+			"type": "text",
+			"id": "add_text",
+			"label": "附加文字",
+			"default": "附加文字"
+		},
+		{
+			"type": "color_scheme",
+			"id": "author_color_scheme",
+			"default": "background-3",
+			"label": "附加文字色彩配置"
+		},
+		{
+			"type": "header",
+			"content": "欄位設定"
+		},
+		{
+			"type": "select",
+			"id": "icon_size",
+			"options": [
+				{ "value": "recommended", "label": "推薦" },
+				{ "value": "normal", "label": "正常" },
+				{ "value": "small", "label": "小" },
+				{ "value": "large", "label": "大" }
+			],
+			"default": "recommended",
+			"label": "圖示尺寸"
+		},
+		{
+			"type": "checkbox",
+			"id": "box_shadow",
+			"default": false,
+			"label": "為圖示加上陰影"
+		},
+		{
+			"type": "select",
+			"id": "icon_style",
+			"options": [
+				{ "value": "subtle", "label": "柔和" },
+				{ "value": "contrast", "label": "高對比" },
+				{ "value": "colored", "label": "彩色" }
+			],
+			"default": "colored",
+			"label": "圖示樣式"
+		},
+		{
+			"type": "header",
+			"content": "按鈕 1"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_button",
+			"default": true,
+			"label": "顯示按鈕"
+		},
+		{
+			"type": "text",
+			"id": "button_label",
+			"default": "按鈕文字",
+			"label": "按鈕文字"
+		},
+		{
+			"type": "url",
+			"id": "button_link",
+			"label": "按鈕連結"
+		},
+		{
+			"type": "select",
+			"id": "button_style",
+			"options": [
+				{ "group": "實心按鈕", "value": "primary", "label": "主要按鈕" },
+				{ "group": "實心按鈕", "value": "secondary", "label": "次要按鈕" },
+				{ "group": "實心按鈕", "value": "tertiary", "label": "第三按鈕" },
+				{ "group": "文字按鈕", "value": "simple", "label": "主要文字按鈕" },
+				{ "group": "文字按鈕", "value": "simple_secondary", "label": "次要文字按鈕" },
+				{ "group": "文字按鈕", "value": "simple_link", "label": "連結樣式" }
+			],
+			"default": "primary",
+			"label": "按鈕樣式"
+		},
+		{
+			"type": "header",
+			"content": "按鈕 2"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_button_2",
+			"default": true,
+			"label": "顯示按鈕"
+		},
+		{
+			"type": "text",
+			"id": "button_label_2",
+			"default": "按鈕文字",
+			"label": "按鈕文字"
+		},
+		{
+			"type": "url",
+			"id": "button_link_2",
+			"label": "按鈕連結"
+		},
+		{
+			"type": "select",
+			"id": "button_style_2",
+			"options": [
+				{ "group": "實心按鈕", "value": "primary", "label": "主要按鈕" },
+				{ "group": "實心按鈕", "value": "secondary", "label": "次要按鈕" },
+				{ "group": "實心按鈕", "value": "tertiary", "label": "第三按鈕" },
+				{ "group": "文字按鈕", "value": "simple", "label": "主要文字按鈕" },
+				{ "group": "文字按鈕", "value": "simple_secondary", "label": "次要文字按鈕" },
+				{ "group": "文字按鈕", "value": "simple_link", "label": "連結樣式" }
+			],
+			"default": "simple",
+			"label": "按鈕樣式"
+		},
+		{
+			"type": "header",
+			"content": "區塊間距"
+		},
+		{
+			"type": "select",
+			"id": "padding_top",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "特小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "特大" }
+			],
+			"default": "m",
+			"label": "頂部內邊距"
+		},
+		{
+			"type": "select",
+			"id": "padding_bottom",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "特小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "特大" }
+			],
+			"default": "m",
+			"label": "底部內邊距"
+		},
+		{
+			"type": "header",
+			"content": "區塊邊界"
+		},
+		{
+			"type": "select",
+			"id": "margin_top",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "特小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "特大" }
+			],
+			"default": "no-indent",
+			"label": "頂部外邊界"
+		},
+		{
+			"type": "select",
+			"id": "margin_bottom",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "特小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "特大" }
+			],
+			"default": "no-indent",
+			"label": "底部外邊界"
+		}
+	],
+	"blocks": [
+		{
+			"type": "column",
+			"name": "欄位",
+			"settings": [
+				{
+					"type": "select",
+					"id": "icon",
+					"options": [
+						{ "value": "none", "label": "無" },
+						{ "value": "arrow-bar", "label": "箭頭列" },
+						{ "value": "bag-1", "label": "提袋 1" },
+						{ "value": "bag-2", "label": "提袋 2" },
+						{ "value": "bag-3", "label": "提袋 3" },
+						{ "value": "bar-chart", "label": "長條圖" },
+						{ "value": "bars-upward", "label": "向上箭頭" },
+						{ "value": "baseball", "label": "棒球" },
+						{ "value": "battery-1", "label": "電池 1" },
+						{ "value": "battery-2", "label": "電池 2" },
+						{ "value": "battery-3", "label": "電池 3" },
+						{ "value": "book", "label": "書本" },
+						{ "value": "card", "label": "卡片" },
+						{ "value": "card-holder", "label": "名片夾" },
+						{ "value": "chart", "label": "圖表" },
+						{ "value": "chart-2", "label": "圖表 2" },
+						{ "value": "chart-3", "label": "圖表 3" },
+						{ "value": "chats", "label": "對話" },
+						{ "value": "check-1", "label": "勾選 1" },
+						{ "value": "check-2", "label": "勾選 2" },
+						{ "value": "check-3", "label": "勾選 3" },
+						{ "value": "check-4", "label": "勾選 4" },
+						{ "value": "circle", "label": "圓圈" },
+						{ "value": "circles", "label": "多個圓圈" },
+						{ "value": "clock-1", "label": "時鐘 1" },
+						{ "value": "clock-2", "label": "時鐘 2" },
+						{ "value": "close", "label": "關閉" },
+						{ "value": "cloud-server", "label": "雲端伺服器" },
+						{ "value": "computer", "label": "電腦" },
+						{ "value": "computer-mouse", "label": "滑鼠" },
+						{ "value": "confetti", "label": "彩紙" },
+						{ "value": "delivery", "label": "貨車" },
+						{ "value": "delivery-box", "label": "包裹" },
+						{ "value": "devices", "label": "多裝置" },
+						{ "value": "directions", "label": "方向" },
+						{ "value": "dumbbell", "label": "啞鈴" },
+						{ "value": "eye", "label": "眼睛" },
+						{ "value": "facebook", "label": "Facebook" },
+						{ "value": "file-1", "label": "檔案 1" },
+						{ "value": "file-2", "label": "檔案 2" },
+						{ "value": "flag", "label": "旗幟" },
+						{ "value": "folder-1", "label": "資料夾 1" },
+						{ "value": "folder-2", "label": "資料夾 2" },
+						{ "value": "food", "label": "食物" },
+						{ "value": "hand-1", "label": "手 1" },
+						{ "value": "hand-2", "label": "手 2" },
+						{ "value": "hand-3", "label": "手 3" },
+						{ "value": "headphones", "label": "耳機" },
+						{ "value": "instagram", "label": "Instagram" },
+						{ "value": "laptop-1", "label": "筆電 1" },
+						{ "value": "laptop-2", "label": "筆電 2" },
+						{ "value": "leaf", "label": "葉子" },
+						{ "value": "lightning-bolt-1", "label": "閃電 1" },
+						{ "value": "lightning-bolt-2", "label": "閃電 2" },
+						{ "value": "like", "label": "讚" },
+						{ "value": "link", "label": "連結" },
+						{ "value": "lock-1", "label": "鎖 1" },
+						{ "value": "lock-2", "label": "鎖 2" },
+						{ "value": "logout", "label": "登出" },
+						{ "value": "luggage", "label": "行李" },
+						{ "value": "mark", "label": "標記" },
+						{ "value": "medicine", "label": "藥物" },
+						{ "value": "microphone", "label": "麥克風" },
+						{ "value": "moon", "label": "月亮" },
+						{ "value": "pencil", "label": "鉛筆" },
+						{ "value": "phone-1", "label": "手機 1" },
+						{ "value": "phone-2", "label": "手機 2" },
+						{ "value": "phone-3", "label": "手機 3" },
+						{ "value": "phone-4", "label": "手機 4" },
+						{ "value": "pinterest", "label": "Pinterest" },
+						{ "value": "plug", "label": "插頭" },
+						{ "value": "presentation-1", "label": "簡報 1" },
+						{ "value": "presentation-2", "label": "簡報 2" },
+						{ "value": "pulse", "label": "脈搏" },
+						{ "value": "recycle", "label": "回收" },
+						{ "value": "rocket", "label": "火箭" },
+						{ "value": "search", "label": "搜尋" },
+						{ "value": "sending", "label": "傳送" },
+						{ "value": "server-1", "label": "伺服器 1" },
+						{ "value": "server-2", "label": "伺服器 2" },
+						{ "value": "settings", "label": "設定" },
+						{ "value": "shield", "label": "盾牌" },
+						{ "value": "shopping-basket", "label": "購物籃" },
+						{ "value": "shuffle", "label": "隨機播放" },
+						{ "value": "snapchat", "label": "Snapchat" },
+						{ "value": "sound-waves", "label": "聲波" },
+						{ "value": "speaker", "label": "喇叭" },
+						{ "value": "squares-1", "label": "方塊 1" },
+						{ "value": "squares-2", "label": "方塊 2" },
+						{ "value": "stack", "label": "堆疊" },
+						{ "value": "star", "label": "星星" },
+						{ "value": "stopwatch", "label": "碼錶" },
+						{ "value": "sun", "label": "太陽" },
+						{ "value": "tag", "label": "標籤" },
+						{ "value": "telephone-tower", "label": "電塔" },
+						{ "value": "tik-tok", "label": "TikTok" },
+						{ "value": "tree", "label": "樹木" },
+						{ "value": "trend", "label": "趨勢" },
+						{ "value": "trophy", "label": "獎盃" },
+						{ "value": "tumblr", "label": "Tumblr" },
+						{ "value": "tv", "label": "電視" },
+						{ "value": "twitter", "label": "Twitter" },
+						{ "value": "user-1", "label": "使用者 1" },
+						{ "value": "user-2", "label": "使用者 2" },
+						{ "value": "user-3", "label": "使用者 3" },
+						{ "value": "user-4", "label": "使用者 4" },
+						{ "value": "user-5", "label": "使用者 5" },
+						{ "value": "video", "label": "影片" },
+						{ "value": "vimeo", "label": "Vimeo" },
+						{ "value": "wallet", "label": "錢包" },
+						{ "value": "watch", "label": "手錶" },
+						{ "value": "water-1", "label": "水 1" },
+						{ "value": "water-2", "label": "水 2" },
+						{ "value": "water-3", "label": "水 3" },
+						{ "value": "wave-1", "label": "波浪 1" },
+						{ "value": "wave-2", "label": "波浪 2" },
+						{ "value": "wifi-1", "label": "Wi-Fi 1" },
+						{ "value": "wifi-2", "label": "Wi-Fi 2" },
+						{ "value": "window", "label": "視窗" },
+						{ "value": "youtube", "label": "YouTube" }
+					],
+					"default": "none",
+					"label": "圖示"
+				},
+				{
+					"type": "select",
+					"id": "icon_fill_type",
+					"options": [
+						{ "value": "solid", "label": "實心" },
+						{ "value": "gradient", "label": "漸層" }
+					],
+					"default": "solid",
+					"label": "圖示填色類型"
+				},
+				{
+					"type": "text",
+					"id": "heading",
+					"label": "標題",
+					"default": "欄位標題"
+				},
+				{
+					"type": "text",
+					"id": "text",
+					"label": "文字",
+					"default": "您可以在此描述您的內容。"
+				}
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "圖片與文字",
+			"blocks": [
+				{
+					"type": "column"
+				},
+				{
+					"type": "column"
+				},
+				{
+					"type": "column"
+				},
+				{
+					"type": "column"
+				}
+			]
+		}
+	]
+}
+{% endschema %}

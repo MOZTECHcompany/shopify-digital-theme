@@ -1,0 +1,589 @@
+{% comment %}
+  ============================================================
+  主題：終極影片區塊 v4.19 (多種主標題特效) - 深度優化版
+  特色：
+  - [多種特效] 新增下拉菜單，可在「實心」、「鏤空」、「霓虹輝光」、「陰影浮雕」四種主標題特效間切換。
+  - [智能設置] schema 設置根據所選特效動態顯示相關選項，界面更清晰。
+  - [動態CSS] CSS 根據後台選擇，精準應用對應的特效樣式。
+  - [保留優點] 完整保留 v4.18 的所有功能。
+  - [深度優化] 強化手機端效能、懶加載、UX/UI 及字體佈局。
+  ============================================================
+{% endcomment %}
+
+{% comment %} Preconnect for faster font loading {% endcomment %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    /* Theme Colors */
+    --uvb-bg-color: {{ section.settings.background_color | default: '#FFFFFF' }};
+    --uvb-scroll-container-bg: {{ section.settings.scroll_container_color | default: '#F5F5F7' }};
+    
+    /* Desktop Text Colors */
+    --uvb-title-color-desktop: {{ section.settings.title_color_desktop | default: '#1C1C1E' }};
+    --uvb-subtitle-color-desktop: {{ section.settings.description_color_desktop | default: '#58585A' }};
+    
+    /* Mobile Text Colors */
+    --uvb-title-color-mobile: {{ section.settings.title_color_mobile | default: '#1C1C1E' }};
+    --uvb-subtitle-color-mobile: {{ section.settings.description_color_mobile | default: '#58585A' }};
+  }
+
+  #shopify-section-{{ section.id }} .final-correct-scroll-container {
+    height: 300vh; /* 桌面端高度 */
+    position: relative;
+    background-color: var(--uvb-scroll-container-bg);
+    font-family: 'Poppins', sans-serif;
+    /* 啟用硬體加速，提升滾動平滑度 */
+    transform: translateZ(0); 
+    will-change: transform;
+  }
+  #shopify-section-{{ section.id }} .final-correct-sticky-wrapper {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    background-color: var(--uvb-bg-color);
+    /* 預防抖動 */
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+  
+  #shopify-section-{{ section.id }} .final-correct-animation-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: scale(var(--video-scale, 0.8));
+    border-radius: var(--video-radius, 24px);
+    box-shadow: 0 15px 40px -15px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+    /* 明確聲明將變化的屬性，提升 GPU 渲染效率 */
+    will-change: transform, border-radius; 
+    background-color: #e5e5e5; /* 影片載入前的預設背景色 */
+  }
+  
+  #shopify-section-{{ section.id }} .final-correct-video-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+    filter: brightness(1);
+    /* 避免影片在動畫時模糊或抖動 */
+    image-rendering: -webkit-optimize-contrast; 
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    /* 確保預設是不透明的，避免載入時閃爍 */
+    opacity: 1; 
+    transition: opacity 0.5s ease-in-out; /* 影片載入後平滑顯示 */
+  }
+
+  /* 影片載入前隱藏，只顯示 poster */
+  #shopify-section-{{ section.id }} .final-correct-video-bg:not([src]) {
+    opacity: 0;
+  }
+
+  #shopify-section-{{ section.id }} .final-correct-video-desktop { display: block; }
+  #shopify-section-{{ section.id }} .final-correct-video-mobile { display: none; }
+  
+  #shopify-section-{{ section.id }} .final-correct-scrim-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 17;
+    opacity: var(--content-opacity, 0);
+    transition: opacity 0.8s ease;
+    pointer-events: none;
+    background: linear-gradient(180deg, transparent 60%, {{ section.settings.background_color | color_modify: 'alpha', 0.8 }} 85%, {{ section.settings.background_color }} 100%);
+  }
+  
+  #shopify-section-{{ section.id }} .final-correct-content-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    padding-bottom: {{ section.settings.content_vertical_position }}vh;
+    box-sizing: border-box;
+  }
+  .final-correct-title,
+  .final-correct-subtitle-wrapper {
+    opacity: var(--content-opacity, 0);
+    transition: opacity 0.8s ease;
+    /* 啟用硬體加速 */
+    will-change: opacity;
+  }
+  .fc-line-reveal { overflow: hidden; }
+  .fc-line-reveal > * {
+    transform: translateY(110%);
+    transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+    /* 啟用硬體加速 */
+    will-change: transform;
+  }
+  .final-correct-content-wrapper.is-visible .fc-line-reveal > * {
+    transform: translateY(0);
+  }
+
+  .final-correct-title {
+    font-weight: {{ section.settings.title_weight_desktop }};
+    text-transform: uppercase;
+    /* 使用 clamp 確保字體大小在桌面端也有彈性，並設定合理範圍 */
+    font-size: clamp(32px, {{ section.settings.title_font_size_desktop }}vw, 96px); 
+    line-height: 1.1;
+    transition-delay: 0s;
+    /* 文本渲染平滑 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    
+    /* --- Dynamic Text Effect Logic --- */
+    {% case section.settings.title_effect %}
+      {% when 'outline' %}
+        color: transparent;
+        -webkit-text-stroke-width: {{ section.settings.outline_width }}px;
+        -webkit-text-stroke-color: var(--uvb-title-color-desktop);
+        text-shadow: none;
+      
+      {% when 'neon_glow' %}
+        color: var(--uvb-title-color-desktop);
+        -webkit-text-stroke-width: 0;
+        {%- assign neon_color = section.settings.neon_glow_color | default: '#2BB9ED' -%}
+        text-shadow: 0 0 5px {{ neon_color | color_modify: 'alpha', 0.8 }},
+                     0 0 10px {{ neon_color | color_modify: 'alpha', 0.6 }},
+                     0 0 20px {{ neon_color | color_modify: 'alpha', 0.4 }},
+                     0 0 40px {{ neon_color | color_modify: 'alpha', 0.2 }};
+
+      {% when 'drop_shadow' %}
+        color: var(--uvb-title-color-desktop);
+        -webkit-text-stroke-width: 0;
+        {%- assign shadow_color = section.settings.drop_shadow_color | default: 'rgba(0,0,0,0.5)' -%}
+        text-shadow: 2px 2px 5px {{ shadow_color }};
+
+      {% else %}
+        color: var(--uvb-title-color-desktop);
+        -webkit-text-stroke-width: 0;
+        text-shadow: none;
+    {% endcase %}
+  }
+  
+  #shopify-section-{{ section.id }} .final-correct-subtitle-wrapper {
+    max-width: 550px;
+    width: 90%;
+    margin-top: 2vh;
+    /* 使用 clamp 確保字體大小在桌面端也有彈性 */
+    font-size: clamp(14px, {{ section.settings.description_font_size_desktop }}px, 20px); 
+    font-weight: {{ section.settings.description_weight_desktop }};
+    line-height: 1.6;
+    color: var(--uvb-subtitle-color-desktop);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  #shopify-section-{{ section.id }} .final-correct-subtitle-wrapper .fc-line-reveal > * {
+    transition-delay: 0.2s;
+  }
+
+  @keyframes gradient-flow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+  #shopify-section-{{ section.id }} .final-correct-cta-button {
+    color: #fff; border: none; padding: 12px 22px 12px 30px;
+    border-radius: 10px;
+    text-decoration: none; font-weight: 600; display: inline-flex; align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    font-size: 13.5px;
+    position: relative;
+    background: linear-gradient(90deg, {{ section.settings.cta_brand_color }}, {{ section.settings.cta_brand_color | color_lighten: 15 }}, {{ section.settings.cta_brand_color }});
+    background-size: 200% 100%; animation: gradient-flow 4s ease-in-out infinite;
+    box-shadow: 0 0 15px {{ section.settings.cta_brand_color | color_modify: 'alpha', 0.2 }};
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    /* 最小觸控區域 */
+    min-height: 44px; 
+    min-width: 44px; 
+  }
+  #shopify-section-{{ section.id }} .cta-arrow {
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    width: 0.9em; height: 0.9em;
+  }
+  #shopify-section-{{ section.id }} .final-correct-cta-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 30px {{ section.settings.cta_brand_color | color_modify: 'alpha', 0.5 }};
+  }
+  #shopify-section-{{ section.id }} .final-correct-cta-button:hover .cta-arrow {
+    transform: translateX(5px);
+  }
+  
+  @media (max-width: 768px) {
+    #shopify-section-{{ section.id }} .final-correct-scroll-container { 
+      height: 250vh; /* 手機端滾動高度 */
+    }
+    #shopify-section-{{ section.id }} .final-correct-video-desktop { display: none; }
+    #shopify-section-{{ section.id }} .final-correct-video-mobile { display: block; }
+
+    #shopify-section-{{ section.id }} .final-correct-content-wrapper {
+        padding-bottom: {{ section.settings.content_vertical_position }}vh;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    #shopify-section-{{ section.id }} .final-correct-scrim-overlay {
+        /* 手機端漸變調整：從 70% 開始，讓更多影片內容可見 */
+        background: linear-gradient(180deg, transparent 70%, {{ section.settings.background_color | color_modify: 'alpha', 0.85 }} 90%, {{ section.settings.background_color }} 100%);
+    }
+
+    .final-correct-title { 
+      /* 使用 clamp 確保字體大小在手機端有彈性且有最小/最大值 */
+      font-size: clamp(30px, {{ section.settings.title_font_size_mobile }}vw, 60px); 
+      font-weight: {{ section.settings.title_weight_mobile }};
+      /* Apply mobile color based on effect */
+      {% if section.settings.title_effect == 'outline' %}
+        -webkit-text-stroke-color: var(--uvb-title-color-mobile);
+      {% else %}
+        color: var(--uvb-title-color-mobile);
+      {% endif %}
+      line-height: 1.2; /* 手機端標題行高略寬，提升可讀性 */
+    }
+    #shopify-section-{{ section.id }} .final-correct-subtitle-wrapper { 
+      /* 使用 clamp 確保字體大小在手機端有彈性且有最小/最大值 */
+      font-size: clamp(12px, {{ section.settings.description_font_size_mobile }}px, 16px);
+      font-weight: {{ section.settings.description_weight_mobile }};
+      color: var(--uvb-subtitle-color-mobile);
+      max-width: 95%;
+      margin-top: 1.5vh;
+      line-height: 1.7; /* 手機端描述行高略寬，提升可讀性 */
+    }
+    #shopify-section-{{ section.id }} .final-correct-cta-button {
+      margin-top: 15px;
+      font-size: 13px;
+      padding: 10px 18px 10px 25px;
+      /* 確保手機按鈕仍有足夠觸控區域 */
+      min-height: 44px; 
+      min-width: 44px; 
+    }
+  }
+
+  /* 針對極小螢幕的進一步優化 */
+  @media (max-width: 480px) {
+    .final-correct-title {
+      font-size: clamp(26px, {{ section.settings.title_font_size_mobile | times: 0.8 }}vw, 50px); /* 在更小螢幕上稍微縮小字體 */
+    }
+    #shopify-section-{{ section.id }} .final-correct-subtitle-wrapper {
+      font-size: clamp(11px, {{ section.settings.description_font_size_mobile | times: 0.9 }}px, 15px); /* 在更小螢幕上稍微縮小字體 */
+      padding-left: 15px;
+      padding-right: 15px;
+    }
+    #shopify-section-{{ section.id }} .final-correct-cta-button {
+      padding: 8px 16px 8px 22px;
+      font-size: 12px;
+    }
+  }
+</style>
+
+<div class="final-correct-scroll-container" id="FinalCorrectContainer-{{ section.id }}">
+  <div class="final-correct-sticky-wrapper">
+    <div class="final-correct-animation-wrapper" id="FinalCorrectAnimationWrapper-{{ section.id }}">
+      
+      {% assign desktop_mp4_source = section.settings.feature_video.sources | where: "format", "mp4" | first %}
+      {% assign desktop_webm_source = section.settings.feature_video.sources | where: "format", "webm" | first %}
+      
+      <video class="final-correct-video-bg final-correct-video-desktop" 
+             poster="{{ section.settings.feature_video_img | image_url: width: 1920, format: 'pjpg' }}" 
+             loop autoplay muted playsinline preload="none" 
+             data-src-mp4="{{ desktop_mp4_source.url }}" 
+             data-src-webm="{{ desktop_webm_source.url }}"
+             fetchpriority="high"
+             aria-label="背景動畫影片 (桌面)">
+        您的瀏覽器不支持影片標籤。
+      </video>
+      {% assign mobile_mp4_source = section.settings.feature_video_mobile.sources | where: "format", "mp4" | first %}
+      {% assign mobile_webm_source = section.settings.feature_video_mobile.sources | where: "format", "webm" | first %}
+
+      <video class="final-correct-video-bg final-correct-video-mobile" 
+             poster="{{ section.settings.feature_video_mobile_img | image_url: width: 1080, format: 'pjpg' }}" 
+             loop autoplay muted playsinline preload="none"
+             data-src-mp4="{{ mobile_mp4_source.url }}"
+             data-src-webm="{{ mobile_webm_source.url }}"
+             fetchpriority="high"
+             aria-label="背景動畫影片 (手機)">
+        您的瀏覽器不支持影片標籤。
+      </video>
+      
+      <div class="final-correct-scrim-overlay"></div>
+      
+      <div class="final-correct-content-wrapper" id="FinalCorrectContent-{{ section.id }}">
+        <div class="fc-line-reveal">
+          <h1 class="final-correct-title">{{ section.settings.feature_video_title }}</h1>
+        </div>
+        <div class="final-correct-subtitle-wrapper">
+          <div class="fc-line-reveal">
+            <div>{{ section.settings.feature_video_description }}</div>
+          </div>
+          <div class="fc-line-reveal">
+            <a href="{{ section.settings.cta_button_link }}" class="final-correct-cta-button">
+              <span>{{ section.settings.cta_button_text }}</span>
+              <span class="cta-arrow" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                  <path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2h12.172z"/>
+                </svg>
+              </span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.getElementById('FinalCorrectContainer-{{ section.id }}');
+  if (!container) {
+    console.warn(`FinalCorrectContainer-${{ section.id }} not found. Script may not function as expected.`);
+    return;
+  }
+
+  const stickyWrapper = container.querySelector('.final-correct-sticky-wrapper');
+  const animationWrapper = container.querySelector('.final-correct-animation-wrapper');
+  const contentWrapper = document.getElementById('FinalCorrectContent-{{ section.id }}');
+  const scrimOverlay = container.querySelector('.final-correct-scrim-overlay');
+  const videoDesktop = container.querySelector('.final-correct-video-desktop');
+  const videoMobile = container.querySelector('.final-correct-video-mobile');
+  
+  let animationFrameId = null;
+  let videoSourceLoaded = false; // 標誌：影片來源是否已設定
+
+  // 函數：根據螢幕尺寸設定影片源
+  const loadVideoSource = () => {
+    if (videoSourceLoaded) return; // 如果已載入，則跳過
+
+    let currentVideoElement = null;
+    let mp4Src = '';
+    let webmSrc = '';
+
+    if (window.innerWidth <= 768) { // 手機端
+      currentVideoElement = videoMobile;
+      mp4Src = currentVideoElement?.dataset.srcMp4;
+      webmSrc = currentVideoElement?.dataset.srcWebm;
+    } else { // 桌面端
+      currentVideoElement = videoDesktop;
+      mp4Src = currentVideoElement?.dataset.srcMp4;
+      webmSrc = currentVideoElement?.dataset.srcWebm;
+    }
+
+    if (currentVideoElement) {
+      // 根據瀏覽器支持性選擇最佳影片格式
+      if (currentVideoElement.canPlayType('video/webm') && webmSrc) {
+        currentVideoElement.src = webmSrc;
+      } else if (mp4Src) {
+        currentVideoElement.src = mp4Src;
+      } else {
+        // 如果兩種格式都不可用，可以考慮顯示錯誤或靜態圖片
+        console.warn('No playable video format found for current device.');
+        return; // 終止函數執行
+      }
+
+      currentVideoElement.load(); // 觸發瀏覽器載入影片
+      videoSourceLoaded = true; // 設置標誌為已載入
+
+      // 監聽影片載入完成事件，應用平滑過渡
+      currentVideoElement.addEventListener('loadeddata', () => {
+        // 在影片開始播放或第一幀可用時，移除 opacity 0 的樣式，讓影片漸入
+        currentVideoElement.style.opacity = '1'; 
+      }, { once: true }); // 監聽一次即可
+      
+      // 確保 autoplay 在某些情況下（如 iOS 的限制）能正常觸發
+      currentVideoElement.play().catch(error => {
+        // 捕獲並處理自動播放錯誤（例如，用戶未互動前無法自動播放）
+        // console.log("Video autoplay prevented:", error); // 可以註釋掉這行，避免過多控制台訊息
+      });
+    }
+  };
+
+  // 處理滾動動畫的邏輯
+  const handleScrollAnimation = () => {
+    cancelAnimationFrame(animationFrameId); // 取消前一個動畫幀，避免重複執行
+    animationFrameId = requestAnimationFrame(() => {
+      const rect = container.getBoundingClientRect();
+      // 計算區塊滾動了多遠
+      // 當 rect.top 為 0 時，表示區塊頂部與視窗頂部對齊
+      const scrollAmount = -rect.top; 
+      
+      // 計算滾動進度：只在區塊從開始到中間（總高度的 50%）進行動畫
+      // 確保 progress 始終在 0 到 1 之間
+      const totalScrollAnimationRange = container.clientHeight * 0.5; // 動畫在總高度的前 50% 發生
+      let progress = Math.max(0, Math.min(1, scrollAmount / totalScrollAnimationRange));
+      
+      // 影片縮放：從 0.8 放大到 1.0 (0.8 + 0.2 * progress)
+      const scale = 0.8 + 0.2 * progress;
+      // 影片圓角：從 24px 縮小到 0px (24 * (1 - progress))
+      const radius = 24 * (1 - progress);
+      // 內容透明度：在 progress 達到 0.2 時開始顯示，並在 progress 達到 0.85 (0.2 + 0.65) 時完全顯示
+      // (progress - 0.2) * (1 / (0.85 - 0.2)) = (progress - 0.2) * 1.538 約等於 1.5
+      const contentOpacity = Math.max(0, Math.min(1, (progress - 0.2) * 1.5));
+
+      animationWrapper.style.setProperty('--video-scale', scale);
+      animationWrapper.style.setProperty('--video-radius', `${radius}px`);
+      
+      // 避免重複設置 CSS 變量，只有當值有變化時才設置
+      const currentContentOpacity = parseFloat(stickyWrapper.style.getPropertyValue('--content-opacity') || 0);
+      if (Math.abs(currentContentOpacity - contentOpacity) > 0.01) { // 設置一個閾值避免過於頻繁的更新
+        stickyWrapper.style.setProperty('--content-opacity', contentOpacity);
+      }
+      if(scrimOverlay) {
+        const currentScrimOpacity = parseFloat(scrimOverlay.style.getPropertyValue('--content-opacity') || 0);
+        if (Math.abs(currentScrimOpacity - contentOpacity) > 0.01) {
+          scrimOverlay.style.setProperty('--content-opacity', contentOpacity);
+        }
+      }
+      
+      // 根據內容透明度切換文字動畫類名
+      if(contentOpacity > 0.1 && !contentWrapper.classList.contains('is-visible')) {
+        contentWrapper.classList.add('is-visible');
+      } else if (contentOpacity <= 0.1 && contentWrapper.classList.contains('is-visible')) {
+        contentWrapper.classList.remove('is-visible');
+      }
+    });
+  };
+
+  // Intersection Observer 監聽器
+  // `rootMargin`: 在元素進入視窗前 `X` 像素時觸發。
+  // `threshold`: 當元素可見百分比達到這些值時觸發。
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        // 當區塊進入視窗範圍時，載入影片源並綁定滾動事件
+        loadVideoSource(); 
+        window.addEventListener('scroll', handleScrollAnimation, { passive: true });
+        // 立即執行一次動畫，確保頁面載入時的正確狀態
+        handleScrollAnimation(); 
+      } else {
+        // 當區塊離開視窗時，移除滾動事件監聽器，節省資源
+        window.removeEventListener('scroll', handleScrollAnimation);
+        // 可以考慮在此處暫停影片或將 src 設置為空以釋放資源，但需要測試用戶體驗
+        // if (videoDesktop) videoDesktop.pause();
+        // if (videoMobile) videoMobile.pause();
+      }
+    });
+  }, { 
+    // 當區塊上方距離視窗底部還有 500px 時就開始預載入，確保平滑過渡
+    // 數字可以根據實際測試調整
+    rootMargin: '0px 0px 500px 0px', 
+    threshold: [0, 0.1, 1] // 監聽 0%, 10%, 100% 可見度
+  }); 
+
+  // 開始監聽目標容器
+  observer.observe(container);
+
+  // 初始檢查：如果頁面載入時區塊已在視窗內，立即載入影片
+  const checkInitialVisibility = () => {
+    const rect = container.getBoundingClientRect();
+    // 如果區塊的頂部在視窗底部上方，且底部在視窗頂部下方，則表示在視窗內
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      loadVideoSource();
+    }
+  };
+  checkInitialVisibility();
+
+  // 處理視窗尺寸改變事件，重新載入影片以適應桌面/手機版本切換
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      // 重置影片載入標誌，以便在尺寸變化後重新載入正確的影片
+      videoSourceLoaded = false; 
+      loadVideoSource();
+      handleScrollAnimation(); // 重新觸發動畫以更新樣式
+    }, 200); // 設置一個延遲，避免在 resize 過程中頻繁觸發
+  }, { passive: true });
+});
+</script>
+
+{% schema %}
+{
+  "name": "終極影片區塊 v4.19 (優化版)",
+  "settings": [
+    {
+      "type": "header",
+      "content": "主題與顏色"
+    },
+    { "type": "color", "id": "background_color", "label": "影片背景色", "default": "#FFFFFF" },
+    { "type": "color", "id": "scroll_container_color", "label": "滾動容器背景色", "default": "#F5F5F7" },
+    { "type": "color", "id": "cta_brand_color", "label": "CTA 按鈕主色", "default": "#2BB9ED" },
+    {
+      "type": "header",
+      "content": "主標題"
+    },
+    { "type": "text", "id": "feature_video_title", "label": "文字", "default": "Universal Charge MAX" },
+    { "type": "color", "id": "title_color_desktop", "label": "顏色 (桌面)", "default": "#1C1C1E" },
+    { "type": "color", "id": "title_color_mobile", "label": "顏色 (手機)", "default": "#1C1C1E" },
+    { "type": "range", "id": "title_font_size_desktop", "min": 4, "max": 10, "step": 0.1, "unit": "vw", "label": "字體大小 (桌面)", "default": 7.0 },
+    { "type": "range", "id": "title_font_size_mobile", "min": 8, "max": 15, "step": 0.1, "unit": "vw", "label": "字體大小 (手機)", "default": 9.5 },
+    { "type": "range", "id": "title_weight_desktop", "min": 100, "max": 900, "step": 100, "label": "字體粗細 (桌面)", "default": 800 },
+    { "type": "range", "id": "title_weight_mobile", "min": 100, "max": 900, "step": 100, "label": "字體粗細 (手機)", "default": 800 },
+    
+    {
+      "type": "header",
+      "content": "描述文字"
+    },
+    { "type": "richtext", "id": "feature_video_description", "label": "文字", "default": "<p>The next-gen power bank is here. Universal Charge MAX combines 45W fast charging, wireless power, and a modular system—designed to fuel every device, anywhere.</p>" },
+    { "type": "color", "id": "description_color_desktop", "label": "顏色 (桌面)", "default": "#58585A" },
+    { "type": "color", "id": "description_color_mobile", "label": "顏色 (手機)", "default": "#58585A" },
+    { "type": "range", "id": "description_font_size_desktop", "min": 12, "max": 20, "step": 0.1, "unit": "px", "label": "字體大小 (桌面)", "default": 14 },
+    { "type": "range", "id": "description_font_size_mobile", "min": 11, "max": 18, "step": 0.1, "unit": "px", "label": "字體大小 (手機)", "default": 13.5 },
+    { "type": "range", "id": "description_weight_desktop", "min": 100, "max": 900, "step": 100, "label": "字體粗細 (桌面)", "default": 400 },
+    { "type": "range", "id": "description_weight_mobile", "min": 100, "max": 900, "step": 100, "label": "字體粗細 (手機)", "default": 400 },
+    
+    { "type": "header", "content": "按鈕與佈局" },
+    { "type": "text", "id": "cta_button_text", "label": "按鈕文字", "default": "Explore Now" },
+    { "type": "url", "id": "cta_button_link", "label": "按鈕連結" },
+    { "type": "range", "id": "content_vertical_position", "min": 5, "max": 25, "step": 0.5, "unit": "vh", "label": "內容垂直位置 (距底部)", "default": 10 },
+
+    {
+      "type": "header",
+      "content": "主標題特效"
+    },
+    {
+      "type": "select",
+      "id": "title_effect",
+      "label": "選擇特效",
+      "options": [
+        { "value": "solid", "label": "實心" },
+        { "value": "outline", "label": "鏤空" },
+        { "value": "neon_glow", "label": "霓虹輝光" },
+        { "value": "drop_shadow", "label": "陰影浮雕" }
+      ],
+      "default": "solid"
+    },
+    { "type": "paragraph", "content": "--- 鏤空特效設置 ---" },
+    { "type": "range", "id": "outline_width", "min": 1, "max": 4, "step": 0.1, "unit": "px", "label": "描邊寬度", "default": 2 },
+    { "type": "paragraph", "content": "--- 霓虹輝光特效設置 ---" },
+    { "type": "color", "id": "neon_glow_color", "label": "輝光顏色", "default": "#2BB9ED" },
+    { "type": "paragraph", "content": "--- 陰影浮雕特效設置 ---" },
+    { "type": "color", "id": "drop_shadow_color", "label": "陰影顏色", "default": "rgba(0,0,0,0.5)" },
+
+    { "type": "header", "content": "桌面端媒體" },
+    { "type": "video", "id": "feature_video", "label": "背景影片 (桌面)" },
+    { "type": "image_picker", "id": "feature_video_img", "label": "影片預覽圖 (封面)" },
+    { "type": "header", "content": "行動裝置媒體" },
+    { "type": "video", "id": "feature_video_mobile", "label": "背景影片 (手機)" },
+    { "type": "image_picker", "id": "feature_video_mobile_img", "label": "手機影片預覽圖 (封面)" }
+  ],
+  "presets": [
+    { "name": "終極影片區塊 v4.19 (優化版)", "category": "影片" }
+  ]
+}
+{% endschema %}

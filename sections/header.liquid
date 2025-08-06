@@ -1,0 +1,1421 @@
+{{ 'component-loading-overlay.css' | asset_url | stylesheet_tag }}
+{% if settings.show_shipping %}
+	{{ 'component-cart-shipping.css' | asset_url | stylesheet_tag }}
+{% endif %}
+{%- if settings.cart_type == "drawer" -%}
+	{{ 'component-discounts.css' | asset_url | stylesheet_tag }}
+	{{ 'component-cart-drawer.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
+
+{{ 'component-list-menu.css' | asset_url | stylesheet_tag }}
+{{ 'component-search.css' | asset_url | stylesheet_tag }}
+{{ 'template-collection.css' | asset_url | stylesheet_tag }}
+{{ 'component-menu-drawer.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+{{ 'component-card.css' | asset_url | stylesheet_tag }}
+{{ 'component-card-horizontal.css' | asset_url | stylesheet_tag }}
+{{ 'component-article-card-small.css' | asset_url | stylesheet_tag }}
+{{ 'component-predictive-search.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'header.js' | asset_url }}" defer="defer"></script>
+
+<style>
+	@media screen and (min-width: 1100px) {
+		header-drawer {
+			display: none;
+		}
+	}
+
+	.menu-drawer-container {
+		display: flex;
+	}
+
+	.list-menu {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	.list-menu--inline {
+		display: inline-flex;
+		flex-wrap: wrap;
+	}
+
+	summary.list-menu__item {
+		padding-right: 2.7rem;
+	}
+
+	.list-menu__item {
+		display: flex;
+		align-items: center;
+	}
+
+	.list-menu__item--link {
+		text-decoration: none;
+		padding-bottom: 1rem;
+		padding-top: 1rem;
+	}
+
+	@media screen and (min-width: 750px) {
+		.list-menu__item--link {
+			padding-bottom: 1rem;
+			padding-top: 1rem;
+		}
+	}
+
+	/* --- MODIFICATION START: Visually Centered Logo for Mobile using Grid --- */
+	@media screen and (max-width: 749px) {
+		.header--left-logo.header--mobile-logo-center {
+			display: grid;
+			grid-template-columns: 1fr auto 1fr;
+			align-items: center;
+		}
+		
+		.header--left-logo.header--mobile-logo-center .header__heading {
+			justify-self: center;
+		}
+
+		.header--left-logo.header--mobile-logo-center .header__icons {
+			justify-self: end;
+		}
+	}
+	/* --- MODIFICATION END --- */
+
+
+	{% if section.settings.full_width != true %}
+		.shopify-section-header-sticky {
+			top: -1.6rem;
+		}
+
+		.header--center-logo .list-menu--inline {
+			margin-left: -1rem;
+		}
+
+		@media screen and (min-width: 1200px) {
+			.shopify-section-header-sticky {
+				top: -3.2rem;
+			}
+		}
+	{% endif %}
+	{% if section.settings.sticky_header_type == "always" %}
+		.shopify-section-header {
+			position: sticky;
+		{% if section.settings.full_width != true %}
+				top: -1.6rem;
+			{% else %}
+				top: 0;
+		{%- endif -%}
+		}
+		.section-logo-bar:has(.logo-bar:not(.logo-disable-on-mobile)) ~ .shopify-section-header {
+			top: 0;
+		}
+		@media screen and (min-width: 1200px) {
+			.shopify-section-header {
+			{% if section.settings.full_width != true %}
+					top: -3.2rem;
+				{% else %}
+					top: 0;
+			{%- endif -%}
+			}
+			.section-logo-bar:has(.logo-bar:not(.logo-disable-on-desktop)) ~ .shopify-section-header {
+				top: 0;
+			}
+		}
+	{% endif %}
+</style>
+
+<script src="{{ 'details-disclosure.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'details-modal.js' | asset_url }}" defer="defer"></script>
+{%- if settings.cart_type == "drawer" -%}
+  <script src="{{ 'cart.js' | asset_url }}" defer="defer"></script>
+	<script src="{{ 'cart-drawer.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+
+<{%- if section.settings.sticky_header_type != 'none' %}sticky-header data-sticky-type="{{ section.settings.sticky_header_type }}"{% else %}div{% endif %} class="header-wrapper {% if section.settings.full_width %}header--border{% else %}container{% endif %}">
+	<header class="header header--{{ section.settings.header_type }} header--mobile-logo-{{ section.settings.mobile_logo_alignment }} {% if section.settings.menu != blank %}header--has-menu{% endif %} container {% if section.settings.header_type == 'center-logo' %}{% if section.settings.enable_logo_mobile != true %} header--without-logo-mobile{% endif %}{% if section.settings.enable_logo_desktop != true %} header--without-logo-desktop{% endif %}{% endif %}">	
+		{% if section.settings.header_type == 'left-logo' %}
+			{% render 'header-left-logo' %}
+		{% elsif section.settings.header_type == 'center-logo' %}
+			{% render 'header-center-logo' %}
+		{% endif %}
+	</header>
+</{% if section.settings.enable_sticky_header %}sticky-header{% else %}div{% endif %}>
+
+{% javascript %}
+	class StickyHeader extends HTMLElement {
+	constructor() {
+	super();
+	}
+
+	connectedCallback() {
+		this.header = document.querySelector('.shopify-section-header');
+		this.headerWrapper = document.querySelector('.header-wrapper');
+		this.headerInner = document.querySelector('.header');
+		this.headerIsAlwaysSticky = this.getAttribute('data-sticky-type') === 'always';
+		this.headerBounds = {};
+		this.currentScrollTop = 0;
+		this.preventReveal = false;
+		this.predictiveSearch = this.querySelector('predictive-search');
+
+		this.onScrollHandler = this.onScroll.bind(this);
+		this.hideHeaderOnScrollUp = () => this.preventReveal = true;
+
+		this.addEventListener('preventHeaderReveal', this.hideHeaderOnScrollUp);
+		window.addEventListener('scroll', this.onScrollHandler, false);
+
+		this.createObserver();
+		
+		if (this.headerIsAlwaysSticky) this.reveal; 
+	}
+
+	disconnectedCallback() {
+		this.removeEventListener('preventHeaderReveal', this.hideHeaderOnScrollUp);
+		window.removeEventListener('scroll', this.onScrollHandler);
+	}
+
+	createObserver() {
+		let observer = new IntersectionObserver((entries, observer) => {
+		this.headerBounds = entries[0].intersectionRect;
+		observer.disconnect();
+		});
+
+		if (this.header) {
+			observer.observe(this.header);
+		}
+	}
+
+	onScroll() {
+	const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+	if (this.headerIsAlwaysSticky && scrollTop > this.header.offsetHeight + 1) {
+		this.header.classList.add('shopify-section-header-sticky','shopify-section-header-always-sticky');
+	};
+
+	if (this.headerIsAlwaysSticky && scrollTop < this.header.offsetHeight) {
+		this.header.classList.remove('shopify-section-header-sticky');
+	};
+
+	if (scrollTop > this.currentScrollTop && scrollTop > this.headerBounds.bottom) {
+		if (this.preventHide) return;
+		requestAnimationFrame(this.hide.bind(this));
+		} else if (scrollTop < this.currentScrollTop && scrollTop > this.headerBounds.bottom) {
+		if (!this.preventReveal) {
+		requestAnimationFrame(this.reveal.bind(this));
+		} else {
+			window.clearTimeout(this.isScrolling);
+
+			this.isScrolling = setTimeout(() => {
+			this.preventReveal = false;
+			}, 66);
+
+			requestAnimationFrame(this.hide.bind(this));
+		}
+		} else if (scrollTop <= this.headerBounds.top) {
+		requestAnimationFrame(this.reset.bind(this));
+		}
+
+		this.currentScrollTop = scrollTop;
+	}
+
+	hide() {
+		if (this.headerIsAlwaysSticky) return;
+		this.header.classList.add('shopify-section-header-hidden', 'shopify-section-header-sticky');
+		this.closeMenuDisclosure();
+	}
+
+	reveal() {
+		if (this.headerIsAlwaysSticky) return;
+		this.header.classList.add('shopify-section-header-sticky', 'animate');
+		this.header.classList.remove('shopify-section-header-hidden');
+	}
+
+	reset() {
+		if (this.headerIsAlwaysSticky) return;
+		this.header.classList.remove('shopify-section-header-hidden', 'shopify-section-header-sticky', 'animate');
+	}
+
+	closeMenuDisclosure() {
+		this.disclosures = this.disclosures || this.header.querySelectorAll('details-disclosure');
+		if (this.disclosures) {
+			this.disclosures.forEach(disclosure => {
+				disclosure.close(); 
+			});
+		}
+		this.disclosureLists = this.header.querySelectorAll('.disclosure__list');
+			if (this.disclosureLists) {
+				this.disclosureLists.forEach(disclosureList => {
+					disclosureList.setAttribute('hidden', true); 
+				});
+			}
+		}
+	}
+
+	customElements.define('sticky-header', StickyHeader);
+
+{% endjavascript %}
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Organization",
+    "name": {{ shop.name | json }},
+    {% if section.settings.logo %}
+      "logo": {{ section.settings.logo | image_url: section.settings.logo.width | prepend: "https:" | json }},
+    {% endif %}
+    "sameAs": [
+      {{ settings.social_twitter_link | json }},
+      {{ settings.social_facebook_link | json }},
+      {{ settings.social_pinterest_link | json }},
+      {{ settings.social_instagram_link | json }},
+			{{ settings.social_linkedin_link | json }},
+      {{ settings.social_tumblr_link | json }},
+      {{ settings.social_snapchat_link | json }},
+      {{ settings.social_youtube_link | json }},
+      {{ settings.social_vimeo_link | json }}
+    ],
+    "url": {{ shop.url | append: page.url | json }}
+  }
+
+</script>
+
+<script>
+	const calcHeader = () => {
+		const header = document.querySelector('.shopify-section-header');
+		const headerObserver = new ResizeObserver(entries => {
+			const headerHeight = header.getBoundingClientRect().height;
+			const marginHeader = getComputedStyle(header.querySelector('.header')).getPropertyValue('margin-top');
+			document.documentElement.style.setProperty('--header-height', `${headerHeight}px`);
+			document.documentElement.style.setProperty('--margin-header', `${marginHeader}`);
+
+			document.querySelectorAll('.header__inline-menu .list-menu:not(.header__submenu) > li').forEach(item => {
+				item.addEventListener('mouseenter', (event) => {
+					item.querySelectorAll('.header__submenu .header__submenu').forEach(submenu => {
+						submenu.style.setProperty('--clientY', `${submenu.getBoundingClientRect().top}px`);
+					})
+				})
+			})
+		});
+		if (header) headerObserver.observe(header);
+	}
+
+	calcHeader();
+	
+	document.addEventListener('shopify:section:load', calcHeader);
+	document.addEventListener('shopify:section:unload',calcHeader);
+	document.addEventListener('shopify:section:reorder', calcHeader);
+
+</script>
+
+{%- if request.page_type == 'index' -%}
+	{% assign potential_action_target = shop.url | append: routes.search_url | append: "?q={search_term_string}" %}
+	<script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "WebSite",
+      "name": {{ shop.name | json }},
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {{ potential_action_target | json }},
+        "query-input": "required name=search_term_string"
+      },
+      "url": {{ shop.url | append: page.url | json }}
+    }
+	</script>
+{%- endif -%}
+
+{% schema %}
+{
+	"name": "頁首",
+	"class": "shopify-section-header",
+	"settings": [
+		{
+			"type": "checkbox",
+			"id": "h1_logo",
+			"label": "使用 H1 標籤的 Logo",
+			"default": true
+		},
+		{
+			"type": "select",
+			"id": "header_type",
+			"options": [
+				{
+					"value": "left-logo",
+					"label": "Logo 置左"
+				},
+				{
+					"value": "center-logo",
+					"label": "Logo 置中 (堆疊式)"
+				}
+			],
+			"default": "left-logo",
+			"label": "頁首版面配置 (電腦與平板)"
+		},
+		{
+			"type": "select",
+			"id": "mobile_logo_alignment",
+			"label": "行動版 Logo 位置",
+			"options": [
+				{ "value": "left", "label": "置左" },
+				{ "value": "center", "label": "置中" }
+			],
+			"default": "center",
+			"info": "當電腦版為「Logo 置左」時，此設定可讓行動版 Logo 在單行內置中。"
+		},
+		{
+			"type": "checkbox",
+			"id": "full_width",
+			"default": false,
+			"label": "啟用滿版寬度"
+		},
+		{
+			"type": "image_picker",
+			"id": "logo",
+			"label": "Logo 圖片"
+		},
+		{
+			"type": "image_picker",
+			"id": "logo_2",
+			"label": "第二 Logo (可選)",
+			"info": "用於特定頁面或效果，例如透明頁首時。"
+		},
+		{
+			"type": "range",
+			"id": "logo_width",
+			"min": 50,
+			"max": 350,
+			"step": 5,
+			"default": 90,
+			"unit": "px",
+			"label": "Logo 寬度"
+		},
+		{
+			"type": "checkbox",
+			"id": "enable_logo_mobile",
+			"default": true,
+			"label": "在行動裝置上顯示 Logo"
+		},
+		{
+			"type": "checkbox",
+			"id": "enable_logo_desktop",
+			"default": true,
+			"label": "在電腦版上顯示 Logo"
+		},
+		{
+			"type": "link_list",
+			"id": "menu",
+			"default": "main-menu",
+			"label": "主選單",
+			"info": "管理您的導覽選單。"
+		},
+		{
+			"type": "checkbox",
+			"id": "enable_country_selector",
+			"default": true,
+			"label": "啟用國家/地區選擇器"
+		},
+		{
+			"type": "checkbox",
+			"id": "enable_language_selector",
+			"default": false,
+			"label": "啟用語言選擇器"
+		},
+		{
+			"type": "checkbox",
+			"id": "enable_social",
+			"default": false,
+			"label": "顯示社群媒體圖示"
+		},
+		{
+			"type": "select",
+			"id": "sticky_header_type",
+			"options": [
+				{
+					"value": "none",
+					"label": "無"
+				},
+				{
+					"value": "on-scroll-up",
+					"label": "向上滾動時顯示"
+				},
+				{
+					"value": "always",
+					"label": "永遠固定"
+				}
+			],
+			"default": "on-scroll-up",
+			"label": "固定頁首 (Sticky Header)"
+		},
+		{
+			"type": "header",
+			"content": "搜尋設定"
+		},
+		{
+			"type": "checkbox",
+			"id": "enable_search",
+			"default": true,
+			"label": "啟用搜尋功能",
+			"info": "顯示預測性搜尋結果。"
+		},
+		{
+			"type": "color_scheme",
+			"id": "search_color_scheme",
+			"default": "background-2",
+			"label": "色彩配置"
+		},
+		{
+			"type": "checkbox",
+			"id": "enable_box_shadow",
+			"default": true,
+			"label": "顯示陰影"
+		},
+		{
+			"type": "collection_list",
+			"id": "collection_list",
+			"label": "推薦商品系列"
+		},
+		{
+			"type": "product_list",
+			"limit": 2,
+			"id": "product_list",
+			"label": "推薦商品"
+		},
+    {
+      "type": "header",
+      "content": "卡片設定"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "options": [
+        { "value": "1/1", "label": "正方形 (1:1)" },
+        { "value": "3/2", "label": "橫向 (3:2)" },
+        { "value": "4/5", "label": "直向 (4:5)" },
+				{ "value": "5/4", "label": "直向 (5:4)" }
+      ],
+      "default": "5/4",
+      "label": "圖片比例"
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "圖片縮放方式",
+      "options": [
+        { "value": "contain", "label": "符合" },
+        { "value": "cover", "label": "填滿" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_image",
+      "default": true,
+      "label": "滑鼠懸停時顯示第二張圖片"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "default": false,
+      "label": "顯示品牌/廠商"
+    }
+	],
+	"blocks": [
+		{
+			"type": "mega_menu",
+			"name": "大型選單 (欄位式)",
+			"settings": [
+				{
+					"type": "text",
+					"id": "mega_menu_trigger",
+					"label": "觸發詞",
+					"info": "輸入主選單中完全相同的項目名稱來觸發此大型選單。"
+				},
+				{
+					"type": "range",
+					"min": 1,
+					"max": 4, 
+					"default": 4,
+					"id": "column_to_show",
+					"label": "顯示的欄位數"
+				},
+				{
+					"type": "header",
+					"content": "欄位 1"
+				},
+				{
+					"type": "checkbox",
+					"id": "enable_column_1",
+					"default": true,
+					"label": "啟用此欄位"
+					},
+				{
+					"type": "select",
+					"id": "icon_1",
+					"options": [
+						{ "value": "none", "label": "無" },
+						{ "value": "arrow-bar", "label": "箭頭列" },
+						{ "value": "bag-1", "label": "購物袋 1" },
+						{ "value": "bag-2", "label": "購物袋 2" },
+						{ "value": "bag-3", "label": "購物袋 3" },
+						{ "value": "bar-chart", "label": "長條圖" },
+						{ "value": "check-1", "label": "勾選 1" },
+						{ "value": "delivery", "label": "運送" },
+						{ "value": "star", "label": "星星" },
+						{ "value": "tag", "label": "標籤" }
+					],
+					"default": "none",
+					"label": "圖示"
+				},
+				{
+					"type": "text",
+					"id": "heading_1",
+					"default": "標題",
+					"label": "標題"
+				},
+				{
+					"type": "text",
+					"id": "description_1",
+					"default": "此處可填寫簡短描述",
+					"label": "描述"
+				},
+				{
+					"type": "url",
+					"id": "link_1",
+					"label": "連結"
+				},
+				{
+					"type": "link_list",
+					"id": "menu_1",
+					"label": "選單"
+				},
+				{
+					"type": "header",
+					"content": "欄位 2"
+				},
+				{
+					"type": "checkbox",
+					"id": "enable_column_2",
+					"default": true,
+					"label": "啟用此欄位"
+				},
+				{
+					"type": "select",
+					"id": "icon_2",
+					"options": [
+						{ "value": "none", "label": "無" },
+						{ "value": "arrow-bar", "label": "箭頭列" },
+						{ "value": "bag-1", "label": "購物袋 1" },
+						{ "value": "bag-2", "label": "購物袋 2" },
+						{ "value": "bag-3", "label": "購物袋 3" },
+						{ "value": "bar-chart", "label": "長條圖" },
+						{ "value": "check-1", "label": "勾選 1" },
+						{ "value": "delivery", "label": "運送" },
+						{ "value": "star", "label": "星星" },
+						{ "value": "tag", "label": "標籤" }
+					],
+					"default": "none",
+					"label": "圖示"
+				},
+				{
+					"type": "text",
+					"id": "heading_2",
+					"default": "標題",
+					"label": "標題"
+				},
+				{
+					"type": "text",
+					"id": "description_2",
+					"default": "此處可填寫簡短描述",
+					"label": "描述"
+				},
+				{
+					"type": "url",
+					"id": "link_2",
+					"label": "連結"
+				},
+				{
+					"type": "link_list",
+					"id": "menu_2",
+					"label": "選單"
+				},
+				{
+					"type": "header",
+					"content": "欄位 3"
+				},
+				{
+					"type": "checkbox",
+					"id": "enable_column_3",
+					"default": true,
+					"label": "啟用此欄位"
+				},
+				{
+					"type": "select",
+					"id": "icon_3",
+					"options": [
+						{ "value": "none", "label": "無" },
+						{ "value": "arrow-bar", "label": "箭頭列" },
+						{ "value": "bag-1", "label": "購物袋 1" },
+						{ "value": "bag-2", "label": "購物袋 2" },
+						{ "value": "bag-3", "label": "購物袋 3" },
+						{ "value": "bar-chart", "label": "長條圖" },
+						{ "value": "check-1", "label": "勾選 1" },
+						{ "value": "delivery", "label": "運送" },
+						{ "value": "star", "label": "星星" },
+						{ "value": "tag", "label": "標籤" }
+					],
+					"default": "none",
+					"label": "圖示"
+				},
+				{
+					"type": "text",
+					"id": "heading_3",
+					"default": "標題",
+					"label": "標題"
+				},
+				{
+					"type": "text",
+					"id": "description_3",
+					"default": "此處可填寫簡短描述",
+					"label": "描述"
+				},
+				{
+					"type": "url",
+					"id": "link_3",
+					"label": "連結"
+				},
+				{
+					"type": "link_list",
+					"id": "menu_3",
+					"label": "選單"
+				},
+				{
+					"type": "header",
+					"content": "欄位 4"
+				},
+				{
+					"type": "checkbox",
+					"id": "enable_column_4",
+					"default": true,
+					"label": "啟用此欄位"
+				},
+				{
+					"type": "select",
+					"id": "icon_4",
+					"options": [
+						{ "value": "none", "label": "無" },
+						{ "value": "arrow-bar", "label": "箭頭列" },
+						{ "value": "bag-1", "label": "購物袋 1" },
+						{ "value": "bag-2", "label": "購物袋 2" },
+						{ "value": "bag-3", "label": "購物袋 3" },
+						{ "value": "bar-chart", "label": "長條圖" },
+						{ "value": "check-1", "label": "勾選 1" },
+						{ "value": "delivery", "label": "運送" },
+						{ "value": "star", "label": "星星" },
+						{ "value": "tag", "label": "標籤" }
+					],
+					"default": "none",
+					"label": "圖示"
+				},
+				{
+					"type": "text",
+					"id": "heading_4",
+					"default": "標題",
+					"label": "標題"
+				},
+				{
+					"type": "text",
+					"id": "description_4",
+					"default": "此處可填寫簡短描述",
+					"label": "描述"
+				},
+				{
+					"type": "url",
+					"id": "link_4",
+					"label": "連結"
+				},
+				{
+					"type": "link_list",
+					"id": "menu_4",
+					"label": "選單"
+				},
+				{
+					"type": "header",
+					"content": "欄位 5"
+				},
+				{
+					"type": "checkbox",
+					"id": "enable_column_5",
+					"default": false,
+					"label": "啟用此欄位"
+				},
+				{
+					"type": "select",
+					"id": "icon_5",
+					"options": [
+						{ "value": "none", "label": "無" },
+						{ "value": "arrow-bar", "label": "箭頭列" },
+						{ "value": "bag-1", "label": "購物袋 1" },
+						{ "value": "bag-2", "label": "購物袋 2" },
+						{ "value": "bag-3", "label": "購物袋 3" },
+						{ "value": "bar-chart", "label": "長條圖" },
+						{ "value": "check-1", "label": "勾選 1" },
+						{ "value": "delivery", "label": "運送" },
+						{ "value": "star", "label": "星星" },
+						{ "value": "tag", "label": "標籤" }
+					],
+					"default": "none",
+					"label": "圖示"
+				},
+				{
+					"type": "text",
+					"id": "heading_5",
+					"default": "標題",
+					"label": "標題"
+				},
+				{
+					"type": "text",
+					"id": "description_5",
+					"default": "此處可填寫簡短描述",
+					"label": "描述"
+				},
+				{
+					"type": "url",
+					"id": "link_5",
+					"label": "連結"
+				},
+				{
+					"type": "link_list",
+					"id": "menu_5",
+					"label": "選單"
+				},
+				{
+					"type": "header",
+					"content": "欄位 6"
+				},
+				{
+					"type": "checkbox",
+					"id": "enable_column_6",
+					"default": false,
+					"label": "啟用此欄位"
+				},
+				{
+					"type": "select",
+					"id": "icon_6",
+					"options": [
+						{ "value": "none", "label": "無" },
+						{ "value": "arrow-bar", "label": "箭頭列" },
+						{ "value": "bag-1", "label": "購物袋 1" },
+						{ "value": "bag-2", "label": "購物袋 2" },
+						{ "value": "bag-3", "label": "購物袋 3" },
+						{ "value": "bar-chart", "label": "長條圖" },
+						{ "value": "check-1", "label": "勾選 1" },
+						{ "value": "delivery", "label": "運送" },
+						{ "value": "star", "label": "星星" },
+						{ "value": "tag", "label": "標籤" }
+					],
+					"default": "none",
+					"label": "圖示"
+				},
+				{
+					"type": "text",
+					"id": "heading_6",
+					"default": "標題",
+					"label": "標題"
+				},
+				{
+					"type": "text",
+					"id": "description_6",
+					"default": "此處可填寫簡短描述",
+					"label": "描述"
+				},
+				{
+					"type": "url",
+					"id": "link_6",
+					"label": "連結"
+				},
+				{
+					"type": "link_list",
+					"id": "menu_6",
+					"label": "選單"
+				},
+				{
+					"type": "header",
+					"content": "欄位 7"
+				},
+				{
+					"type": "checkbox",
+					"id": "enable_column_7",
+					"default": false,
+					"label": "啟用此欄位"
+				},
+				{
+					"type": "select",
+					"id": "icon_7",
+					"options": [
+						{ "value": "none", "label": "無" },
+						{ "value": "arrow-bar", "label": "箭頭列" },
+						{ "value": "bag-1", "label": "購物袋 1" },
+						{ "value": "bag-2", "label": "購物袋 2" },
+						{ "value": "bag-3", "label": "購物袋 3" },
+						{ "value": "bar-chart", "label": "長條圖" },
+						{ "value": "check-1", "label": "勾選 1" },
+						{ "value": "delivery", "label": "運送" },
+						{ "value": "star", "label": "星星" },
+						{ "value": "tag", "label": "標籤" }
+					],
+					"default": "none",
+					"label": "圖示"
+				},
+				{
+					"type": "text",
+					"id": "heading_7",
+					"default": "標題",
+					"label": "標題"
+				},
+				{
+					"type": "text",
+					"id": "description_7",
+					"default": "此處可填寫簡短描述",
+					"label": "描述"
+				},
+				{
+					"type": "url",
+					"id": "link_7",
+					"label": "連結"
+				},
+				{
+					"type": "link_list",
+					"id": "menu_7",
+					"label": "選單"
+				},
+				{
+					"type": "header",
+					"content": "欄位 8"
+				},
+				{
+					"type": "checkbox",
+					"id": "enable_column_8",
+					"default": false,
+					"label": "啟用此欄位"
+				},
+				{
+					"type": "select",
+					"id": "icon_8",
+					"options": [
+						{ "value": "none", "label": "無" },
+						{ "value": "arrow-bar", "label": "箭頭列" },
+						{ "value": "bag-1", "label": "購物袋 1" },
+						{ "value": "bag-2", "label": "購物袋 2" },
+						{ "value": "bag-3", "label": "購物袋 3" },
+						{ "value": "bar-chart", "label": "長條圖" },
+						{ "value": "check-1", "label": "勾選 1" },
+						{ "value": "delivery", "label": "運送" },
+						{ "value": "star", "label": "星星" },
+						{ "value": "tag", "label": "標籤" }
+					],
+					"default": "none",
+					"label": "圖示"
+				},
+				{
+					"type": "text",
+					"id": "heading_8",
+					"default": "標題",
+					"label": "標題"
+				},
+				{
+					"type": "text",
+					"id": "description_8",
+					"default": "此處可填寫簡短描述",
+					"label": "描述"
+				},
+				{
+					"type": "url",
+					"id": "link_8",
+					"label": "連結"
+				},
+				{
+					"type": "link_list",
+					"id": "menu_8",
+					"label": "選單"
+				},
+				{
+					"type": "header",
+					"content": "推廣區塊"
+				},
+				{
+					"type": "checkbox",
+					"id": "enable_promo",
+					"default": true,
+					"label": "啟用推廣區塊"
+				},
+				{
+					"type": "text",
+					"id": "promo_heading",
+					"default": "推廣標題",
+					"label": "標題"
+				},
+				{
+					"type": "textarea",
+					"id": "promo_description",
+					"default": "撰寫一些推廣內容來吸引顧客。",
+					"label": "描述"
+				},
+				{
+					"type": "text",
+					"id": "promo_link_label",
+					"default": "查看更多",
+					"label": "按鈕文字"
+				},
+				{
+					"type": "url",
+					"id": "promo_link",
+					"label": "按鈕連結"
+				},
+				{
+					"type": "select",
+					"id": "promo_button_style",
+					"options": [
+						{ "group": "主要樣式", "value": "primary", "label": "主要按鈕" },
+						{ "group": "主要樣式", "value": "secondary", "label": "次要按鈕" },
+						{ "group": "主要樣式", "value": "tertiary", "label": "第三按鈕" },
+						{ "group": "簡易樣式", "value": "simple", "label": "簡易" },
+						{ "group": "簡易樣式", "value": "simple_secondary", "label": "簡易次要" },
+						{ "group": "簡易樣式", "value": "simple_link", "label": "純連結" }
+					],
+					"default": "simple",
+					"label": "按鈕樣式"
+				},
+				{
+					"type": "header",
+					"content": "圖示設定"
+				},
+				{
+					"type": "color_scheme",
+					"id": "icon_color_scheme",
+					"default": "background-1",
+					"label": "圖示色彩配置",
+					"info": "僅在圖示樣式為「彩色」時適用。"
+				},
+				{
+					"type": "select",
+					"id": "icon_style",
+					"options": [
+						{ "value": "subtle", "label": "細緻" },
+						{ "value": "contrast", "label": "對比" },
+						{ "value": "colored", "label": "彩色" }
+					],
+					"default": "colored",
+					"label": "圖示樣式"
+				},
+				{
+					"type": "select",
+					"id": "icon_fill_type",
+					"options": [
+						{ "value": "solid", "label": "實色" },
+						{ "value": "gradient", "label": "漸層" }
+					],
+					"default": "gradient",
+					"label": "圖示填色類型"
+				},
+				{
+					"type": "select",
+					"id": "icon_size",
+					"options": [
+						{ "value": "recommended", "label": "建議尺寸" },
+						{ "value": "normal", "label": "正常" },
+						{ "value": "small", "label": "小" },
+						{ "value": "large", "label": "大" }
+					],
+					"default": "recommended",
+					"label": "圖示尺寸"
+				},
+				{
+					"type": "checkbox",
+					"id": "box_shadow",
+					"default": true,
+					"label": "顯示陰影"
+				}
+			]
+		},
+		{
+			"type": "mega_menu_tabs",
+			"name": "大型選單 (頁籤式)",
+			"settings": [
+				{
+					"type": "text",
+					"id": "mega_menu_tabs_trigger",
+					"label": "觸發詞",
+					"info": "輸入主選單中完全相同的項目名稱來觸發此大型選單。"
+				},
+				{
+					"type": "header",
+					"content": "頁籤 1"
+				},
+				{
+					"type": "checkbox",
+					"id": "enable_tab_1",
+					"default": true,
+					"label": "啟用此頁籤"
+				},
+				{
+					"type": "select",
+					"id": "icon_1",
+					"options": [
+						{ "value": "none", "label": "無" },
+						{ "value": "arrow-bar", "label": "箭頭列" },
+						{ "value": "bag-1", "label": "購物袋 1" },
+						{ "value": "bag-2", "label": "購物袋 2" },
+						{ "value": "bag-3", "label": "購物袋 3" },
+						{ "value": "bar-chart", "label": "長條圖" },
+						{ "value": "check-1", "label": "勾選 1" },
+						{ "value": "delivery", "label": "運送" },
+						{ "value": "star", "label": "星星" },
+						{ "value": "tag", "label": "標籤" }
+					],
+					"default": "none",
+					"label": "圖示"
+				},
+				{
+					"type": "text",
+					"id": "heading_1",
+					"default": "頁籤標題",
+					"label": "標題"
+				},
+				{
+					"type": "text",
+					"id": "description_1",
+					"default": "此處可填寫簡短描述",
+					"label": "描述"
+				},
+				{
+					"type": "link_list",
+					"id": "menu_1",
+					"label": "選單"
+				},
+				{
+					"type": "header",
+					"content": "頁籤 2"
+				},
+				{
+					"type": "checkbox",
+					"id": "enable_tab_2",
+					"default": true,
+					"label": "啟用此頁籤"
+				},
+				{
+					"type": "select",
+					"id": "icon_2",
+					"options": [
+						{ "value": "none", "label": "無" },
+						{ "value": "arrow-bar", "label": "箭頭列" },
+						{ "value": "bag-1", "label": "購物袋 1" },
+						{ "value": "bag-2", "label": "購物袋 2" },
+						{ "value": "bag-3", "label": "購物袋 3" },
+						{ "value": "bar-chart", "label": "長條圖" },
+						{ "value": "check-1", "label": "勾選 1" },
+						{ "value": "delivery", "label": "運送" },
+						{ "value": "star", "label": "星星" },
+						{ "value": "tag", "label": "標籤" }
+					],
+					"default": "none",
+					"label": "圖示"
+				},
+				{
+					"type": "text",
+					"id": "heading_2",
+					"default": "頁籤標題",
+					"label": "標題"
+				},
+				{
+					"type": "text",
+					"id": "description_2",
+					"default": "此處可填寫簡短描述",
+					"label": "描述"
+				},
+				{
+					"type": "link_list",
+					"id": "menu_2",
+					"label": "選單"
+				},
+				{
+					"type": "header",
+					"content": "頁籤 3"
+				},
+				{
+					"type": "checkbox",
+					"id": "enable_tab_3",
+					"default": true,
+					"label": "啟用此頁籤"
+				},
+				{
+					"type": "select",
+					"id": "icon_3",
+					"options": [
+						{ "value": "none", "label": "無" },
+						{ "value": "arrow-bar", "label": "箭頭列" },
+						{ "value": "bag-1", "label": "購物袋 1" },
+						{ "value": "bag-2", "label": "購物袋 2" },
+						{ "value": "bag-3", "label": "購物袋 3" },
+						{ "value": "bar-chart", "label": "長條圖" },
+						{ "value": "check-1", "label": "勾選 1" },
+						{ "value": "delivery", "label": "運送" },
+						{ "value": "star", "label": "星星" },
+						{ "value": "tag", "label": "標籤" }
+					],
+					"default": "none",
+					"label": "圖示"
+				},
+				{
+					"type": "text",
+					"id": "heading_3",
+					"default": "頁籤標題",
+					"label": "標題"
+				},
+				{
+					"type": "text",
+					"id": "description_3",
+					"default": "此處可填寫簡短描述",
+					"label": "描述"
+				},
+				{
+					"type": "link_list",
+					"id": "menu_3",
+					"label": "選單"
+				},
+				{
+					"type": "header",
+					"content": "頁籤 4"
+				},
+				{
+					"type": "checkbox",
+					"id": "enable_tab_4",
+					"default": true,
+					"label": "啟用此頁籤"
+				},
+				{
+					"type": "select",
+					"id": "icon_4",
+					"options": [
+						{ "value": "none", "label": "無" },
+						{ "value": "arrow-bar", "label": "箭頭列" },
+						{ "value": "bag-1", "label": "購物袋 1" },
+						{ "value": "bag-2", "label": "購物袋 2" },
+						{ "value": "bag-3", "label": "購物袋 3" },
+						{ "value": "bar-chart", "label": "長條圖" },
+						{ "value": "check-1", "label": "勾選 1" },
+						{ "value": "delivery", "label": "運送" },
+						{ "value": "star", "label": "星星" },
+						{ "value": "tag", "label": "標籤" }
+					],
+					"default": "none",
+					"label": "圖示"
+				},
+				{
+					"type": "text",
+					"id": "heading_4",
+					"default": "頁籤標題",
+					"label": "標題"
+				},
+				{
+					"type": "text",
+					"id": "description_4",
+					"default": "此處可填寫簡短描述",
+					"label": "描述"
+				},
+				{
+					"type": "link_list",
+					"id": "menu_4",
+					"label": "選單"
+				},
+				{
+					"type": "header",
+					"content": "頁籤 5"
+				},
+				{
+					"type": "checkbox",
+					"id": "enable_tab_5",
+					"default": false,
+					"label": "啟用此頁籤"
+				},
+				{
+					"type": "select",
+					"id": "icon_5",
+					"options": [
+						{ "value": "none", "label": "無" },
+						{ "value": "arrow-bar", "label": "箭頭列" },
+						{ "value": "bag-1", "label": "購物袋 1" },
+						{ "value": "bag-2", "label": "購物袋 2" },
+						{ "value": "bag-3", "label": "購物袋 3" },
+						{ "value": "bar-chart", "label": "長條圖" },
+						{ "value": "check-1", "label": "勾選 1" },
+						{ "value": "delivery", "label": "運送" },
+						{ "value": "star", "label": "星星" },
+						{ "value": "tag", "label": "標籤" }
+					],
+					"default": "none",
+					"label": "圖示"
+				},
+				{
+					"type": "text",
+					"id": "heading_5",
+					"default": "頁籤標題",
+					"label": "標題"
+				},
+				{
+					"type": "text",
+					"id": "description_5",
+					"default": "此處可填寫簡短描述",
+					"label": "描述"
+				},
+				{
+					"type": "link_list",
+					"id": "menu_5",
+					"label": "選單"
+				},
+				{
+					"type": "header",
+					"content": "頁籤 6"
+				},
+				{
+					"type": "checkbox",
+					"id": "enable_tab_6",
+					"default": false,
+					"label": "啟用此頁籤"
+				},
+				{
+					"type": "select",
+					"id": "icon_6",
+					"options": [
+						{ "value": "none", "label": "無" },
+						{ "value": "arrow-bar", "label": "箭頭列" },
+						{ "value": "bag-1", "label": "購物袋 1" },
+						{ "value": "bag-2", "label": "購物袋 2" },
+						{ "value": "bag-3", "label": "購物袋 3" },
+						{ "value": "bar-chart", "label": "長條圖" },
+						{ "value": "check-1", "label": "勾選 1" },
+						{ "value": "delivery", "label": "運送" },
+						{ "value": "star", "label": "星星" },
+						{ "value": "tag", "label": "標籤" }
+					],
+					"default": "none",
+					"label": "圖示"
+				},
+				{
+					"type": "text",
+					"id": "heading_6",
+					"default": "標題",
+					"label": "標題"
+				},
+				{
+					"type": "text",
+					"id": "description_6",
+					"default": "此處可填寫簡短描述",
+					"label": "描述"
+				},
+				{
+					"type": "link_list",
+					"id": "menu_6",
+					"label": "選單"
+				},
+				{
+					"type": "header",
+					"content": "推廣區塊"
+				},
+				{
+					"type": "checkbox",
+					"id": "enable_promo",
+					"default": true,
+					"label": "啟用推廣區塊"
+				},
+				{
+					"type": "text",
+					"id": "promo_heading",
+					"default": "推廣標題",
+					"label": "標題"
+				},
+				{
+					"type": "textarea",
+					"id": "promo_description",
+					"default": "撰寫一些推廣內容來吸引顧客。",
+					"label": "描述"
+				},
+				{
+					"type": "text",
+					"id": "promo_link_label",
+					"default": "查看更多",
+					"label": "按鈕文字"
+				},
+				{
+					"type": "url",
+					"id": "promo_link",
+					"label": "按鈕連結"
+				},
+				{
+					"type": "select",
+					"id": "promo_button_style",
+					"options": [
+						{ "group": "主要樣式", "value": "primary", "label": "主要按鈕" },
+						{ "group": "主要樣式", "value": "secondary", "label": "次要按鈕" },
+						{ "group": "主要樣式", "value": "tertiary", "label": "第三按鈕" },
+						{ "group": "簡易樣式", "value": "simple", "label": "簡易" },
+						{ "group": "簡易樣式", "value": "simple_secondary", "label": "簡易次要" },
+						{ "group": "簡易樣式", "value": "simple_link", "label": "純連結" }
+					],
+					"default": "simple",
+					"label": "按鈕樣式"
+				},
+				{
+					"type": "header",
+					"content": "圖示設定"
+				},
+				{
+					"type": "color_scheme",
+					"id": "icon_color_scheme",
+					"default": "background-1",
+					"label": "圖示色彩配置",
+					"info": "僅在圖示樣式為「彩色」時適用。"
+				},
+				{
+					"type": "select",
+					"id": "icon_style",
+					"options": [
+						{ "value": "subtle", "label": "細緻" },
+						{ "value": "contrast", "label": "對比" },
+						{ "value": "colored", "label": "彩色" }
+					],
+					"default": "colored",
+					"label": "圖示樣式"
+				},
+				{
+					"type": "select",
+					"id": "icon_fill_type",
+					"options": [
+						{ "value": "solid", "label": "實色" },
+						{ "value": "gradient", "label": "漸層" }
+					],
+					"default": "gradient",
+					"label": "圖示填色類型"
+				},
+				{
+					"type": "select",
+					"id": "icon_size",
+					"options": [
+						{ "value": "recommended", "label": "建議尺寸" },
+						{ "value": "normal", "label": "正常" },
+						{ "value": "small", "label": "小" },
+						{ "value": "large", "label": "大" }
+					],
+					"default": "recommended",
+					"label": "圖示尺寸"
+				},
+				{
+					"type": "checkbox",
+					"id": "box_shadow",
+					"default": false,
+					"label": "顯示陰影"
+				}
+			]
+		}
+	],
+	"default": {}
+}
+{% endschema %}

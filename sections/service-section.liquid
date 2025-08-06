@@ -1,0 +1,359 @@
+{% comment %}
+  服務區塊 v5.4.1 - 性能極致優化版 (Schema 修正)
+  - [**性能核心**] 重構所有 box-shadow 和 background-color 動畫，改用偽元素和 opacity/transform 動畫實現 GPU 加速，徹底解決 Mac/Retina 螢幕上的卡頓問題。
+  - [**CSS 結構**] 將複雜的區塊背景移至偽元素，隔離渲染層，提高穩定性。
+  - [**HTML 優化**] 為圖標圖片新增 srcset 和 sizes 屬性，實現響應式圖片載入。
+  - [**視覺效果**] 在提升性能的基礎上，100% 還原了原有的視覺懸停效果。
+  - [**修正**] 修正了 {% schema %} 標籤中的 JSON 錯誤。
+{% endcomment %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --hs-brand-color: {{ section.settings.brand_color | default: '#2BB9ED' }};
+    --hs-brand-color-rgb: {{ section.settings.brand_color.red | default: 43 }}, {{ section.settings.brand_color.green | default: 185 }}, {{ section.settings.brand_color.blue | default: 237 }};
+    
+    --hs-bg-light: #f8f8f8;
+    --hs-card-bg: #ffffff;
+    --hs-text-dark: #212529;
+    --hs-text-muted: #666;
+    --hs-shadow-base: rgba(0, 0, 0, 0.05);
+    --hs-shadow-hover: rgba(0, 0, 0, 0.12);
+    --hs-border-subtle: rgba(0, 0, 0, 0.08);
+    --hs-icon-bg: #e9ecef;
+  }
+
+  .home-service-section {
+    width: 100%;
+    padding: clamp(80px, 10vw, 120px) 0;
+    font-family: 'Poppins', sans-serif;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--hs-bg-light);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    will-change: opacity, transform;
+  }
+  
+  /* **性能優化**: 將複雜背景移至偽元素，將其與內容渲染層分離 */
+  .home-service-section::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 0;
+    background-image:
+      radial-gradient(circle at 50% 50%, #ffffff 0%, var(--hs-bg-light) 70%),
+      url('data:image/svg+xml;utf8,<svg width="100%" height="100%" viewBox="0 0 1200 600" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="pattern-dot" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="%23e0e0e0"/></pattern></defs><rect x="0" y="0" width="100%" height="100%" fill="url(%23pattern-dot)"/><path d="M0,200 C300,100 900,300 1200,200 L1200,0 L0,0 Z" fill="%23f0f0f0" opacity="0.3"/><path d="M0,400 C300,500 900,300 1200,400 L1200,600 L0,600 Z" fill="%23f0f0f0" opacity="0.3"/></svg>');
+    background-size: cover;
+    background-blend-mode: soft-light;
+  }
+
+  .home-service-section.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* 確保內容在背景偽元素之上 */
+  .home-service-section .service-content {
+    padding: 0 clamp(20px, 5vw, 60px);
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .home-service-section .home-service-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 35px;
+    list-style-type: none; margin: 0; padding: 0;
+  }
+  .home-service-section .home-service-grid > li { display: flex; height: 100%; }
+
+  .home-service-section .service-item-wrapper {
+    text-decoration: none; color: inherit; display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start; flex-grow: 1;
+    background-color: var(--hs-card-bg);
+    border-radius: 16px;
+    padding: clamp(30px, 5vw, 45px);
+    border: 1px solid var(--hs-border-subtle);
+    box-shadow: 0 8px 25px var(--hs-shadow-base);
+    position: relative; /* 為偽元素定位 */
+    z-index: 1;
+    
+    /* **性能優化**: 只對 transform 進行動畫 */
+    transition: transform 0.3s ease-out;
+    will-change: transform;
+  }
+
+  /* **性能核心**: 使用偽元素承載 hover 狀態的陰影和邊框，只對 opacity 進行動畫 */
+  .home-service-section .service-item-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -1; /* 放在卡片底下 */
+    border-radius: inherit; /* 繼承父元素的圓角 */
+    box-shadow: 0 15px 40px var(--hs-shadow-hover), 0 40px 100px var(--hs-shadow-hover);
+    border: 1px solid rgba(var(--hs-brand-color-rgb), 0.5);
+    opacity: 0; /* 預設隱藏 */
+    transition: opacity 0.3s ease-out;
+    will-change: opacity;
+  }
+
+  .home-service-section .service-item-wrapper:hover,
+  .home-service-section .service-item-wrapper:active {
+    transform: translateY(-8px) scale(1.02);
+    border-color: transparent; /* 隱藏原始邊框，讓偽元素的邊框顯示 */
+  }
+  
+  .home-service-section .service-item-wrapper:hover::after,
+  .home-service-section .service-item-wrapper:active::after {
+    opacity: 1; /* 顯示偽元素 */
+  }
+
+  .home-service-section .icon-wrapper {
+    display: flex; align-items: center; justify-content: center;
+    width: clamp(60px, 8vw, 80px); height: clamp(60px, 8vw, 80px);
+    background-color: var(--hs-icon-bg);
+    border-radius: 50%;
+    margin-bottom: 25px;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+    overflow: hidden;
+    position: relative; /* 為偽元素定位 */
+    z-index: 0;
+  }
+
+  /* **性能核心**: 同樣使用偽元素承載 hover 狀態的背景色和外陰影 */
+  .home-service-section .icon-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    border-radius: 50%;
+    background-color: rgba(var(--hs-brand-color-rgb), 0.1);
+    box-shadow: 0 0 15px rgba(var(--hs-brand-color-rgb), 0.2);
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+    will-change: opacity;
+  }
+
+  .home-service-section .icon-wrapper img {
+    width: clamp(34px, 5vw, 42px); height: clamp(34px, 5vw, 42px);
+    object-fit: contain;
+    transition: transform 0.3s ease-out;
+    position: relative; /* 確保圖片在偽元素之上 */
+    z-index: 1;
+  }
+  .home-service-section .icon-wrapper svg {
+    width: clamp(34px, 5vw, 42px); height: clamp(34px, 5vw, 42px);
+    position: relative; z-index: 1;
+  }
+
+  .home-service-section .service-item-wrapper:hover .icon-wrapper::before,
+  .home-service-section .service-item-wrapper:active .icon-wrapper::before {
+    opacity: 1; /* 顯示偽元素的背景和陰影 */
+  }
+
+  .home-service-section .service-item-wrapper:hover .icon-wrapper img,
+  .home-service-section .service-item-wrapper:active .icon-wrapper img,
+  .home-service-section .service-item-wrapper:hover .icon-wrapper svg,
+  .home-service-section .service-item-wrapper:active .icon-wrapper svg {
+    transform: scale(1.1);
+  }
+
+  .home-service-section .service-title {
+    font-size: clamp(18px, 2.5vw, 22px); color: var(--hs-text-dark); font-weight: 700;
+    line-height: 1.3; margin: 0 0 12px 0; text-align: center;
+  }
+  .home-service-section .service-description {
+    font-size: clamp(15px, 2vw, 17px); color: var(--hs-text-muted);
+    margin: 0; text-align: center; line-height: 1.6;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+    overflow: hidden; text-overflow: ellipsis; flex-grow: 1;
+  }
+
+  /* 手機端特有樣式 */
+  @media screen and (max-width: 769px) {
+    .home-service-section { padding: clamp(50px, 8vw, 80px) 0; }
+    .home-service-section .service-content { padding: 0 clamp(15px, 4vw, 30px); }
+    .home-service-section .home-service-grid { grid-template-columns: 1fr; gap: 25px; } /* 在手機上改為單欄，避免auto-fit在某些寬度產生單個元素拉伸 */
+    
+    .home-service-section .service-item-wrapper {
+        padding: clamp(20px, 5vw, 35px);
+        box-shadow: 0 3px 10px var(--hs-shadow-base);
+    }
+    .home-service-section .service-item-wrapper:hover,
+    .home-service-section .service-item-wrapper:active {
+        transform: translateY(-4px) scale(1.01);
+    }
+    .home-service-section .service-item-wrapper::after {
+        box-shadow: 0 8px 20px var(--hs-shadow-hover), 0 20px 50px var(--hs-shadow-hover);
+    }
+
+    .home-service-section .icon-wrapper {
+      width: clamp(50px, 7vw, 60px); height: clamp(50px, 7vw, 60px);
+      margin-bottom: 20px;
+    }
+    .home-service-section .icon-wrapper img,
+    .home-service-section .icon-wrapper svg {
+      width: clamp(30px, 4.5vw, 36px); height: clamp(30px, 4.5vw, 36px);
+    }
+    .home-service-section .service-title { font-size: clamp(16px, 4.5vw, 18px); margin-bottom: 10px; }
+    .home-service-section .service-description { font-size: clamp(14px, 3.8vw, 15px); -webkit-line-clamp: unset; overflow: visible; text-overflow: unset; }
+  }
+</style>
+
+<div class="home-service-section" id="HomeServiceSection-{{ section.id }}">
+  <div class="service-content">
+    {% if section.blocks.size > 0 %}
+      <ul class="home-service-grid">
+        {% for block in section.blocks %}
+          {% if block.type == 'service_item' %}
+            <li>
+              <a href="{{ block.settings.service_link | default: '#' }}"
+                {% if block.settings.service_link.type == 'url' or block.settings.service_link.type == 'external' %}target="_blank" rel="noopener"{% endif %}
+                class="service-item-wrapper"
+                {{ block.shopify_attributes }}>
+                <div class="icon-wrapper">
+                  {% if block.settings.service_icon_image != blank %}
+                    <img src="{{ block.settings.service_icon_image | image_url: width: 80, height: 80 }}"
+                         srcset="{{ block.settings.service_icon_image | image_url: width: 80, height: 80 }} 80w,
+                                 {{ block.settings.service_icon_image | image_url: width: 160, height: 160 }} 160w"
+                         sizes="clamp(34px, 5vw, 42px)"
+                         alt="{{ block.settings.service_title | escape }}"
+                         loading="lazy"
+                         decoding="async"
+                         width="80"
+                         height="80">
+                  {% else %}
+                    <svg class="home_service_icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+                  {% endif %}
+                </div>
+                <h3 class="service-title">{{ block.settings.service_title }}</h3>
+                <p class="service-description">{{ block.settings.service_description }}</p>
+              </a>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    {% else %}
+      {% comment %} 
+        Show onboarding content if no blocks are added.
+        I've also replaced the <p> tags for titles with <h3> for better semantics.
+      {% endcomment %}
+      <ul class="home-service-grid">
+        {% for i in (1..3) %}
+          <li>
+            <a href="#" class="service-item-wrapper">
+              <div class="icon-wrapper">
+                <svg class="home_service_icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+              </div>
+              <h3 class="service-title">{{ 'onboarding.service_title' | t: number: i }}</h3>
+              <p class="service-description">{{ 'onboarding.service_description' | t }}</p>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+// JavaScript 部分無需修改，它已經寫得很好
+(() => {
+  const sectionId = 'HomeServiceSection-{{ section.id }}';
+  const section = document.getElementById(sectionId);
+  if (!section) return;
+
+  const observer = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        section.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { root: null, rootMargin: '0px', threshold: 0.1 });
+
+  observer.observe(section);
+})();
+</script>
+
+{% schema %}
+{
+  "name": "服務區塊",
+  "tag": "section",
+  "class": "spaced-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "區塊樣式"
+    },
+    {
+      "type": "color",
+      "id": "brand_color",
+      "label": "品牌主色 (用於互動)",
+      "default": "#2BB9ED"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "service_item",
+      "name": "服務項目",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "text",
+          "id": "service_title",
+          "label": "標題",
+          "default": "服務標題"
+        },
+        {
+          "type": "textarea",
+          "id": "service_description",
+          "label": "描述",
+          "default": "這是關於我們服務的簡短描述，您可以自定義內容。請盡量保持描述文字的長度相似，以獲得最佳視覺效果。"
+        },
+        {
+          "type": "image_picker",
+          "id": "service_icon_image",
+          "label": "服務圖標圖片",
+          "info": "建議上傳 SVG 或 PNG 格式的圖標，確保背景透明，大小為正方形 (例如 80x80px)。"
+        },
+        {
+          "type": "url",
+          "id": "service_link",
+          "label": "連結 (可選)",
+          "info": "點擊服務項目將會跳轉到的頁面。"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "服務區塊",
+      "blocks": [
+        { "type": "service_item" },
+        { "type": "service_item" },
+        { "type": "service_item" }
+      ]
+    }
+  ],
+  "locales": {
+    "en": {
+      "onboarding": {
+        "service_title": "Service Title {{ number }}",
+        "service_description": "Use this section to highlight key services or features. Keep descriptions similar in length for a consistent look."
+      }
+    },
+    "zh-TW": {
+      "onboarding": {
+        "service_title": "服務標題 {{ number }}",
+        "service_description": "使用此區塊來強調您的主要服務或特色。請盡量保持描述文字的長度相似，以獲得一致的視覺效果。"
+      }
+    }
+  }
+}
+{% endschema %}

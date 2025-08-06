@@ -1,0 +1,900 @@
+{{ 'section-steps.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'steps.js' | asset_url }}" defer="defer"></script>
+
+{%- style -%}
+  {% render 'section-padding' %}
+  {% render 'section-margin' %}
+{%- endstyle -%}
+
+{% liquid
+  assign scheme_1 = settings.color_schemes | first %}
+
+{% liquid
+  assign number_size = section.settings.number_size
+  assign heading_size = section.settings.step_heading_size
+  assign text_size = section.settings.text_size
+
+  if section.settings.number_size == "recommended"
+    case section.settings.layout
+      when "slider" or "collapsible"
+        assign number_size = "h6"
+      when "columns" or "columns-with-mobile-slider"
+        assign number_size = "h4"
+      else
+        assign number_size = "recommended"
+    endcase
+  endif
+
+  if section.settings.step_heading_size == "recommended"
+    if section.settings.layout == "slider"
+      assign heading_size = "h5"
+    else
+      assign heading_size = "h4"
+    endif
+  endif
+
+  if section.settings.text_size == "recommended"
+    if section.settings.layout == "slider"
+      assign text_size = "body-normal"
+    else
+      assign text_size = "body-large"
+    endif
+  endif
+%}
+
+<div class="steps color-{{ section.settings.color_scheme }} background section-{{ section.id }}-padding">
+  <div class="container">
+    {% render 'section-text', 
+      section: section, 
+      class: 'steps', 
+      text_align: section.settings.text_align,
+      heading_level: section.settings.heading_level
+    %}
+
+    <div class="steps__content content steps__content--{{ section.settings.layout }}{% if section.settings.layout == "columns-with-mobile-slider" %} steps-slider{% endif %}">
+      <div class="steps__wrapper steps__wrapper--col-{{ section.settings.columns_to_show }}">
+        {% if section.settings.layout == "scroll" %}
+          <span class="steps__bar">
+            <span class="steps__progress" style="height: 0px;"></span>
+          </span>
+        {% endif %}
+
+        {% if section.settings.layout == "slider" %}
+          {% assign images = false %}
+          {%- for block in section.blocks -%}
+             {% if block.settings.image != blank %}
+               {% assign images = true %} 
+              {% break %}
+             {% endif %}
+          {% endfor %}
+          {% if images %}
+            <div class="steps__slider-wrapper">
+              <div class="steps__swiper swiper">
+                <div class="swiper-wrapper">
+                  {%- for block in section.blocks -%}
+                    <div class="swiper-slide">
+                      {%- if block.settings.image != blank -%}
+                        {% liquid
+                          assign width_ratio = 1
+                          if section.settings.image_ratio == 'adapt' 
+                            if block.settings.image.width > block.settings.image.height
+                              assign aspect_ratio_set = 575 | divided_by: 160 | round: 2
+                              if aspect_ratio_set > block.settings.image.aspect_ratio
+                                assign width_ratio = aspect_ratio_set | divided_by: block.settings.image.aspect_ratio | round: 2
+                              endif
+                            endif
+                          endif 
+                        %}
+
+                        {%- capture sizes -%}
+                          (min-width: 1200px) calc(100vw - 120px), 
+                          calc((100vw - 40px)  * {{ width_ratio }})
+                        {%- endcapture -%}
+
+                        <div class="step__image step__image--{{ section.settings.image_ratio }}"
+                          {% if section.settings.image_ratio == 'adapt' %} style = "padding-bottom: {{ 1 | divided_by: block.settings.image.aspect_ratio | times: 100 }}%;" {% endif %}>
+                          {{
+                            block.settings.image
+                            | image_url: width: block.settings.image.width
+                            | image_tag: loading: 'lazy', 
+                            sizes: sizes, 
+                            widths: '360, 550, 710, 1200, 1600, 1800, 1920'
+                          }}
+                        </div>
+                      {%- endif -%}
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+              <div class="steps__navigation swiper-navigation no-js-hidden">
+                <div class="steps__button-prev swiper-button-prev color-{{ section.settings.navigation_color_scheme }}">
+                  {% render 'icon-caret-left' %}
+                </div>
+                <div class="steps__button-next swiper-button-next color-{{ section.settings.navigation_color_scheme }}">
+                  {% render 'icon-caret-right' %}
+                </div>
+              </div>
+            </div>
+          {% endif %}
+          
+          <div class="steps__thumbs swiper">
+          <div class="swiper-wrapper">
+        {% endif %}
+
+        {% if section.settings.layout == "collapsible" %}
+        <div class="steps__info">
+        {% endif %}
+
+          {%- for block in section.blocks -%}
+            {% if section.settings.layout == "columns" or section.settings.layout == "columns-with-mobile-slider" %}
+              <div class="steps__step step" {{ block.shopify_attributes }}>
+                {% if block.settings.image != blank %}
+                  {% liquid
+                    assign width_ratio = 1
+                    if section.settings.image_ratio == 'adapt' 
+                      if block.settings.image.width > block.settings.image.height
+                        assign aspect_ratio_set = 575.0 | divided_by: 160.0 | round: 2
+                        if aspect_ratio_set > block.settings.image.aspect_ratio
+                          assign width_ratio = aspect_ratio_set | divided_by: block.settings.image.aspect_ratio | round: 2
+                        endif
+                      endif
+                    endif
+                  %}
+
+                  {%- capture sizes -%}
+                    (min-width: 1200px) calc(100vw / {{ section.settings.columns_to_show }} - 40px), 
+                    (min-width: 990px) {% if section.settings.columns_to_show == 3 %} calc(100vw / 2 - 40px) {% else %} calc(100vw / {{ section.settings.columns_to_show }} - 40px) {% endif %}, 
+                    (min-width: 750px) {% if section.settings.columns_to_show >= 2 %} calc(100vw / 2 - 40px) {% else %} calc(100vw / {{ section.settings.columns_to_show }} - 40px) {% endif %}, 
+                    calc((100vw - 40px)  * {{ width_ratio }})
+                  {%- endcapture -%}
+
+                  <div class="step__image step__image--{{ section.settings.image_ratio }}"
+                    {% if section.settings.image_ratio == 'adapt' %} style = "padding-bottom: {{ 1 | divided_by: block.settings.image.aspect_ratio | times: 100 }}%;" {% endif %}>
+                    {{
+                      block.settings.image
+                      | image_url: width: block.settings.image.width
+                      | image_tag: loading: 'lazy', 
+                      sizes: sizes, 
+                      widths: '360, 550, 710, 1200, 1600, 1800, 1920'
+                    }}
+                  </div>
+                {% endif %}
+
+                <div class="step__info">
+                  <div class="step__number {{ number_size }}">
+                    <span class="{% if scheme_1.settings.color_accent_gradient != empty %} text-gradient {% endif %}">
+                      {% if block.settings.number != blank %}
+                        {{ block.settings.number }}
+                      {% else %}
+                        {{ forloop.index }}
+                      {% endif %}
+                    </span>
+                  </div>
+
+                  {% if block.settings.heading != blank %}
+                    <h3 class="step__heading {{ heading_size }}">
+                      {{- block.settings.heading -}}
+                    </h3>
+                  {% endif %}
+                  {% if block.settings.text != blank %}
+                    <p class="step__text {{ text_size }}">
+                      {{- block.settings.text -}}
+                    </p>
+                  {% endif %}
+                  {% if block.settings.button_label != blank and block.settings.show_button %}
+                    {% render 'button',
+                      link: block.settings.button_link,
+                      label: block.settings.button_label,
+                      style: block.settings.button_style,
+                      class: 'step'
+                    %}
+                  {% endif %}
+                </div>
+              </div>
+
+            {% elsif section.settings.layout == "scroll" %}
+              <div class="steps__step step" {{ block.shopify_attributes }}>
+                <div class="step__info">
+                  <div class="step__number {{ number_size }}">
+                    {% if block.settings.number != blank %}
+                      {{ block.settings.number }}
+                    {% else %}
+                      {{ forloop.index }}
+                    {% endif %}
+                  </div>
+
+                  {% if block.settings.heading != blank %}
+                    <h3 class="step__heading {{ heading_size }}">
+                      {{- block.settings.heading -}}
+                    </h3>
+                  {% endif %}
+                  {% if block.settings.text != blank %}
+                    <p class="step__text {{ text_size }}">
+                      {{- block.settings.text -}}
+                    </p>
+                  {% endif %}
+                  {% if block.settings.button_label != blank and block.settings.show_button %}
+                    {% render 'button',
+                      link: block.settings.button_link,
+                      label: block.settings.button_label,
+                      style: block.settings.button_style,
+                      class: 'step'
+                    %}
+                  {% endif %}
+                </div>
+
+                {% if block.settings.image != blank %}
+                  {% liquid
+                    assign width_ratio = 1
+                    if section.settings.image_ratio == 'adapt' 
+                      if block.settings.image.width > block.settings.image.height
+                        assign aspect_ratio_set = 575 | divided_by: 160 | round: 2
+                        if aspect_ratio_set > block.settings.image.aspect_ratio
+                          assign width_ratio = aspect_ratio_set | divided_by: block.settings.image.aspect_ratio | round: 2
+                        endif
+                      endif
+                    endif
+                  %}
+
+                  {%- capture sizes -%}
+                    (min-width: 1200px) calc(100vw / 2 - 40px),
+                    calc((100vw - 40px)  * {{ width_ratio }})
+                  {%- endcapture -%}
+
+                  <div class="step__image step__image--{{ section.settings.image_ratio }}"
+                    {% if section.settings.image_ratio == 'adapt' %} style = "padding-bottom: {{ 1 | divided_by: block.settings.image.aspect_ratio | times: 100 }}%;" {% endif %}>
+                    {{
+                      block.settings.image
+                      | image_url: width: block.settings.image.width
+                      | image_tag: loading: 'lazy', 
+                      sizes: sizes, 
+                      widths: '360, 550, 710, 1200, 1600, 1800, 1920'
+                    }}
+                  </div>
+                {% endif %}
+              </div>
+
+            {% elsif section.settings.layout == "collapsible" %}
+              <div class="steps__step step  {% if forloop.first %} active {% endif %}" {{ block.shopify_attributes }}>   
+                <div class="step__toggle">
+                  <div class="step__toggle-group">
+                    <div class="step__number {{ number_size }}">
+                      <span>
+                         {% if block.settings.number != blank %}
+                          {{ block.settings.number }}
+                        {% else %}
+                          {{ forloop.index }}
+                        {% endif %}
+                      </span>
+                    </div>
+                    {% if block.settings.heading != blank %}
+                      <h3 class="step__heading {{ heading_size }}">
+                        {{- block.settings.heading -}}
+                      </h3>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="step__toggle-content"
+                  {% if forloop.first %}
+                    style="display: block;"
+                  {% endif %} >
+                  {% if block.settings.text != blank %}
+                    <p class="step__text {{ text_size }}">
+                      {{- block.settings.text -}}
+                    </p>
+                  {% endif %}
+                  {% if block.settings.button_label != blank and block.settings.show_button %}
+                    {% render 'button',
+                      link: block.settings.button_link,
+                      label: block.settings.button_label,
+                      style: block.settings.button_style,
+                      class: 'step'
+                    %}
+                  {% endif %}
+
+                  {% if block.settings.image != blank %}
+                    {% liquid
+                      assign width_ratio = 1
+                      if section.settings.image_ratio == 'adapt' 
+                        if block.settings.image.width > block.settings.image.height
+                          assign aspect_ratio_set = 575 | divided_by: 160 | round: 2
+                          if aspect_ratio_set > block.settings.image.aspect_ratio
+                            assign width_ratio = aspect_ratio_set | divided_by: block.settings.image.aspect_ratio | round: 2
+                          endif
+                        endif
+                      endif
+                    %}
+
+                    {%- capture sizes -%}
+                      (min-width: 1200px) calc(100vw / 2 - 40px),
+                      calc((100vw - 40px)  * {{ width_ratio }})
+                    {%- endcapture -%}
+                    <div class="step__image step__image--{{ section.settings.image_ratio }} step__image-mobile"
+                      {% if section.settings.image_ratio == 'adapt' %} style = "padding-bottom: {{ 1 | divided_by: block.settings.image.aspect_ratio | times: 100 }}%;" {% endif %}>
+                      {{
+                        block.settings.image
+                        | image_url: width: block.settings.image.width
+                        | image_tag: loading: 'lazy', 
+                        sizes: sizes, 
+                        widths: '360, 550, 710, 1200, 1600, 1800, 1920'
+                      }}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+
+            {% elsif section.settings.layout == "slider" %}
+              <div class="steps__step step swiper-slide" {{ block.shopify_attributes }}>
+                <div class="step__info">
+                  <div class="step__number {{ number_size }}">
+                    <span>
+                      {% if block.settings.number != blank %}
+                        {{ block.settings.number }}
+                      {% else %}
+                        {{ forloop.index }}
+                      {% endif %}
+                    </span>
+                  </div>
+
+                  {% if block.settings.heading != blank %}
+                    <h3 class="step__heading {{ heading_size }}">
+                      {{- block.settings.heading -}}
+                    </h3>
+                  {% endif %}
+                  {% if block.settings.text != blank %}
+                    <p class="step__text {{ text_size }}">
+                      {{- block.settings.text -}}
+                    </p>
+                  {% endif %}
+                  {% if block.settings.button_label != blank and block.settings.show_button %}
+                    {% render 'button',
+                      link: block.settings.button_link,
+                      label: block.settings.button_label,
+                      style: block.settings.button_style,
+                      class: 'step'
+                    %}
+                  {% endif %}
+                </div>
+              </div>
+            {% endif %}
+          {%- endfor -%}
+
+        
+        {% if section.settings.layout == "slider" %}
+        </div>
+        </div>
+        <div class="steps__pagination no-js-hidden swiper-pagination"></div>
+        {% endif %}
+
+        {% if section.settings.layout == "collapsible" %}
+        </div>
+        {% endif %}
+        
+        {% if section.settings.layout == "collapsible" %}
+          <div class="steps__images">
+            {% for block in section.blocks %}
+              {% if block.settings.image != blank %}
+                {% liquid
+                  assign width_ratio = 1
+                  if section.settings.image_ratio == 'adapt' 
+                    if block.settings.image.width > block.settings.image.height
+                      assign aspect_ratio_set = 575 | divided_by: 160 | round: 2
+                      if aspect_ratio_set > block.settings.image.aspect_ratio
+                        assign width_ratio = aspect_ratio_set | divided_by: block.settings.image.aspect_ratio | round: 2
+                      endif
+                    endif
+                  endif 
+                %}
+
+                {%- capture sizes -%}
+                  (min-width: 1200px) calc(100vw / 2 - 40px),
+                  calc((100vw - 40px)  * {{ width_ratio }})
+                {%- endcapture -%}
+                <div class="step__image step__image--{{ section.settings.image_ratio }} {% if forloop.first %} active {% endif %}"
+                {% if section.settings.image_ratio == 'adapt' %} style = "padding-bottom: {{ 1 | divided_by: block.settings.image.aspect_ratio | times: 100 }}%;" {% endif %}>
+                  {{
+                    block.settings.image
+                    | image_url: width: block.settings.image.width
+                    | image_tag: loading: 'lazy', 
+                    sizes: sizes, 
+                    widths: '360, 550, 710, 1200, 1600, 1800, 1920'
+                  }}
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+  {
+    "name": "步驟流程",
+    "tag": "section",
+    "class": "steps-section",
+    "enabled_on": {
+      "templates": ["*"]
+    },
+    "settings": [
+      {
+        "type": "select",
+        "id": "layout",
+        "label": "版面配置",
+        "options": [
+          { "value": "columns", "label": "欄位" },
+          { "value": "columns-with-mobile-slider", "label": "欄位 (行動版滑桿)" },
+          { "value": "scroll", "label": "捲動" },
+          { "value": "collapsible", "label": "可收合" },
+          { "value": "slider", "label": "輪播" }
+				],
+				"default": "columns"
+			},
+      {
+        "type": "color_scheme",
+        "id": "color_scheme",
+        "default": "background-1",
+        "label": "色彩配置"
+      },
+      {
+        "type": "text",
+        "id": "subheading",
+        "label": "副標題",
+        "default": "如何運作"
+      },
+			{
+				"type": "select",
+				"id": "subheading_style",
+				"options": [
+					{ "value": "subtitle", "label": "副標題" },
+					{ "value": "subtitle subtitle--secondary", "label": "副標題 (次要)" }
+				],
+				"default": "subtitle",
+				"label": "副標題樣式"
+			},
+			{
+				"type": "select",
+				"id": "subheading_icon",
+				"options": [
+          { "value": "none", "label": "無" },
+          { "value": "arrow-bar", "label": "箭頭條" },
+          { "value": "bag-1", "label": "提袋 1" },
+          { "value": "bag-2", "label": "提袋 2" },
+          { "value": "bag-3", "label": "提袋 3" },
+          { "value": "bar-chart", "label": "長條圖" },
+          { "value": "bars-upward", "label": "向上長條" },
+          { "value": "baseball", "label": "棒球" },
+          { "value": "battery-1", "label": "電池 1" },
+          { "value": "battery-2", "label": "電池 2" },
+          { "value": "battery-3", "label": "電池 3" },
+          { "value": "book", "label": "書本" },
+          { "value": "card", "label": "卡片" },
+          { "value": "card-holder", "label": "名片夾" },
+          { "value": "chart", "label": "圖表" },
+          { "value": "chart-2", "label": "圖表 2" },
+          { "value": "chart-3", "label": "圖表 3" },
+          { "value": "chats", "label": "對話" },
+          { "value": "check-1", "label": "勾號 1" },
+          { "value": "check-2", "label": "勾號 2" },
+          { "value": "check-3", "label": "勾號 3" },
+          { "value": "check-4", "label": "勾號 4" },
+          { "value": "circle", "label": "圓圈" },
+          { "value": "circles", "label": "多個圓圈" },
+          { "value": "clock-1", "label": "時鐘 1" },
+          { "value": "clock-2", "label": "時鐘 2" },
+          { "value": "close", "label": "關閉" },
+          { "value": "cloud-server", "label": "雲端伺服器" },
+          { "value": "computer", "label": "電腦" },
+          { "value": "computer-mouse", "label": "滑鼠" },
+          { "value": "confetti", "label": "彩紙" },
+          { "value": "delivery", "label": "運送" },
+          { "value": "delivery-box", "label": "包裹" },
+          { "value": "devices", "label": "裝置" },
+          { "value": "directions", "label": "方向" },
+          { "value": "dumbbell", "label": "啞鈴" },
+          { "value": "eye", "label": "眼睛" },
+          { "value": "facebook", "label": "Facebook" },
+          { "value": "file-1", "label": "檔案 1" },
+          { "value": "file-2", "label": "檔案 2" },
+          { "value": "flag", "label": "旗幟" },
+          { "value": "folder-1", "label": "資料夾 1" },
+          { "value": "folder-2", "label": "資料夾 2" },
+          { "value": "food", "label": "食物" },
+          { "value": "hand-1", "label": "手 1" },
+          { "value": "hand-2", "label": "手 2" },
+          { "value": "hand-3", "label": "手 3" },
+          { "value": "headphones", "label": "耳機" },
+          { "value": "instagram", "label": "Instagram" },
+          { "value": "laptop-1", "label": "筆電 1" },
+          { "value": "laptop-2", "label": "筆電 2" },
+          { "value": "leaf", "label": "葉子" },
+          { "value": "lightning-bolt-1", "label": "閃電 1" },
+          { "value": "lightning-bolt-2", "label": "閃電 2" },
+          { "value": "like", "label": "讚" },
+          { "value": "link", "label": "連結" },
+          { "value": "lock-1", "label": "鎖 1" },
+          { "value": "lock-2", "label": "鎖 2" },
+          { "value": "logout", "label": "登出" },
+          { "value": "luggage", "label": "行李" },
+          { "value": "mark", "label": "標記" },
+          { "value": "medicine", "label": "藥品" },
+          { "value": "microphone", "label": "麥克風" },
+          { "value": "moon", "label": "月亮" },
+          { "value": "pencil", "label": "鉛筆" },
+          { "value": "phone-1", "label": "電話 1" },
+          { "value": "phone-2", "label": "電話 2" },
+          { "value": "phone-3", "label": "電話 3" },
+          { "value": "phone-4", "label": "電話 4" },
+          { "value": "pinterest", "label": "Pinterest" },
+          { "value": "plug", "label": "插頭" },
+          { "value": "presentation-1", "label": "簡報 1" },
+          { "value": "presentation-2", "label": "簡報 2" },
+          { "value": "pulse", "label": "脈搏" },
+          { "value": "recycle", "label": "回收" },
+          { "value": "rocket", "label": "火箭" },
+          { "value": "search", "label": "搜尋" },
+          { "value": "sending", "label": "傳送" },
+          { "value": "server-1", "label": "伺服器 1" },
+          { "value": "server-2", "label": "伺服器 2" },
+          { "value": "settings", "label": "設定" },
+          { "value": "shield", "label": "盾牌" },
+          { "value": "shopping-basket", "label": "購物籃" },
+          { "value": "shuffle", "label": "隨機播放" },
+          { "value": "snapchat", "label": "Snapchat" },
+          { "value": "sound-waves", "label": "聲波" },
+          { "value": "speaker", "label": "喇叭" },
+          { "value": "squares-1", "label": "方塊 1" },
+          { "value": "squares-2", "label": "方塊 2" },
+          { "value": "stack", "label": "堆疊" },
+          { "value": "star", "label": "星星" },
+          { "value": "stopwatch", "label": "碼錶" },
+          { "value": "sun", "label": "太陽" },
+          { "value": "tag", "label": "標籤" },
+          { "value": "telephone-tower", "label": "電信塔" },
+          { "value": "tik-tok", "label": "TikTok" },
+          { "value": "tree", "label": "樹" },
+          { "value": "trend", "label": "趨勢" },
+          { "value": "trophy", "label": "獎盃" },
+          { "value": "tumblr", "label": "Tumblr" },
+          { "value": "tv", "label": "電視" },
+          { "value": "twitter", "label": "Twitter" },
+          { "value": "user-1", "label": "使用者 1" },
+          { "value": "user-2", "label": "使用者 2" },
+          { "value": "user-3", "label": "使用者 3" },
+          { "value": "user-4", "label": "使用者 4" },
+          { "value": "user-5", "label": "使用者 5" },
+          { "value": "video", "label": "影片" },
+          { "value": "vimeo", "label": "Vimeo" },
+          { "value": "wallet", "label": "錢包" },
+          { "value": "watch", "label": "手錶" },
+          { "value": "water-1", "label": "水 1" },
+          { "value": "water-2", "label": "水 2" },
+          { "value": "water-3", "label": "水 3" },
+          { "value": "wave-1", "label": "波浪 1" },
+          { "value": "wave-2", "label": "波浪 2" },
+          { "value": "wifi-1", "label": "Wi-Fi 1" },
+          { "value": "wifi-2", "label": "Wi-Fi 2" },
+          { "value": "window", "label": "視窗" },
+          { "value": "youtube", "label": "YouTube" }
+        ],
+				"default": "none",
+				"label": "副標題圖示"
+			},
+      {
+        "type": "inline_richtext",
+        "id": "heading",
+        "label": "標題",
+        "info": "使用方括號 `[文字]` 來突顯標題中的特定單字。",
+        "default": "我們的流程"
+      },
+      {
+        "type": "select",
+        "id": "heading_size",
+        "options": [
+          { "value": "h3", "label": "中" },
+          { "value": "h2", "label": "大" }
+        ],
+        "default": "h2",
+        "label": "標題大小"
+      },
+      {
+        "type": "select",
+        "id": "heading_level",
+        "options": [
+          { "value": "h1", "label": "H1" },
+          { "value": "h2", "label": "H2" },
+          { "value": "h3", "label": "H3" }
+        ],
+        "default": "h2",
+        "label": "標題層級 (HTML 標籤)"
+      },
+      {
+        "type": "select",
+        "id": "heading_line",
+        "options": [
+          { "value": "simple", "label": "簡潔線條" },
+          { "value": "rounded", "label": "圓角線條" },
+          { "value": "background", "label": "背景色塊" },
+          { "value": "none", "label": "無" }
+        ],
+        "default": "simple",
+        "label": "標題線條樣式"
+      },
+      {
+        "type": "color",
+        "id": "line_color",
+        "label": "線條顏色",
+        "default": "#1566E0"
+      },
+      {
+        "type": "checkbox",
+        "id": "word_break",
+        "label": "啟用標題自動換行",
+        "default": false
+      },
+      {
+        "type": "select",
+        "id": "heading_animation",
+        "options": [
+          { "value": "typewriter", "label": "打字機" },
+          { "value": "rolling", "label": "滾動" },
+          { "value": "appearing", "label": "浮現" },
+          { "value": "none", "label": "無" }
+        ],
+        "default": "none",
+        "label": "標題動畫",
+        "info": "此動畫僅在頁面首次載入時播放一次。"
+      },
+      {
+        "type": "checkbox",
+        "id": "word_break_an",
+        "label": "啟用動畫文字自動換行",
+        "default": false
+      },
+      {
+        "type": "textarea",
+        "id": "text",
+        "label": "內文",
+        "default": "使用此區塊分享關於您品牌流程的詳細資訊。"
+      },
+      {
+        "type": "select",
+        "id": "text_align",
+        "label": "文字對齊",
+        "options": [
+          { "value": "left", "label": "靠左" },
+          { "value": "center", "label": "置中" }
+        ],
+        "default": "center"
+      },
+      {
+        "type": "range",
+        "id": "columns_to_show",
+        "min": 1,
+        "max": 6,
+        "step": 1,
+        "default": 3,
+        "label": "每列顯示的欄位數",
+        "info": "僅適用於「欄位」和「欄位 (行動版滑桿)」版面。"
+      },
+      {
+        "type": "select",
+        "id": "image_ratio",
+        "options": [
+          { "value": "landscape", "label": "橫向" },
+          { "value": "portrait", "label": "直向" },
+          { "value": "square", "label": "正方形" },
+          { "value": "adapt", "label": "適應圖片大小" }
+        ],
+        "default": "landscape",
+        "label": "圖片比例"
+      },
+      {
+        "type": "select",
+        "id": "number_size",
+        "label": "數字大小",
+        "options": [
+          { "value": "recommended", "label": "建議大小" },
+          { "value": "h5", "label": "小" },
+          { "value": "h4", "label": "中" }
+        ],
+        "default": "recommended"
+      },
+      {
+        "type": "select",
+        "id": "step_heading_size",
+        "label": "步驟標題大小",
+        "options": [
+          { "value": "recommended", "label": "建議大小" },
+          { "value": "h5", "label": "小" },
+          { "value": "h4", "label": "中" }
+        ],
+        "default": "recommended"
+      },
+      {
+        "type": "select",
+        "id": "text_size",
+        "label": "文字大小",
+        "options": [
+          { "value": "recommended", "label": "建議大小" },
+          { "value": "body-normal", "label": "一般內文" },
+          { "value": "body-large", "label": "大型內文" }
+        ],
+        "default": "recommended"
+      },
+      {
+        "type": "header",
+        "content": "區塊內距 (Padding)"
+      },
+      {
+        "type": "select",
+        "id": "padding_top",
+        "options": [
+          { "value": "no-indent", "label": "無" },
+          { "value": "xs", "label": "超小" },
+          { "value": "s", "label": "小" },
+          { "value": "m", "label": "中" },
+          { "value": "l", "label": "大" },
+          { "value": "xl", "label": "超大" }
+        ],
+        "default": "l",
+        "label": "頂部內距"
+      }, 
+      {
+        "type": "select",
+        "id": "padding_bottom",
+        "options": [
+          { "value": "no-indent", "label": "無" },
+          { "value": "xs", "label": "超小" },
+          { "value": "s", "label": "小" },
+          { "value": "m", "label": "中" },
+          { "value": "l", "label": "大" },
+          { "value": "xl", "label": "超大" }
+        ],
+        "default": "l",
+        "label": "底部內距"
+      },
+      {
+        "type": "header",
+        "content": "區塊外距 (Margin)"
+      },
+      {
+        "type": "select",
+        "id": "margin_top",
+        "options": [
+          { "value": "no-indent", "label": "無" },
+          { "value": "xs", "label": "超小" },
+          { "value": "s", "label": "小" },
+          { "value": "m", "label": "中" },
+          { "value": "l", "label": "大" },
+          { "value": "xl", "label": "超大" }
+        ],
+        "default": "no-indent",
+        "label": "頂部外距"
+      },
+      {
+        "type": "select",
+        "id": "margin_bottom",
+        "options": [
+          { "value": "no-indent", "label": "無" },
+          { "value": "xs", "label": "超小" },
+          { "value": "s", "label": "小" },
+          { "value": "m", "label": "中" },
+          { "value": "l", "label": "大" },
+          { "value": "xl", "label": "超大" }
+        ],
+        "default": "no-indent",
+        "label": "底部外距"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "step",
+        "name": "步驟項目",
+        "settings": [
+           {
+            "type": "image_picker",
+            "id": "image",
+            "label": "圖片"
+          },
+          {
+            "type": "text",
+            "id": "number",
+            "label": "數字",
+            "info": "留空則自動顯示順序編號。"
+          },
+          {
+            "type": "text",
+            "id": "heading",
+            "label": "標題",
+            "default": "步驟標題"
+
+          },
+          {
+            "type": "textarea",
+            "id": "text",
+            "label": "內文",
+            "default": "使用此文字分享有關您品牌的更多資訊。"
+          },
+          {
+            "type": "header",
+            "content": "按鈕設定"
+          },
+          {
+            "type": "checkbox",
+            "id": "show_button",
+            "default": true,
+            "label": "顯示按鈕"
+          },
+          {
+            "type": "select",
+            "id": "button_style",
+            "options": [
+              {
+                "group": "實心按鈕",
+                "value": "primary",
+                "label": "主要"
+              },
+              {
+                "group": "實心按鈕",
+                "value": "secondary",
+                "label": "次要"
+              },
+              {
+                "group": "實心按鈕",
+                "value": "tertiary",
+                "label": "第三"
+              },
+              {
+                "group": "外框/連結按鈕",
+                "value": "simple",
+                "label": "簡潔"
+              },
+              {
+                "group": "外框/連結按鈕",
+                "value": "simple_secondary",
+                "label": "簡潔 (次要)"
+              },
+              {
+                "group": "外框/連結按鈕",
+                "value": "simple_link",
+                "label": "簡潔 (連結樣式)"
+              }
+            ],
+            "default": "simple",
+            "label": "按鈕樣式"
+          },
+          {
+            "type": "text",
+            "id": "button_label",
+            "default": "閱讀更多",
+            "label": "按鈕文字"
+          },
+          {
+            "type": "url",
+            "id": "button_link",
+            "label": "按鈕連結"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "步驟流程",
+        "blocks": [
+          {
+            "type": "step"
+          },
+          {
+            "type": "step"
+          }, 
+          {
+            "type": "step"
+          } 
+        ]
+      }
+    ]
+  }
+{% endschema %}

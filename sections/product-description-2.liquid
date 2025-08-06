@@ -1,0 +1,1050 @@
+{%- comment -%}
+   Sezione: product-description-4-0.liquid (Con Funzionalità Aggiuntive)
+   Autore: Vision (Optimized by ChatGPT)
+   版本: 32.2 (FIX: Verified purchase badge wrapping on mobile)
+   描述:
+   - [修正] 修正了評價卡片中「Verified Purchase」徽章在手機上會斷行的問題。
+   - [新功能] 將「獨立圖片」區塊重構為「圖片橫幅」，實現文字疊加在圖片上的效果。
+   - [新功能] 為新的「圖片橫幅」區塊新增了文字顏色、桌面端水平與垂直對齊的設定，使其更靈活。
+   - [UX 優化] 新的「圖片橫幅」區塊在手機上會自動切換回文字在上、圖片在下的堆疊佈局，以確保最佳可讀性。
+   - [新功能] 為「獨立圖片 (置中)」區塊新增了小標籤、標題、副標題和描述欄位，使其功能更豐富。
+   - [修正] 再次修正「雙模式充電」區塊在手機上的佈局，使其卡片能垂直堆疊且內容靠左對齊，完全匹配設計圖。
+   - [修正] 修正了「雙模式充電」區塊在手機上的佈局，使其圖片能以原始比例顯示。
+   - [修正] 修正了「置中特色文字」區塊的小標籤在手機版上的字體大小。
+   - [依賴] 輪播功能依賴 Swiper.js 函式庫。
+{%- endcomment -%}
+
+<style>
+  /* 導入 Google Fonts - Inter 字體 (作為 SF Pro Display 的備選) */
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  :root {
+    /* 顏色變數 */
+    --pd2-text-color-primary: #121212;
+    --pd2-text-color-secondary: #555555;
+    --pd2-tag-bg-color: #E0F5FF;
+    --pd2-tag-text-color: #2BB9ED;
+    --pd2-image-default-bg: #F4F4F4;
+    --pd2-spec-border-color: #EDEDED;
+    --pd2-card-shadow: rgba(0,0,0,0.05);
+    --pd2-body-bg-color: #FFFFFF;
+    
+    /* [新增] 評價區塊專用顏色 (UI 精修) */
+    --pd2-review-star-color: #2BB9ED;
+    --pd2-review-star-color-empty: #E5E7EB; /* [新增] 空星顏色 */
+    --pd2-review-progress-bg: #E5E7EB;
+    --pd2-review-verified-bg: #DCFCE7;
+    --pd2-review-verified-text: #16A34A;
+
+    /* 佈局變數 */
+    --pd2-content-max-width: 1440px;
+    --pd2-section-padding-desktop: 80px;
+    --pd2-section-padding-mobile: 60px;
+    --pd2-card-content-gap: 56px;
+    --pd2-card-padding: 56px;
+    --pd2-card-border-radius: 15px;
+
+    /* 字體變數 */
+    --pd2-font-family: 'SF Pro Display', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  /* --- 全域與通用樣式 --- */
+  .pd2-section-wrapper {
+    font-family: var(--pd2-font-family);
+    line-height: 1.5;
+    color: var(--pd2-text-color-primary);
+    background-color: var(--pd2-body-bg-color);
+    letter-spacing: 0px;
+  }
+  .pd2-block-group {
+    padding-top: calc(var(--pd2-section-padding-desktop) * 0.6);
+    padding-bottom: calc(var(--pd2-section-padding-desktop) * 0.6);
+  }
+  .pd2-container {
+    max-width: var(--pd2-content-max-width);
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .pd2-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background-color: transparent;
+    object-fit: cover;
+  }
+  .placeholder-svg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-height: 200px;
+  }
+  .pd2-common-tag {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2px 10px;
+    gap: 8px;
+    border: 1px solid var(--pd2-tag-text-color);
+    border-radius: 32px;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 22px;
+    color: var(--pd2-tag-text-color);
+    white-space: nowrap;
+    margin-bottom: 8px;
+    background-color: transparent;
+  }
+
+  .pd2-common-heading {
+    font-weight: 600;
+    font-size: 40px;
+    line-height: 48px;
+    letter-spacing: 0px;
+    color: var(--pd2-text-color-primary);
+    margin: 0;
+  }
+
+  .pd2-common-subheading {
+    font-weight: 500;
+    font-size: 28px;
+    line-height: 36px;
+    color: var(--pd2-text-color-primary);
+    margin: 16px 0 0 0;
+  }
+  .pd2-common-description {
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 32px;
+    color: var(--pd2-text-color-primary);
+    margin: 16px 0 0 0;
+  }
+  .pd2-common-description p { margin: 0 0 1em; }
+  .pd2-common-description p:last-child { margin-bottom: 0; }
+
+  /* --- 主要橫幅 & 卡片式橫幅 --- */
+  .pd2-hero { display: flex; align-items: center; justify-content: center; padding: 0; background-size: cover; background-position: center center; width: 100%; box-sizing: border-box; min-height: 672px; }
+  .pd2-hero-wrapper, .pd2-card-banner-wrapper { width: 100vw; position: relative; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; }
+  .pd2-hero__content-wrapper { max-width: var(--pd2-content-max-width); width: 100%; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; gap: 56px; box-sizing: border-box; }
+  .pd2-hero .pd2-hero__text-wrapper { flex: none; width: 462px; display: flex; flex-direction: column; align-items: flex-start; gap: 32px; color: var(--pd2-text-color-primary); z-index: 2; }
+  .pd2-hero__heading { font-weight: 600; font-size: 48px; line-height: 1.3; }
+  .pd2-hero__subheading { font-size: 28px; line-height: 1.4; margin-top: 8px; }
+  .pd2-hero__tag { display: flex; align-items: center; gap: 16px; height: 56px; }
+  .pd2-hero__tag img { width: 56px; height: 56px; object-fit: contain; }
+  .pd2-hero__tag span { font-weight: 600; font-size: 36px; line-height: 48px; color: var(--pd2-tag-text-color); }
+  .pd2-card-banner { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; z-index: 2; box-sizing: border-box; padding: var(--pd2-section-padding-desktop); }
+  .pd2-card-banner__desktop-image { display: block; width: 100%; height: auto; }
+  .pd2-card-banner__mobile-image { display: none; }
+  .pd2-desktop-align--left .pd2-card-banner { justify-content: flex-start; }
+  .pd2-desktop-align--left .pd2-hero__text-wrapper { text-align: left; align-items: flex-start; }
+  .pd2-desktop-align--center .pd2-card-banner { justify-content: center; }
+  .pd2-desktop-align--center .pd2-hero__text-wrapper { text-align: center; align-items: center; }
+  .pd2-desktop-align--right .pd2-card-banner { justify-content: flex-end; }
+  .pd2-desktop-align--right .pd2-hero__text-wrapper { text-align: right; align-items: flex-end; }
+  .pd2-desktop-valign--flex-start .pd2-card-banner { align-items: flex-start; }
+  .pd2-desktop-valign--center .pd2-card-banner { align-items: center; }
+  .pd2-desktop-valign--flex-end .pd2-card-banner { align-items: flex-end; }
+
+  /* --- 通用圖文區塊 --- */
+  .pd2-image-with-text, .pd2-image-with-features, .pd2-specs-and-image, .pd2-dual-mode-charging, .pd2-image-with-subcards { display: flex; flex-direction: row; align-items: center; gap: var(--pd2-card-content-gap); }
+  .pd2-image-with-text.layout--image-right, .pd2-image-with-features.layout--image-right, .pd2-image-with-subcards.layout--image-right, .pd2-specs-and-image.layout--image-right, .pd2-dual-mode-charging.layout--image-right { flex-direction: row-reverse; }
+  .pd2-image-with-text__image-wrapper, .pd2-image-with-features__image-wrapper, .pd2-specs-and-image__image-wrapper, .pd2-image-with-subcards__image-wrapper, .pd2-dual-mode-charging__image-wrapper { flex: 1; min-width: 0; height: 560px; border-radius: var(--pd2-card-border-radius); overflow: hidden; background-color: var(--pd2-image-default-bg); box-shadow: 0 4px 15px var(--pd2-card-shadow); position: relative; }
+  .pd2-image-with-text__text-wrapper, .pd2-image-with-features__text-wrapper, .pd2-specs-and-image__specs-wrapper, .pd2-image-with-subcards__text-wrapper, .pd2-dual-mode-charging__text-wrapper { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
+
+  /* --- 子區塊: 浮動圖示 --- */
+  .pd2-image-with-features .pd2-feature-icon { position: absolute; top: var(--pos-top); left: var(--pos-left); transform: translate(-50%, -50%); width: 113px; height: 113px; background-color: white; border-radius: 184px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; z-index: 10; }
+  .pd2-image-with-features .pd2-feature-icon img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .pd2-specs-and-image__image-wrapper { height: auto; align-self: stretch; }
+  .pd2-specs-and-image__image { object-fit: contain; height: auto; width: 100%; }
+  .pd2-specs-and-image__specs-wrapper { gap: 0; }
+  .pd2-specs-and-image .pd2-specs-and-image__heading { font-weight: 600; font-size: 48px; line-height: 1.2; margin-bottom: 56px; letter-spacing: 0; }
+  .pd2-specs-table { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px 40px; }
+  .pd2-spec-item { display: flex; flex-direction: column; gap: 4px; border-top: 1px solid var(--pd2-spec-border-color); padding-top: 24px; }
+  .pd2-spec-item__key { font-weight: 400; font-size: 18px; line-height: 1.4; color: var(--pd2-text-color-secondary); }
+  .pd2-spec-item__value { font-weight: 600; font-size: 20px; line-height: 1.4; color: var(--pd2-text-color-primary); }
+  .pd2-dual-mode-charging .pd2-dual-mode-cards { display: flex; gap: 12px; width: 100%; margin-top: 16px; }
+  .pd2-dual-mode-charging .pd2-dual-mode-card { display: flex; flex-direction: column; padding: 20px; gap: 16px; flex: 1; background: var(--pd2-image-default-bg); border-radius: 16px; text-align: center; }
+  .pd2-dual-mode-charging .pd2-dual-mode-card__title { font-weight: 600; font-size: 20px; line-height: 28px; }
+  .pd2-dual-mode-charging .pd2-dual-mode-card__time-wrapper { display: flex; align-items: flex-end; gap: 8px; justify-content: center; }
+  .pd2-dual-mode-charging .pd2-dual-mode-card__time-wrapper .number { font-weight: 600; font-size: 44px; line-height: 40px; color: var(--pd2-tag-text-color); }
+  .pd2-dual-mode-charging .pd2-dual-mode-card__description { font-weight: 400; font-size: 16px; line-height: 20px; }
+  .pd2-charging-info { border: 1px solid var(--pd2-spec-border-color); border-radius: 20px; padding: 24px; margin-top: 24px; display: flex; flex-direction: column; gap: 16px; width: fit-content; max-width: 100%; }
+  .pd2-charging-info--has-image { padding: 0; border: none; background-color: transparent; }
+  .pd2-charging-info__image { max-width: 100%; height: auto; display: block; border-radius: 20px; }
+  .pd2-charging-info__content-wrapper { display: flex; flex-direction: column; gap: 16px; }
+  .pd2-charging-info__row-1, .pd2-charging-info__row-2 { display: flex; flex-direction: column; gap: 4px; }
+  .pd2-charging-info__row-1-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
+  .pd2-charging-info__row-1-title .text { font-size: 20px; font-weight: 600; line-height: 1.4; white-space: pre-wrap; }
+  .pd2-charging-info__row-1-title .symbol, .pd2-charging-info__row-1-title .number { font-size: 40px; font-weight: 600; color: var(--pd2-tag-text-color); line-height: 1; }
+  .pd2-charging-info__row-1-title .time { font-size: 20px; font-weight: 600; line-height: 1.4; }
+  .pd2-charging-info__subtitle { font-size: 16px; color: var(--pd2-text-color-secondary); margin: 0; line-height: 1.5; }
+  .pd2-charging-info__row-2-text { font-size: 16px; line-height: 1.5; color: var(--pd2-text-color-secondary); word-break: break-word; }
+  .pd2-charging-info__row-2-text strong { color: var(--pd2-tag-text-color); font-weight: 600; }
+  .pd2-safety-icons { display: inline-grid; grid-template-columns: repeat(4, auto); gap: 24px 8px; margin-top: 24px; }
+  .pd2-safety-icon { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; }
+  .pd2-safety-icon__icon-wrapper { box-sizing: border-box; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: 1px solid var(--pd2-tag-text-color); border-radius: 44px; }
+  .pd2-safety-icon__icon { width: 24px; height: 24px; object-fit: contain; }
+  .pd2-safety-icon__text { font-weight: 500; font-size: 14px; line-height: 18px; }
+  .pd2-centered-feature { text-align: center; max-width: 860px; margin: 0 auto; padding: 0; gap: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+  .pd2-centered-feature .pd2-common-tag { font-weight: 500; font-size: 24px; line-height: 1.5; margin-bottom: 8px; padding: 2px 10px; background-color: transparent; border: 1px solid var(--pd2-tag-text-color); }
+  .pd2-centered-feature .pd2-common-heading { font-weight: 600; font-size: 72px; line-height: 1.1; text-align: center; margin-bottom: 8px; }
+  .pd2-centered-feature .pd2-common-subheading { margin-top: 0; margin-bottom: 8px; }
+  .pd2-centered-feature .pd2-common-description { margin-top: 0; }
+  
+  /* [重構] 獨立圖片區塊 -> 圖片橫幅區塊 */
+  .pd2-standalone-image-wrapper { position: relative; width: 100%; border-radius: var(--pd2-card-border-radius); overflow: hidden; }
+  .pd2-standalone-image-wrapper .pd2-standalone-image { display: block; width: 100%; height: auto; }
+  .pd2-standalone-image__overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; padding: 50px; box-sizing: border-box; pointer-events: none; }
+  .pd2-standalone-image__text-wrapper { pointer-events: auto; max-width: 45%; display: flex; flex-direction: column; gap: 8px; }
+  .pd2-standalone-image__text-wrapper .pd2-common-heading, .pd2-standalone-image__text-wrapper .pd2-common-subheading, .pd2-standalone-image__text-wrapper .pd2-common-description { color: inherit; }
+  /* 對齊輔助類 */
+  .pd2-standalone-image-wrapper.pd2-desktop-align--left .pd2-standalone-image__overlay { justify-content: flex-start; }
+  .pd2-standalone-image-wrapper.pd2-desktop-align--left .pd2-standalone-image__text-wrapper { text-align: left; align-items: flex-start; }
+  .pd2-standalone-image-wrapper.pd2-desktop-align--center .pd2-standalone-image__overlay { justify-content: center; }
+  .pd2-standalone-image-wrapper.pd2-desktop-align--center .pd2-standalone-image__text-wrapper { text-align: center; align-items: center; }
+  .pd2-standalone-image-wrapper.pd2-desktop-align--right .pd2-standalone-image__overlay { justify-content: flex-end; }
+  .pd2-standalone-image-wrapper.pd2-desktop-align--right .pd2-standalone-image__text-wrapper { text-align: right; align-items: flex-end; }
+  .pd2-standalone-image-wrapper.pd2-desktop-valign--flex-start .pd2-standalone-image__overlay { align-items: flex-start; }
+  .pd2-standalone-image-wrapper.pd2-desktop-valign--center .pd2-standalone-image__overlay { align-items: center; }
+  .pd2-standalone-image-wrapper.pd2-desktop-valign--flex-end .pd2-standalone-image__overlay { align-items: flex-end; }
+  
+
+  /* --- [評價區塊] CSS (精修版) --- */
+  .reviews-section-wrapper {
+    background-color: transparent;
+    padding: 0;
+  }
+  .reviews-section__content {
+    max-width: 100%;
+    margin: 0 auto;
+    background-color: #FFFFFF;
+    border-radius: 20px;
+    padding: 40px 50px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  }
+  .reviews-section__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 20px; border-bottom: 1px solid var(--pd2-spec-border-color); padding-bottom: 24px; }
+  .reviews-section__title { font-size: 24px; font-weight: bold; color: #111827; margin: 0; }
+  .reviews-section__write-review-btn { background-color: #111827; color: #FFFFFF; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 500; transition: background-color 0.3s; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; border: none; }
+  .reviews-section__write-review-btn:hover { background-color: #374151; }
+  .reviews-section__write-review-btn[disabled] { background-color: #9CA3AF; cursor: not-allowed; }
+  .reviews-section__write-review-btn svg { width: 16px; height: 16px; }
+  .reviews-section__body { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 60px; }
+  .reviews-summary__average-box { display: flex; align-items: center; gap: 16px; margin-bottom: 25px; }
+  .reviews-summary__average-score { font-size: 56px; font-weight: bold; line-height: 1; color: #111827; }
+  .reviews-summary__average-details { display: flex; flex-direction: column; }
+  .reviews-summary__total { font-size: 14px; color: #4B5563; margin-top: 4px; }
+  .reviews-summary__breakdown-item { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; font-size: 14px; }
+  .reviews-summary__breakdown-item .star-rating { color: #4B5563; font-weight: 500; flex-shrink: 0; width: 50px; display: flex; align-items: center; gap: 4px; }
+  .reviews-summary__breakdown-item .star-rating svg { width: 16px; height: 16px; color: #4B5563; }
+  .progress-bar { flex-grow: 1; height: 8px; background-color: var(--pd2-review-progress-bg); border-radius: 4px; overflow: hidden; }
+  .progress-bar__fill { height: 100%; background-color: var(--pd2-review-star-color); border-radius: 4px; transition: width 0.5s ease-in-out; }
+  .reviews-summary__breakdown-count { width: 25px; text-align: right; color: #4B5563; font-weight: 500; }
+  .reviews-list-wrapper { position: relative; min-width: 0; padding: 0 45px; overflow: hidden; }
+  .reviews-list.swiper-container { padding-bottom: 40px; margin: 0; padding-top: 5px; }
+  .reviews-list .swiper-slide { height: auto; }
+  .reviews-list--no-reviews { display: flex; align-items: center; justify-content: center; text-align: center; color: #6B7280; min-height: 250px; border: 2px dashed #D1D5DB; border-radius: 12px; font-size: 16px; padding: 20px; }
+  .review-card { background-color: #F9FAFB; border: 1px solid var(--pd2-spec-border-color); border-radius: 12px; padding: 24px; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; }
+  .review-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .review-card .star-rating { display: flex; gap: 2px; color: var(--pd2-review-star-color); }
+  .review-card .star-rating svg { width: 18px; height: 18px; }
+  .review-card__verified-badge {
+    font-size: 12px;
+    color: var(--pd2-review-verified-text);
+    background-color: var(--pd2-review-verified-bg);
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 99px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap; /* [修正] 新增此行來防止徽章文字換行 */
+  }
+  .review-card__verified-badge svg { width: 14px; height: 14px; }
+  .review-card__title { font-weight: 600; margin: 0 0 8px 0; font-size: 18px; color: #111827; }
+  .review-card__content { line-height: 1.6; color: #374151; font-size: 15px; margin-bottom: 16px; flex-grow: 1; }
+  .review-card__author-date { font-size: 14px; color: #6B7280; }
+  .review-swiper-button-prev, .review-swiper-button-next { position: absolute; top: 50%; transform: translateY(-50%) translateY(-20px); z-index: 10; cursor: pointer; color: #4B5563; background-color: #FFFFFF; border: 1px solid var(--pd2-spec-border-color); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1); transition: all 0.2s; }
+  .review-swiper-button-prev:hover, .review-swiper-button-next:hover { color: #111827; border-color: #D1D5DB; transform: translateY(-50%) translateY(-20px) scale(1.05); }
+  .review-swiper-button-prev { left: 0; }
+  .review-swiper-button-next { right: 0; }
+  .review-swiper-button-prev svg, .review-swiper-button-next svg { width: 20px; height: 20px; }
+  .review-swiper-pagination { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); }
+  .review-swiper-pagination .swiper-pagination-bullet { background: #D1D5DB; opacity: 1; }
+  .review-swiper-pagination .swiper-pagination-bullet-active { background: #111827; }
+
+  /* --- [優化] 動態平均星級顯示 (修正版) --- */
+  .reviews-summary__average-stars {
+    position: relative;
+    display: inline-block;
+    font-size: 20px; /* 星星的大小 */
+    line-height: 1;
+    color: var(--pd2-review-star-color-empty); /* 底層灰色星星 */
+    letter-spacing: 2px; /* 星星之間的間距 */
+  }
+  .reviews-summary__average-stars-filled {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    color: var(--pd2-review-star-color); /* 上層彩色星星 */
+    overflow: hidden; /* 關鍵：裁剪寬度外的部分 */
+    white-space: nowrap; /* 防止星星換行 */
+    width: 0; /* 由 Liquid 動態設定 */
+  }
+
+  /* --- [商品輪播推薦] CSS --- */
+  .featured-product-section { padding: 60px 0; position: relative; }
+  .featured-product-swiper.swiper-container { padding: 0 5vw 50px; overflow: hidden; }
+  .featured-product__slide-content { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 60px; align-items: center; }
+  .featured-product__image-wrapper { background-color: #fff; border-radius: 24px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+  .featured-product__image { width: 100%; height: auto; object-fit: contain; }
+  .featured-product__text-wrapper { color: #fff; }
+  .featured-product__rating { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; font-size: 16px; }
+  .featured-product__rating .stars { display: flex; gap: 4px; color: #FFD700; }
+  .featured-product__rating .stars svg { width: 20px; height: 20px; }
+  .featured-product__title { font-size: 32px; font-weight: bold; line-height: 1.3; margin: 0 0 20px; }
+  .featured-product__price { margin-bottom: 30px; }
+  .featured-product__price .current_price { font-size: 24px; font-weight: bold; margin-right: 12px; }
+  .featured-product__price .compare_price { font-size: 18px; text-decoration: line-through; opacity: 0.8; }
+  .featured-product__button { display: inline-block; background-color: #111; color: #fff; padding: 12px 30px; border-radius: 50px; text-decoration: none; font-weight: bold; transition: all 0.2s; }
+  .featured-product__button:hover { transform: scale(1.05); background-color: #333; color: #fff !important; }
+  .product-swiper-button-prev, .product-swiper-button-next { position: absolute; top: 50%; transform: translateY(-50%) translateY(-25px); z-index: 10; cursor: pointer; color: #111827; background-color: #FFFFFF; border: 1px solid #E5E7EB; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.2s; }
+  .product-swiper-button-prev:hover, .product-swiper-button-next:hover { background-color: #F9FAFB; transform: translateY(-50%) translateY(-25px) scale(1.05); }
+  .product-swiper-button-prev { left: calc(5vw - 50px); }
+  .product-swiper-button-next { right: calc(5vw - 50px); }
+  .product-swiper-button-prev svg, .product-swiper-button-next svg { width: 24px; height: 24px; }
+  .product-swiper-pagination { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); }
+  .product-swiper-pagination .swiper-pagination-bullet { background-color: #fff; opacity: 0.6; transition: all 0.2s; }
+  .product-swiper-pagination .swiper-pagination-bullet-active { background-color: #fff; opacity: 1; transform: scale(1.2); }
+
+  /* --- 響應式設計 --- */
+  @media (max-width: 990px) {
+    .pd2-block-group { padding-top: calc(var(--pd2-section-padding-mobile) * 0.5); padding-bottom: calc(var(--pd2-section-padding-mobile) * 0.5); }
+    .pd2-hero { flex-direction: column; padding: var(--pd2-section-padding-mobile) 0; gap: 30px; min-height: auto; }
+    .pd2-hero__content-wrapper { padding: 0 20px; flex-direction: column; text-align: center; gap: 20px; }
+    .pd2-hero .pd2-hero__text-wrapper { margin: 0; max-width: 100%; width: auto; text-align: center; align-items: center; gap: 20px;}
+    .pd2-hero__heading { font-size: 36px; line-height: 1.2; }
+    .pd2-hero__subheading { font-size: 20px; line-height: 1.4; }
+    .pd2-card-banner { padding: var(--pd2-section-padding-mobile) 20px; }
+    .pd2-card-banner__desktop-image { display: none; }
+    .pd2-card-banner__mobile-image { display: block; width: 100%; height: auto; }
+    .pd2-card-banner .pd2-hero__text-wrapper { width: 100%; }
+    .pd2-mobile-align--left .pd2-card-banner { justify-content: flex-start; }
+    .pd2-mobile-align--left .pd2-hero__text-wrapper { text-align: left; align-items: flex-start; }
+    .pd2-mobile-align--center .pd2-card-banner { justify-content: center; }
+    .pd2-mobile-align--center .pd2-hero__text-wrapper { text-align: center; align-items: center; }
+    .pd2-mobile-align--right .pd2-card-banner { justify-content: flex-end; }
+    .pd2-mobile-align--right .pd2-hero__text-wrapper { text-align: right; align-items: flex-end; }
+    .pd2-mobile-valign--flex-start .pd2-card-banner { align-items: flex-start; }
+    .pd2-mobile-valign--center .pd2-card-banner { align-items: center; }
+    .pd2-mobile-valign--flex-end .pd2-card-banner { align-items: flex-end; }
+    .pd2-image-with-text, .pd2-image-with-features, .pd2-image-with-subcards, .pd2-specs-and-image, .pd2-dual-mode-charging { flex-direction: column; gap: 30px; padding: 0; }
+    .pd2-image-with-text.layout--image-right, .pd2-image-with-features.layout--image-right, .pd2-image-with-subcards.layout--image-right, .pd2-specs-and-image.layout--image-right, .pd2-dual-mode-charging.layout--image-right { flex-direction: column; }
+    
+    .pd2-image-with-text__image-wrapper, .pd2-image-with-features__image-wrapper, .pd2-image-with-subcards__image-wrapper, .pd2-dual-mode-charging__image-wrapper {
+        width: 100%;
+        height: auto;
+        border-radius: 20px;
+    }
+    .pd2-image-with-text__image-wrapper, .pd2-image-with-features__image-wrapper, .pd2-image-with-subcards__image-wrapper {
+        aspect-ratio: 1 / 1;
+    }
+
+    .pd2-image-with-text__text-wrapper, .pd2-image-with-features__text-wrapper, .pd2-image-with-subcards__text-wrapper, .pd2-dual-mode-charging__text-wrapper { align-items: center; width: 100%; gap: 12px; }
+    .pd2-common-heading, .pd2-specs-and-image .pd2-specs-and-image__heading { text-align: center; font-size: 30px !important; line-height: 1.3 !important; margin-bottom: 0 !important; }
+    .pd2-common-subheading { text-align: center; font-size: 20px; line-height: 1.4; margin-top: 4px; }
+    .pd2-common-description { text-align: center; font-size: 16px; line-height: 1.5; margin-top: 8px; margin-bottom: 0; }
+    
+    .pd2-centered-feature .pd2-common-tag {
+      font-size: 16px; /* 修正手機版字體過大問題 */
+    }
+
+    /* 修正雙模式充電區塊手機版樣式 */
+    .pd2-dual-mode-cards {
+        flex-direction: column;
+        gap: 16px;
+    }
+    .pd2-dual-mode-charging .pd2-dual-mode-card {
+        text-align: left;
+        gap: 8px;
+    }
+    .pd2-dual-mode-charging .pd2-dual-mode-card__time-wrapper {
+        justify-content: flex-start;
+    }
+    
+    /* [重構] 圖片橫幅手機版樣式 */
+    .pd2-standalone-image-wrapper { display: flex; flex-direction: column; border-radius: 0; }
+    .pd2-standalone-image__overlay { position: static; order: -1; padding: 0 0 30px 0; }
+    .pd2-standalone-image__text-wrapper { max-width: 100%; text-align: center; align-items: center; color: var(--pd2-text-color-primary) !important; }
+    .pd2-standalone-image-wrapper .pd2-standalone-image { border-radius: var(--pd2-card-border-radius); }
+
+    /* --- 手機版響應式: 新增區塊 --- */
+    .reviews-section__content { padding: 20px; max-width: min(100% - 30px, 1440px); }
+    .reviews-section__header { flex-direction: column; align-items: flex-start; gap: 15px; padding-bottom: 20px; margin-bottom: 20px; }
+    .reviews-section__body { grid-template-columns: 1fr; gap: 30px; }
+    .reviews-list-wrapper { padding: 0; }
+    .reviews-list.swiper-container { padding-bottom: 30px; }
+    
+    /* [優化] 手機版顯示評價輪播箭頭 */
+    .review-swiper-button-prev, .review-swiper-button-next {
+      width: 32px;
+      height: 32px;
+      transform: translateY(-50%) translateY(-15px);
+    }
+    .review-swiper-button-prev { left: 5px; }
+    .review-swiper-button-next { right: 5px; }
+    .review-swiper-button-prev svg, .review-swiper-button-next svg { width: 16px; height: 16px; }
+
+    /* 商品輪播推薦手機版 */
+    .product-swiper-button-prev, .product-swiper-button-next { display: none; }
+    .featured-product__slide-content { grid-template-columns: 1fr; gap: 25px; background-color: #fff; border-radius: 24px; padding: 30px 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.07); }
+    .featured-product__image-wrapper { background-color: transparent; padding: 0; box-shadow: none; }
+    .featured-product__text-wrapper { text-align: center; color: #111; }
+    .featured-product__rating { justify-content: center; }
+    .featured-product__title { font-size: 24px; }
+  }
+</style>
+
+<div class="pd2-section-wrapper" data-section-id="{{ section.id }}">
+  {%- liquid
+    assign rendered_blocks = ''
+    assign review_blocks = section.blocks | where: "type", "customer_review"
+    assign total_reviews = review_blocks.size
+    assign total_rating = 0
+    assign five_star_count = 0
+    assign four_star_count = 0
+    assign three_star_count = 0
+    assign two_star_count = 0
+    assign one_star_count = 0
+
+    if total_reviews > 0
+      for review in review_blocks
+        assign rating_value = review.settings.rating | default: 5
+        assign total_rating = total_rating | plus: rating_value
+        case rating_value
+          when 5
+            assign five_star_count = five_star_count | plus: 1
+          when 4
+            assign four_star_count = four_star_count | plus: 1
+          when 3
+            assign three_star_count = three_star_count | plus: 1
+          when 2
+            assign two_star_count = two_star_count | plus: 1
+          when 1
+            assign one_star_count = one_star_count | plus: 1
+        endcase
+      endfor
+      assign average_rating = total_rating | times: 1.0 | divided_by: total_reviews | round: 1
+    else
+      assign average_rating = 0.0
+    endif
+    
+    assign rating_counts = "" | append: five_star_count | append: "," | append: four_star_count | append: "," | append: three_star_count | append: "," | append: two_star_count | append: "," | append: one_star_count | split: ","
+    assign review_section_rendered = false
+  -%}
+  {%- for block in section.blocks -%}
+    {%- if rendered_blocks contains block.id -%}{%- continue -%}{%- endif -%}
+    {% if review_section_rendered and block.type == 'customer_review' %}{%- continue -%}{% endif %}
+
+    <div class="pd2-block-group" style="background-color: {% if block.type != 'featured_product' %}{{ block.settings.section_bg_color | default: 'transparent' }}{% else %}transparent{% endif %}; {% if block.type == 'featured_product' %}padding: 0;{% endif %}" {{ block.shopify_attributes }}>
+      {%- comment -%} 檢查是否為滿版區塊 {% endcomment -%}
+      {%- if block.type == 'pd2_hero' or block.type == 'pd2_card_banner' or block.type == 'featured_product' -%}
+          {%- if block.type == 'pd2_hero' -%}
+            <div class="pd2-hero-wrapper">
+              <style>.pd2-hero-{{ section.id }} { background-image: url('{{ block.settings.image_desktop | image_url: width: 1920 }}'); } @media (max-width: 990px) { .pd2-hero-{{ section.id }} { background-image: url('{{ block.settings.image_mobile | image_url: width: 750 }}'); } }</style>
+              <div class="pd2-hero pd2-hero-{{ section.id }}">
+                <div class="pd2-hero__content-wrapper">
+                  <div class="pd2-hero__text-wrapper">
+                    <div>
+                      <div class="pd2-hero__heading">{{ block.settings.heading | newline_to_br }}</div>
+                      <div class="pd2-hero__subheading">{{ block.settings.subheading }}</div>
+                    </div>
+                    <div class="pd2-hero__tag">
+                      {%- if block.settings.tag_icon_image != blank -%} <img src="{{ block.settings.tag_icon_image | image_url: width: 56 }}" alt="{{ block.settings.tag_text | escape }}" width="56" height="56"> {%- else -%} <svg width="56" height="32" viewBox="0 0 56 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M49.3333 31.5H6.66667C2.9869 31.5 0 28.5131 0 24.8333V7.16667C0 3.4869 2.9869 0.5 6.66667 0.5H49.3333C53.0131 0.5 56 3.4869 56 7.16667V24.8333C56 28.5131 53.0131 31.5 49.3333 31.5Z" fill="#2BB9ED"/><path d="M12.916 10.3333H7.83268V21.6666H12.916V10.3333Z" fill="black"/><path d="M21.916 10.3333H16.8327V21.6666H21.916V10.3333Z" fill="black"/><path d="M30.916 10.3333H25.8327V21.6666H30.916V10.3333Z" fill="black"/><path d="M39.916 10.3333H34.8327V21.6666H39.916V10.3333Z" fill="black"/><path d="M51.334 13.1667V18.8333H47.0007V13.1667H51.334Z" fill="black"/></svg> {%- endif -%}
+                      <span>{{ block.settings.tag_text }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {%- elsif block.type == 'pd2_card_banner' -%}
+            <div class="pd2-card-banner-wrapper pd2-desktop-align--{{ block.settings.text_align }} pd2-desktop-valign--{{ block.settings.vertical_align }} pd2-mobile-align--{{ block.settings.mobile_text_align }} pd2-mobile-valign--{{ block.settings.mobile_vertical_align }}">
+              <img class="pd2-card-banner__desktop-image" src="{{ block.settings.image_desktop | image_url: width: 1920 }}" alt="{{ block.settings.heading | escape }}" loading="lazy">
+              <img class="pd2-card-banner__mobile-image" src="{{ block.settings.image_mobile | default: block.settings.image_desktop | image_url: width: 750 }}" alt="{{ block.settings.heading | escape }}" loading="lazy">
+              <div class="pd2-card-banner">
+                <div class="pd2-hero__text-wrapper">
+                  <div>
+                    <div class="pd2-hero__heading">{{ block.settings.heading | newline_to_br }}</div>
+                    <div class="pd2-hero__subheading">{{ block.settings.subheading }}</div>
+                  </div>
+                  {%- if block.settings.tag_text != blank -%}
+                    <div class="pd2-hero__tag">
+                      {%- if block.settings.tag_icon_image != blank -%} <img src="{{ block.settings.tag_icon_image | image_url: width: 56 }}" alt="{{ block.settings.tag_text | escape }}" width="56" height="56"> {%- else -%} <svg width="56" height="32" viewBox="0 0 56 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M49.3333 31.5H6.66667C2.9869 31.5 0 28.5131 0 24.8333V7.16667C0 3.4869 2.9869 0.5 6.66667 0.5H49.3333C53.0131 0.5 56 3.4869 56 7.16667V24.8333C56 28.5131 53.0131 31.5 49.3333 31.5Z" fill="#2BB9ED"/><path d="M12.916 10.3333H7.83268V21.6666H12.916V10.3333Z" fill="black"/><path d="M21.916 10.3333H16.8327V21.6666H21.916V10.3333Z" fill="black"/><path d="M30.916 10.3333H25.8327V21.6666H30.916V10.3333Z" fill="black"/><path d="M39.916 10.3333H34.8327V21.6666H39.916V10.3333Z" fill="black"/><path d="M51.334 13.1667V18.8333H47.0007V13.1667H51.334Z" fill="black"/></svg> {%- endif -%}
+                      <span>{{ block.settings.tag_text }}</span>
+                    </div>
+                  {%- endif -%}
+                </div>
+              </div>
+            </div>
+          {%- elsif block.type == 'featured_product' -%}
+            <div class="featured-product-section" style="background-color: {{ block.settings.background_color }};">
+              <div class="featured-product-swiper swiper-container">
+                <div class="swiper-wrapper">
+                  {%- for i in (1..5) -%}
+                    {%- capture product_id -%}product_{{ i }}{%- endcapture -%}
+                    {%- assign product_obj = block.settings[product_id] -%}
+                    {%- if product_obj != blank -%}
+                      <div class="swiper-slide">
+                        <div class="featured-product__slide-content">
+                          <div class="featured-product__image-wrapper">{%- if product_obj.featured_image != blank -%}<img class="featured-product__image" src="{{ product_obj.featured_image | image_url: width: 800 }}" alt="{{ product_obj.featured_image.alt | escape }}" loading="lazy">{%- else -%}{{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}{%- endif -%}</div>
+                          <div class="featured-product__text-wrapper">
+                            <div class="featured-product__rating">{%- capture rating_id -%}rating_{{ i }}{%- endcapture -%}{%- capture review_count_id -%}review_count_{{ i }}{%- endcapture -%}{%- assign rating_val = block.settings[rating_id] -%}{%- assign review_count_val = block.settings[review_count_id] -%}<span class="rating-score">{{ rating_val | format: '0.0' }}</span><div class="stars">{%- for j in (1..5) -%}<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.0006 18.26L4.94715 22.2082L6.52248 14.2799L0.587891 8.7918L8.61483 7.84006L12.0006 0.5L15.3864 7.84006L23.4133 8.7918L17.4787 14.2799L19.054 22.2082L12.0006 18.26Z"></path></svg>{%- endfor -%}</div><span>{{ review_count_val }} Reviews</span></div>
+                            <h2 class="featured-product__title">{{ product_obj.title }}</h2>
+                            <div class="featured-product__price">{%- assign max_compare_at_price = 0 -%}{%- for variant in product_obj.variants -%}{%- if variant.compare_at_price > max_compare_at_price -%}{%- assign max_compare_at_price = variant.compare_at_price -%}{%- endif -%}{%- endfor -%}<span class="current_price">{{ product_obj.price_max | money }}</span>{%- if max_compare_at_price > product_obj.price_max -%}<span class="compare_price">{{ max_compare_at_price | money }}</span>{%- endif -%}</div>
+                            <a href="{{ product_obj.url }}" class="featured-product__button">{{ block.settings.button_text }}</a>
+                          </div>
+                        </div>
+                      </div>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </div>
+              </div>
+              <div class="product-swiper-button-prev"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg></div>
+              <div class="product-swiper-button-next"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></div>
+              <div class="product-swiper-pagination"></div>
+            </div>
+          {%- endif -%}
+      {%- else -%}
+        {%- comment -%} 以下為非滿版、受容器限制的區塊 {% endcomment -%}
+        <div class="pd2-container">
+          {%- case block.type -%}
+            {%- when 'pd2_image_with_features' -%}
+              <div class="pd2-image-with-features layout--image-{{ block.settings.image_position }}">
+                <div class="pd2-image-with-features__image-wrapper pd2-image-wrapper" style="border-radius: {{ block.settings.image_border_radius }}px; background-color: {{ block.settings.image_bg_color }};">
+                  {%- if block.settings.image != blank -%} <img class="pd2-image-with-features__main-image" src="{{ block.settings.image | image_url: width: 624 }}" alt="{{ block.settings.image.alt | escape }}" loading="lazy"> {%- else -%} <div class="placeholder-svg">{{ 'image' | placeholder_svg_tag }}</div> {%- endif -%}
+                  {%- assign parent_index = forloop.index -%}{%- for i in (parent_index..section.blocks.size) -%}{%- assign potential_child = section.blocks[i] -%}{%- assign current_index = forloop.index0 | plus: parent_index -%}{%- if potential_child.type == 'pd2_feature_icon' -%}<div class="pd2-feature-icon" {{ potential_child.shopify_attributes }} style="--pos-top: {{ potential_child.settings.pos_top }}%; --pos-left: {{ potential_child.settings.pos_left }}%;">{%- if potential_child.settings.icon_image != blank -%}<img src="{{ potential_child.settings.icon_image | image_url: width: 113 }}" alt="{{ potential_child.settings.icon_image.alt | escape }}">{%- else -%}{{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}{%- endif -%}</div>{%- assign rendered_blocks = rendered_blocks | append: potential_child.id | append: ',' -%}{%- else -%}{%- if current_index >= parent_index %}{%- break -%}{%- endif -%}{%- endif -%}{%- endfor -%}
+                </div>
+                <div class="pd2-image-with-features__text-wrapper">
+                  {%- if block.settings.tag_text != blank -%}<div class="pd2-common-tag">{{ block.settings.tag_text }}</div>{%- endif -%}
+                  {%- if block.settings.heading != blank -%}<h2 class="pd2-common-heading">{{ block.settings.heading | newline_to_br }}</h2>{%- endif -%}
+                  {%- if block.settings.description != blank -%}<div class="pd2-common-description rte">{{ block.settings.description }}</div>{%- endif -%}
+                </div>
+              </div>
+
+            {%- when 'pd2_specs_and_image' -%}
+               <div class="pd2-specs-and-image layout--image-{{ block.settings.image_position }} {%- if block.settings.force_2x2_mobile -%}pd2-specs--mobile-2x2{%- endif -%}">
+                <div class="pd2-specs-and-image__image-wrapper pd2-image-wrapper" style="border-radius: {{ block.settings.image_border_radius }}px; background-color: {{ block.settings.image_bg_color }};">
+                  {%- if block.settings.image != blank -%}<img class="pd2-specs-and-image__image" src="{{ block.settings.image | image_url: width: 624 }}" alt="{{ block.settings.image.alt | escape }}" loading="lazy">{%- else -%}<div class="placeholder-svg">{{ 'image' | placeholder_svg_tag }}</div>{%- endif -%}
+                </div>
+                <div class="pd2-specs-and-image__specs-wrapper">
+                  <h3 class="pd2-specs-and-image__heading">{{ block.settings.heading }}</h3>
+                  <div class="pd2-specs-table">
+                    {%- assign parent_index = forloop.index -%}{%- for i in (parent_index..section.blocks.size) -%}{%- assign potential_child = section.blocks[i] -%}{%- assign current_index = forloop.index0 | plus: parent_index -%}{%- if potential_child.type == 'pd2_spec_item' -%}<div class="pd2-spec-item" {{ potential_child.shopify_attributes }}><span class="pd2-spec-item__key">{{ potential_child.settings.key }}</span><span class="pd2-spec-item__value">{{ potential_child.settings.value }}</span></div>{%- assign rendered_blocks = rendered_blocks | append: potential_child.id | append: ',' -%}{%- else -%}{%- if current_index >= parent_index %}{%- break -%}{%- endif -%}{%- endif -%}{%- endfor -%}
+                  </div>
+                </div>
+              </div>
+
+            {%- when 'pd2_image_with_text', 'pd2_image_with_subcards' -%}
+              <div class="{% if block.type == 'pd2_image_with_text' %}pd2-image-with-text{% else %}pd2-image-with-subcards{% endif %} layout--image-{{ block.settings.image_position }}">
+                <div class="{% if block.type == 'pd2_image_with_text' %}pd2-image-with-text__image-wrapper{% else %}pd2-image-with-subcards__image-wrapper{% endif %} pd2-image-wrapper" style="border-radius: {{ block.settings.image_border_radius }}px; background-color: {{ block.settings.image_bg_color }};">
+                  {%- if block.settings.image != blank -%}<img src="{{ block.settings.image | image_url: width: 624 }}" alt="{{ block.settings.image.alt | escape }}" loading="lazy">{%- else -%}<div class="placeholder-svg">{{ 'image' | placeholder_svg_tag }}</div>{%- endif -%}
+                </div>
+                <div class="{% if block.type == 'pd2_image_with_text' %}pd2-image-with-text__text-wrapper{% else %}pd2-image-with-subcards__text-wrapper{% endif %}">
+                  {%- if block.settings.tag_text != blank -%}<div class="pd2-common-tag">{{ block.settings.tag_text }}</div>{%- endif -%}
+                  {%- if block.settings.heading != blank -%}<h2 class="pd2-common-heading">{{ block.settings.heading | newline_to_br }}</h2>{%- endif -%}
+                  {%- if block.settings.subheading != blank -%}<h3 class="pd2-common-subheading">{{ block.settings.subheading }}</h3>{%- endif -%}
+                  {%- if block.settings.description != blank -%}<div class="pd2-common-description rte">{{ block.settings.description }}</div>{%- endif -%}
+                  {%- if block.settings.feature_list != blank -%}<div class="pd2-features-list rte">{{ block.settings.feature_list }}</div>{%- endif -%}
+                  {%- if block.type == 'pd2_image_with_subcards' -%}{%- assign parent_index = forloop.index -%}{%- assign child_blocks_rendered = false -%}{%- assign open_wrapper = '' -%}{%- for i in (parent_index..section.blocks.size) -%}{%- assign potential_child = section.blocks[i] -%}{%- assign current_index = forloop.index0 | plus: parent_index -%}{%- assign valid_child_types = 'pd2_charging_info,pd2_dual_mode_card,pd2_safety_icon' -%}{%- if valid_child_types contains potential_child.type -%}{%- unless child_blocks_rendered -%}{%- assign child_blocks_rendered = true -%}{%- if potential_child.type == 'pd2_safety_icon' -%}<div class="pd2-safety-icons">{%- assign open_wrapper = 'safety' %}{%- endif -%}{%- if potential_child.type == 'pd2_dual_mode_card' -%}<div class="pd2-dual-mode-cards">{%- assign open_wrapper = 'dual_mode' %}{%- endif -%}{%- endunless -%}{%- if potential_child.type == 'pd2_charging_info' -%}<div class="pd2-charging-info {% if potential_child.settings.card_image != blank %}pd2-charging-info--has-image{% endif %}" {{ potential_child.shopify_attributes }}>{%- if potential_child.settings.card_image != blank -%}<img class="pd2-charging-info__image" src="{{ potential_child.settings.card_image | image_url: width: 600 }}" alt="{{ potential_child.settings.card_image.alt | escape }}" loading="lazy">{%- else -%}<div class="pd2-charging-info__content-wrapper"><div class="pd2-charging-info__row-1"><div class="pd2-charging-info__row-1-title"><span class="text">{{ potential_child.settings.title_line1 | newline_to_br }}</span><span class="symbol">{{ potential_child.settings.symbol }}</span><span class="number">{{ potential_child.settings.number }}</span><span class="time">{{ potential_child.settings.time_unit }}</span></div><p class="pd2-charging-info__subtitle">{{ potential_child.settings.subtitle }}</p></div><div class="pd2-charging-info__row-2"><div class="pd2-charging-info__row-2-text rte">{{ potential_child.settings.description_line2 }}</div></div></div>{%- endif -%}</div>{%- endif -%}{%- if potential_child.type == 'pd2_dual_mode_card' and open_wrapper == 'dual_mode' -%}<div class="pd2-dual-mode-card" {{ potential_child.shopify_attributes }}><h4 class="pd2-dual-mode-card__title">{{ potential_child.settings.title }}</h4><div class="pd2-dual-mode-card__time-wrapper"><span class="text">{{ potential_child.settings.time_prefix }}</span><span class="number">{{ potential_child.settings.time_value }}</span><span class="text">{{ potential_child.settings.time_suffix }}</span></div><p class="pd2-dual-mode-card__description">{{ potential_child.settings.description }}</p></div>{%- endif -%}{%- if potential_child.type == 'pd2_safety_icon' and open_wrapper == 'safety' -%}<div class="pd2-safety-icon" {{ potential_child.shopify_attributes }}><div class="pd2-safety-icon__icon-wrapper">{%- if potential_child.settings.icon_image != blank -%}<img class="pd2-safety-icon__icon" src="{{ potential_child.settings.icon_image | image_url: width: 48 }}" alt="{{ potential_child.settings.icon_image.alt | escape }}">{%- else -%}{{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}{%- endif -%}</div><p class="pd2-safety-icon__text">{{ potential_child.settings.text | newline_to_br }}</p></div>{%- endif -%}{%- assign rendered_blocks = rendered_blocks | append: potential_child.id | append: ',' -%}{%- else -%}{%- if current_index >= parent_index %}{%- break -%}{%- endif -%}{%- endif -%}{%- endfor -%}{%- if open_wrapper != '' %}</div>{%- endif -%}{%- endif -%}
+                </div>
+              </div>
+
+            {%- when 'pd2_dual_mode_charging' -%}
+              <div class="pd2-dual-mode-charging layout--image-{{ block.settings.image_position }}">
+                <div class="pd2-dual-mode-charging__image-wrapper pd2-image-wrapper">{%- if block.settings.image != blank -%}<img src="{{ block.settings.image | image_url: width: 624 }}" alt="{{ block.settings.image.alt | escape }}" loading="lazy">{%- else -%}<div class="placeholder-svg">{{ 'image' | placeholder_svg_tag }}</div>{%- endif -%}</div>
+                <div class="pd2-dual-mode-charging__text-wrapper">
+                  {%- if block.settings.tag_text != blank -%}<div class="pd2-common-tag">{{ block.settings.tag_text }}</div>{%- endif -%}
+                  {%- if block.settings.heading != blank -%}<h2 class="pd2-common-heading">{{ block.settings.heading | newline_to_br }}</h2>{%- endif -%}
+                  {%- if block.settings.subheading != blank -%}<h3 class="pd2-common-subheading">{{ block.settings.subheading }}</h3>{%- endif -%}
+                  <div class="pd2-dual-mode-cards">
+                    <div class="pd2-dual-mode-card"><h4 class="pd2-dual-mode-card__title">{{ block.settings.card1_title }}</h4><div class="pd2-dual-mode-card__time-wrapper"><span class="text">{{ block.settings.card1_time_prefix }}</span><span class="number">{{ block.settings.card1_time_value }}</span><span class="text">{{ block.settings.card1_time_suffix }}</span></div><p class="pd2-dual-mode-card__description">{{ block.settings.card1_description }}</p></div>
+                    <div class="pd2-dual-mode-card"><h4 class="pd2-dual-mode-card__title">{{ block.settings.card2_title }}</h4><div class="pd2-dual-mode-card__time-wrapper"><span class="text">{{ block.settings.card2_time_prefix }}</span><span class="number">{{ block.settings.card2_time_value }}</span><span class="text">{{ block.settings.card2_time_suffix }}</span></div><p class="pd2-dual-mode-card__description">{{ block.settings.card2_description }}</p></div>
+                  </div>
+                </div>
+              </div>
+
+            {%- when 'pd2_centered_feature' -%}
+              <div class="pd2-centered-feature">
+                {%- if block.settings.tag_text != blank -%}<div class="pd2-common-tag">{{ block.settings.tag_text }}</div>{%- endif -%}
+                {%- if block.settings.heading != blank -%}<h2 class="pd2-common-heading">{{ block.settings.heading | newline_to_br }}</h2>{%- endif -%}
+                {%- if block.settings.subheading != blank -%}<h3 class="pd2-common-subheading">{{ block.settings.subheading }}</h3>{%- endif -%}
+                {%- if block.settings.description != blank -%}<div class="pd2-common-description rte">{{ block.settings.description }}</div>{%- endif -%}
+                {%- if block.settings.feature_list != blank -%}<div class="pd2-features-list rte">{{ block.settings.feature_list }}</div>{%- endif -%}
+              </div>
+
+            {%- when 'pd2_standalone_image' -%}
+              {%- liquid
+                assign has_text_content = false
+                if block.settings.tag_text != blank or block.settings.heading != blank or block.settings.subheading != blank or block.settings.description != blank
+                  assign has_text_content = true
+                endif
+              -%}
+              <div class="pd2-standalone-image-wrapper pd2-desktop-align--{{ block.settings.text_align }} pd2-desktop-valign--{{ block.settings.vertical_align }}">
+                <picture>
+                  {%- if block.settings.image_mobile != blank -%}
+                    <source media="(max-width: 990px)" srcset="{{ block.settings.image_mobile | image_url: width: 750 }}">
+                  {%- endif -%}
+                  <img
+                    class="pd2-standalone-image"
+                    src="{{ block.settings.image | image_url: width: 1440 }}"
+                    alt="{{ block.settings.image.alt | default: block.settings.heading | escape }}"
+                    loading="lazy">
+                </picture>
+
+                {%- if has_text_content -%}
+                  <div class="pd2-standalone-image__overlay">
+                    <div class="pd2-standalone-image__text-wrapper" style="color: {{ block.settings.text_color }};">
+                      {%- if block.settings.tag_text != blank -%}<div class="pd2-common-tag">{{ block.settings.tag_text }}</div>{%- endif -%}
+                      {%- if block.settings.heading != blank -%}<h2 class="pd2-common-heading">{{ block.settings.heading | newline_to_br }}</h2>{%- endif -%}
+                      {%- if block.settings.subheading != blank -%}<h3 class="pd2-common-subheading">{{ block.settings.subheading }}</h3>{%- endif -%}
+                      {%- if block.settings.description != blank -%}<div class="pd2-common-description rte">{{ block.settings.description }}</div>{%- endif -%}
+                    </div>
+                  </div>
+                {%- endif -%}
+              </div>
+
+            {%- when 'review_summary' -%}
+              <div class="reviews-section-wrapper">
+                <div class="reviews-section__content">
+                  <div class="reviews-section__header">
+                    <h2 class="reviews-section__title">{{ block.settings.title }}</h2>
+                    {%- if block.settings.write_review_link != blank -%}
+                      <a href="{{ block.settings.write_review_link }}" class="reviews-section__write-review-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
+                        <span>{{ block.settings.write_review_text }}</span>
+                      </a>
+                    {%- else -%}
+                      <button class="reviews-section__write-review-btn" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
+                        <span>{{ block.settings.write_review_text }}</span>
+                      </button>
+                    {%- endif -%}
+                  </div>
+                  <div class="reviews-section__body">
+                    <div class="reviews-summary">
+                      <div class="reviews-summary__average-box">
+                        <div class="reviews-summary__average-score">{{ average_rating | format: '0.0' }}</div>
+                        <div class="reviews-summary__average-details">
+                          <div class="reviews-summary__average-stars">
+                            ★★★★★
+                            {%- assign average_percentage = average_rating | times: 20.0 -%}
+                            <div class="reviews-summary__average-stars-filled" style="width: {{ average_percentage }}%;">★★★★★</div>
+                          </div>
+                          <div class="reviews-summary__total">{{ total_reviews }} reviews</div>
+                        </div>
+                      </div>
+                      <div class="reviews-summary__breakdown-box">
+                         {% for i in (1..5) reversed %}
+                           {% assign star_index = 5 | minus: i %}{% assign count = rating_counts[star_index] %}
+                           {% if total_reviews > 0 %}{% assign percentage = count | times: 100.0 | divided_by: total_reviews %}{% else %}{% assign percentage = 0 %}{% endif %}
+                           <div class="reviews-summary__breakdown-item">
+                             <span class="star-rating">{{ i }} <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg></span>
+                             <div class="progress-bar"><div class="progress-bar__fill" style="width: {{ percentage }}%;"></div></div>
+                             <span class="reviews-summary__breakdown-count">{{ count }}</span>
+                           </div>
+                         {% endfor %}
+                      </div>
+                    </div>
+                    <div class="reviews-list-wrapper">
+                      <div class="reviews-list swiper-container {% if total_reviews == 0 %}reviews-list--no-reviews{% endif %}">
+                        <div class="swiper-wrapper">
+                          {%- if total_reviews > 0 -%}
+                            {%- for review_block in review_blocks -%}
+                                <div class="swiper-slide">
+                                  <div class="review-card" {{ review_block.shopify_attributes }}>
+                                    <div class="review-card__header">
+                                       <div class="star-rating">
+                                        {%- for i in (1..review_block.settings.rating) -%}<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>{%- endfor -%}
+                                       </div>
+                                       {%- if review_block.settings.is_verified -%}
+                                         <span class="review-card__verified-badge">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+                                            <span>Verified Purchase</span>
+                                         </span>
+                                       {%- endif -%}
+                                    </div>
+                                    {%- if review_block.settings.title != blank -%}<h3 class="review-card__title">{{ review_block.settings.title }}</h3>{%- endif -%}
+                                    <div class="review-card__content">{{ review_block.settings.content }}</div>
+                                    <p class="review-card__author-date">{{ review_block.settings.author }}{% if review_block.settings.date != blank %} • {{ review_block.settings.date }}{% endif %}</p>
+                                  </div>
+                                </div>
+                            {%- endfor -%}
+                          {%- else -%}
+                             <p>{{ block.settings.no_reviews_text }}</p>
+                          {%- endif -%}
+                        </div>
+                      </div>
+                      {% if total_reviews > 1 %}
+                        <div class="review-swiper-button-prev">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                        </div>
+                        <div class="review-swiper-button-next">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                        </div>
+                        <div class="review-swiper-pagination"></div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% assign review_section_rendered = true %}
+
+            {%- when 'customer_review' -%}
+              {%- comment -%} This block is a data source for 'review_summary' and does not render independently. {%- endcomment -%}
+          {%- endcase -%}
+        </div>
+      {%- endif -%}
+    </div>
+    {%- assign rendered_blocks = rendered_blocks | append: block.id | append: ',' -%}
+  {%- endfor -%}
+</div>
+
+<script>
+  function initReviewSwiper(sectionId) {
+    const swiperElement = document.querySelector(`[data-section-id="${sectionId}"] .reviews-list.swiper-container`);
+    const totalSlides = {{ total_reviews | default: 0 }};
+    if (swiperElement && !swiperElement.swiper && totalSlides > 0) {
+      new Swiper(swiperElement, {
+        loop: totalSlides > 1,
+        autoHeight: true,
+        spaceBetween: 20,
+        navigation: {
+          nextEl: `[data-section-id="${sectionId}"] .review-swiper-button-next`,
+          prevEl: `[data-section-id="${sectionId}"] .review-swiper-button-prev`,
+        },
+        pagination: {
+          el: `[data-section-id="${sectionId}"] .review-swiper-pagination`,
+          clickable: true,
+        },
+      });
+    }
+  }
+
+  function initProductSwiper(sectionId) {
+    const swiperElement = document.querySelector(`[data-section-id="${sectionId}"] .featured-product-swiper.swiper-container`);
+    if (swiperElement && !swiperElement.swiper) {
+      const slideCount = swiperElement.querySelectorAll('.swiper-slide').length;
+      if (slideCount > 0) {
+        new Swiper(swiperElement, {
+          loop: slideCount > 1,
+          slidesPerView: 1,
+          spaceBetween: 30,
+          navigation: {
+            nextEl: `[data-section-id="${sectionId}"] .product-swiper-button-next`,
+            prevEl: `[data-section-id="${sectionId}"] .product-swiper-button-prev`,
+          },
+          pagination: {
+            el: `[data-section-id="${sectionId}"] .product-swiper-pagination`,
+            clickable: true,
+          },
+        });
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const sectionId = '{{ section.id }}';
+    initReviewSwiper(sectionId);
+    initProductSwiper(sectionId);
+  });
+
+  document.addEventListener('shopify:section:load', function (event) {
+    if (event.detail.sectionId === '{{ section.id }}') {
+      initReviewSwiper(event.detail.sectionId);
+      initProductSwiper(event.detail.sectionId);
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "產品描述 4.0 + 評價/推薦",
+  "tag": "section",
+  "class": "product-description-4-0",
+  "max_blocks": 70,
+  "blocks": [
+    {
+      "type": "pd2_hero",
+      "name": "⭐️ 主要橫幅 (Hero)",
+      "limit": 1,
+      "settings": [
+        { "type": "textarea", "id": "heading", "label": "主標題", "default": "Space Capsule Power Bank", "info": "在此處使用 Enter 鍵可以換行" },
+        { "type": "text", "id": "subheading", "label": "副標題", "default": "The ultimate form of pocket charging" },
+        { "type": "text", "id": "tag_text", "label": "標籤文字", "default": "5,000mAh" },
+        { "type": "image_picker", "id": "tag_icon_image", "label": "標籤圖示 (Tag Icon)", "info": "建議尺寸 56x56 px。若留空，將會顯示預設圖示。" },
+        { "type": "image_picker", "id": "image_desktop", "label": "桌面端背景圖片 (Desktop)" },
+        { "type": "image_picker", "id": "image_mobile", "label": "行动端背景图片 (Mobile)" }
+      ]
+    },
+    {
+      "type": "pd2_card_banner",
+      "name": "⭐️ 卡片式橫幅 (Card Banner)",
+      "settings": [
+        { "type": "header", "content": "內容設定" },
+        { "type": "textarea", "id": "heading", "label": "主標題", "default": "Card Banner Heading", "info": "在此處使用 Enter 鍵可以換行" },
+        { "type": "text", "id": "subheading", "label": "副標題", "default": "This is a reusable banner card." },
+        { "type": "text", "id": "tag_text", "label": "標籤文字", "default": "Feature" },
+        { "type": "image_picker", "id": "tag_icon_image", "label": "標籤圖示 (Tag Icon)", "info": "建議尺寸 56x56 px。若留空，將會顯示預設圖示。" },
+        { "type": "header", "content": "桌面版對齊方式" },
+        { "type": "select", "id": "text_align", "label": "水平對齊", "options": [{ "value": "left", "label": "靠左" }, { "value": "center", "label": "置中" }, { "value": "right", "label": "靠右" }], "default": "left" },
+        { "type": "select", "id": "vertical_align", "label": "垂直對齊", "options": [{ "value": "flex-start", "label": "靠上" }, { "value": "center", "label": "置中" }, { "value": "flex-end", "label": "靠下" }], "default": "center" },
+        { "type": "header", "content": "手機版對齊方式 (Mobile Alignment)" },
+        { "type": "select", "id": "mobile_text_align", "label": "水平對齊 (手機)", "options": [ { "value": "left", "label": "靠左" }, { "value": "center", "label": "置中" }, { "value": "right", "label": "靠右" } ], "default": "center" },
+        { "type": "select", "id": "mobile_vertical_align", "label": "垂直對齊 (手機)", "options": [ { "value": "flex-start", "label": "靠上" }, { "value": "center", "label": "置中" }, { "value": "flex-end", "label": "靠下" } ], "default": "center" },
+        { "type": "header", "content": "背景圖片" },
+        { "type": "image_picker", "id": "image_desktop", "label": "桌面端背景圖片 (Desktop)" },
+        { "type": "image_picker", "id": "image_mobile", "label": "行动端背景图片 (Mobile)", "info": "這張圖片在手機上會根據原始比例顯示。如果未上傳，會使用桌面版圖片。" }
+      ]
+    },
+    {
+      "type": "pd2_image_with_features",
+      "name": "⭐️ 圖文 (帶浮動圖示)",
+      "settings": [
+        { "type": "paragraph", "content": "請在其下方新增「子: 浮動圖示」區塊。" },
+        { "type": "select", "id": "image_position", "label": "圖片位置", "options": [{ "value": "left", "label": "左側" }, { "value": "right", "label": "右側" }], "default": "right" },
+        { "type": "color", "id": "section_bg_color", "label": "区段背景颜色", "default": "rgba(0,0,0,0)" },
+        { "type": "image_picker", "id": "image", "label": "主圖片" },
+        { "type": "color", "id": "image_bg_color", "label": "圖片背景顏色", "default": "#f0f8ff" },
+        { "type": "range", "id": "image_border_radius", "label": "圖片圓角", "min": 0, "max": 50, "step": 1, "unit": "px", "default": 40 },
+        { "type": "header", "content": "文字內容" },
+        { "type": "text", "id": "tag_text", "label": "小標籤", "default": "Unfold" },
+        { "type": "textarea", "id": "heading", "label": "標題", "default": "Challenge the Limits\of Existing Products" },
+        { "type": "richtext", "id": "description", "label": "描述", "default": "<p>Shrink and Combine</p>" }
+      ]
+    },
+    { "type": "pd2_feature_icon", "name": "子: 浮動圖示", "settings": [ { "type": "image_picker", "id": "icon_image", "label": "小圖示圖片" }, { "type": "range", "id": "pos_top", "label": "垂直位置 (Top %)", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 50 }, { "type": "range", "id": "pos_left", "label": "水平位置 (Left %)", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 50 } ] },
+    {
+      "type": "pd2_specs_and_image",
+      "name": "⭐️ 規格表 + 圖片",
+       "settings": [
+        { "type": "paragraph", "content": "請在其下方新增「子: 規格項目」區塊。" },
+        { "type": "select", "id": "image_position", "label": "圖片位置", "options": [{ "value": "left", "label": "左側" }, { "value": "right", "label": "右側" }], "default": "right" },
+        { "type": "color", "id": "section_bg_color", "label": "区段背景颜色", "default": "rgba(0,0,0,0)" },
+        { "type": "text", "id": "heading", "label": "區塊標題", "default": "Detailed Description" },
+        { "type": "image_picker", "id": "image", "label": "圖片" },
+        { "type": "color", "id": "image_bg_color", "label": "圖片背景顏色", "default": "#f7f7f7" },
+        { "type": "range", "id": "image_border_radius", "label": "圖片圓角", "min": 0, "max": 50, "step": 1, "unit": "px", "default": 40 },
+        { "type": "checkbox", "id": "force_2x2_mobile", "label": "手機版強制顯示 2x2 網格", "info": "勾選此項後，在手機上此區塊的規格表將會以兩欄顯示，而非預設的單欄置中。", "default": false }
+      ]
+    },
+    { "type": "pd2_spec_item", "name": "子: 規格項目", "settings": [ { "type": "text", "id": "key", "label": "規格名稱", "default": "Lightning Head Output" }, { "type": "text", "id": "value", "label": "規格值", "default": "5V - 2.1A" } ] },
+    {
+      "type": "pd2_image_with_text",
+      "name": "⭐️ 圖文 (通用)",
+      "settings": [
+        { "type": "select", "id": "image_position", "label": "圖片位置", "options": [{ "value": "left", "label": "左側" }, { "value": "right", "label": "右側" }], "default": "left" },
+        { "type": "color", "id": "section_bg_color", "label": "区段背景颜色", "default": "rgba(0,0,0,0)" },
+        { "type": "image_picker", "id": "image", "label": "圖片" },
+        { "type": "color", "id": "image_bg_color", "label": "圖片背景顏色", "default": "#f7f7f7" },
+        { "type": "range", "id": "image_border_radius", "label": "圖片圓角", "min": 0, "max": 50, "step": 1, "unit": "px", "default": 40 },
+        { "type": "header", "content": "文字內容" },
+        { "type": "text", "id": "tag_text", "label": "小標籤" },
+        { "type": "textarea", "id": "heading", "label": "標題" },
+        { "type": "text", "id": "subheading", "label": "副標題 (可選)" },
+        { "type": "richtext", "id": "description", "label": "描述" },
+        { "type": "richtext", "id": "feature_list", "label": "特色列表 (可選)", "info": "範例：<p><strong>1</strong> <em>+</em> <span>Built-in Head</span></p>" }
+      ]
+    },
+    {
+      "type": "pd2_image_with_subcards",
+      "name": "⭐️ 圖文 (帶子卡片)",
+      "settings": [
+        { "type": "paragraph", "content": "如果圖文下方需要放置【卡片式】子項目 (如充電信息、安全圖標等)，請使用此區塊作為父層。" },
+        { "type": "select", "id": "image_position", "label": "圖片位置", "options": [{ "value": "left", "label": "左側" }, { "value": "right", "label": "右側" }], "default": "left" },
+        { "type": "color", "id": "section_bg_color", "label": "区段背景颜色", "default": "rgba(0,0,0,0)" },
+        { "type": "image_picker", "id": "image", "label": "圖片" },
+        { "type": "color", "id": "image_bg_color", "label": "圖片背景顏色", "default": "#f7f7f7" },
+        { "type": "range", "id": "image_border_radius", "label": "圖片圓角", "min": 0, "max": 50, "step": 1, "unit": "px", "default": 40 },
+        { "type": "header", "content": "文字內容" },
+        { "type": "text", "id": "tag_text", "label": "小標籤" },
+        { "type": "textarea", "id": "heading", "label": "標題" },
+        { "type": "text", "id": "subheading", "label": "副標題 (可選)" },
+        { "type": "richtext", "id": "description", "label": "描述" },
+        { "type": "richtext", "id": "feature_list", "label": "特色列表 (可選)", "info": "此區塊同樣支持特色列表。" }
+      ]
+    },
+    {
+      "type": "pd2_dual_mode_charging",
+      "name": "⭐️ 雙模式充電 (圖文)",
+      "settings": [
+        { "type": "select", "id": "image_position", "label": "圖片位置", "options": [{ "value": "left", "label": "左側" }, { "value": "right", "label": "右側" }], "default": "left" },
+        { "type": "color", "id": "section_bg_color", "label": "区段背景颜色", "default": "rgba(0,0,0,0)" },
+        { "type": "image_picker", "id": "image", "label": "主圖片" },
+        { "type": "color", "id": "image_bg_color", "label": "圖片背景顏色", "default": "#f7f7f7" },
+        { "type": "range", "id": "image_border_radius", "label": "圖片圓角", "min": 0, "max": 50, "step": 1, "unit": "px", "default": 40 },
+        { "type": "header", "content": "右側文字內容" },
+        { "type": "text", "id": "tag_text", "label": "小標籤", "default": "Easy to Charge" },
+        { "type": "textarea", "id": "heading", "label": "標題", "default": "Dual Mode Battery Life For Instant Full Charge Level" },
+        { "type": "text", "id": "subheading", "label": "副標題", "default": "AC plug and Type-C port to ensure full power at all times." },
+        { "type": "header", "content": "卡片一 (左)" },
+        { "type": "text", "id": "card1_title", "label": "卡片標題", "default": "Charge with AC Plug" },
+        { "type": "text", "id": "card1_time_prefix", "label": "時間前綴", "default": "About" },
+        { "type": "text", "id": "card1_time_value", "label": "時間值", "default": "4-5" },
+        { "type": "text", "id": "card1_time_suffix", "label": "時間後綴", "default": "hours" },
+        { "type": "text", "id": "card1_description", "label": "卡片描述", "default": "Charges after plugging into socket" },
+        { "type": "header", "content": "卡片二 (右)" },
+        { "type": "text", "id": "card2_title", "label": "卡片標題", "default": "Charge via Type-C Port" },
+        { "type": "text", "id": "card2_time_prefix", "label": "時間前綴", "default": "About" },
+        { "type": "text", "id": "card2_time_value", "label": "時間值", "default": "1-2" },
+        { "type": "text", "id": "card2_time_suffix", "label": "時間後綴", "default": "hours" },
+        { "type": "text", "id": "card2_description", "label": "Charges with charger and cable" }
+      ]
+    },
+    {
+      "type": "pd2_charging_info",
+      "name": "子: 充電信息卡片",
+      "settings": [
+        { "type": "image_picker", "id": "card_image", "label": "卡片图片 (优先)", "info": "如果上传了此图片，下方的所有文字设置将被忽略，会直接显示这张图片。" },
+        { "type": "header", "content": "文字内容 (无图片时显示)" },
+        { "type": "textarea", "id": "title_line1", "label": "标题第一行", "default": "Mobile Phone\nCharging" },
+        { "type": "text", "id": "symbol", "label": "符号", "default": "≥" },
+        { "type": "text", "id": "number", "label": "数字", "default": "1" },
+        { "type": "text", "id": "time_unit", "label": "时间单位", "default": "time" },
+        { "type": "text", "id": "subtitle", "label": "副标题", "default": "Take iPhone 15 for example" },
+        { "type": "html", "id": "description_line2", "label": "描述第二行", "default": "Charge the device from <strong>20%-100%</strong> about ≥ <strong>time</strong> when fully charged" }
+      ]
+    },
+    { "type": "pd2_safety_icon", "name": "子: 安全圖標", "settings": [ { "type": "image_picker", "id": "icon_image", "label": "圖標圖片" }, { "type": "textarea", "id": "text", "label": "圖標下方文字", "default": "Overheat\nProtection", "info": "使用換行符 (Enter 鍵) 來分行" } ] },
+    {
+      "type": "pd2_centered_feature",
+      "name": "⭐️ 置中特色文字",
+      "settings": [
+        { "type": "color", "id": "section_bg_color", "label": "区段背景颜色", "default": "rgba(0,0,0,0)" },
+        { "type": "text", "id": "tag_text", "label": "小標籤" },
+        { "type": "textarea", "id": "heading", "label": "標題", "info": "在此處使用 Enter 鍵可以換行" },
+        { "type": "text", "id": "subheading", "label": "副標題 (可選)" },
+        { "type": "richtext", "id": "description", "label": "描述" },
+        { "type": "richtext", "id": "feature_list", "label": "特色列表 (可選)", "info": "用於『同時充電』等大標題佈局。範例：<p><strong>1</strong><span>Built-in Head</span><em>+</em><strong>1</strong><span>Output Port</span></p>" }
+      ]
+    },
+    {
+      "type": "pd2_standalone_image",
+      "name": "⭐️ 圖片橫幅 (可疊加文字)",
+      "settings": [
+        { "type": "color", "id": "section_bg_color", "label": "区段背景颜色", "default": "rgba(0,0,0,0)" },
+        { "type": "header", "content": "文字內容 (可選)" },
+        { "type": "text", "id": "tag_text", "label": "小標籤" },
+        { "type": "textarea", "id": "heading", "label": "標題" },
+        { "type": "text", "id": "subheading", "label": "副標題" },
+        { "type": "richtext", "id": "description", "label": "描述" },
+        { "type": "color", "id": "text_color", "label": "文字顏色", "default": "#121212" },
+        { "type": "header", "content": "桌面版對齊方式" },
+        { "type": "select", "id": "text_align", "label": "水平對齊", "options": [{ "value": "left", "label": "靠左" }, { "value": "center", "label": "置中" }, { "value": "right", "label": "靠右" }], "default": "left" },
+        { "type": "select", "id": "vertical_align", "label": "垂直對齊", "options": [{ "value": "flex-start", "label": "靠上" }, { "value": "center", "label": "置中" }, { "value": "flex-end", "label": "靠下" }], "default": "center" },
+        { "type": "header", "content": "圖片設定" },
+        { "type": "image_picker", "id": "image", "label": "圖片 (桌面版)" },
+        { "type": "image_picker", "id": "image_mobile", "label": "手機版圖片 (可選)", "info": "如果留空，手機將會顯示桌面版圖片。" }
+      ]
+    },
+    {
+      "type": "review_summary",
+      "name": "🚀 評價區塊 (容器)",
+      "limit": 1,
+      "settings": [
+        { "type": "paragraph", "content": "請先新增此區塊，它會自動抓取下方的「└ 評價項目」並以輪播方式顯示。" },
+        { "type": "text", "id": "title", "label": "區塊標題", "default": "Customer Reviews" },
+        { "type": "text", "id": "write_review_text", "label": "撰寫評價按鈕文字", "default": "Write a review" },
+        {
+          "type": "url",
+          "id": "write_review_link",
+          "label": "撰寫評價按鈕連結",
+          "info": "請在此貼上評價 App 提供的表單連結或錨點連結 (例如: #judgeme_review_form)。如果留空，按鈕將不可點擊。"
+        },
+        { "type": "text", "id": "no_reviews_text", "label": "沒有評價時的提示文字", "default": "No reviews yet. Be the first to share your thoughts!" }
+      ]
+    },
+    {
+      "type": "customer_review",
+      "name": "  └ 評價項目",
+      "settings": [
+        { "type": "paragraph", "content": "此區塊為「評價區塊(容器)」的資料來源，請務必新增在容器下方。" },
+        { "type": "range", "id": "rating", "min": 1, "max": 5, "step": 1, "label": "星級評分", "default": 5 },
+        { "type": "text", "id": "author", "label": "評論者姓名", "default": "Customer Name" },
+        { "type": "text", "id": "title", "label": "評論標題 (選填)" },
+        { "type": "textarea", "id": "content", "label": "評論內容", "default": "This is a great product! Highly recommended." },
+        { "type": "text", "id": "date", "label": "評論日期 (選填)", "default": "2023-10-27" },
+        { "type": "checkbox", "id": "is_verified", "label": "是否為已驗證購買?", "default": true }
+      ]
+    },
+    {
+      "type": "featured_product",
+      "name": "🚀 商品輪播推薦",
+      "limit": 1,
+      "settings": [
+        { "type": "header", "content": "一般設定" },
+        { "type": "color", "id": "background_color", "label": "背景顏色", "default": "#34b4e7" },
+        { "type": "text", "id": "button_text", "label": "按鈕文字", "default": "Buy Now" },
+        { "type": "header", "content": "商品 1 設定" },
+        { "type": "product", "id": "product_1", "label": "選擇商品 1" },
+        { "type": "range", "id": "rating_1", "min": 1, "max": 5, "step": 0.1, "label": "商品 1 星級評分", "default": 5.0, "unit": "星" },
+        { "type": "number", "id": "review_count_1", "label": "商品 1 評論數量", "default": 3 },
+        { "type": "header", "content": "商品 2 設定 (選填)" },
+        { "type": "product", "id": "product_2", "label": "選擇商品 2" },
+        { "type": "range", "id": "rating_2", "min": 1, "max": 5, "step": 0.1, "label": "商品 2 星級評分", "default": 4.8, "unit": "星" },
+        { "type": "number", "id": "review_count_2", "label": "商品 2 評論數量", "default": 12 },
+        { "type": "header", "content": "商品 3 設定 (選填)" },
+        { "type": "product", "id": "product_3", "label": "選擇商品 3" },
+        { "type": "range", "id": "rating_3", "min": 1, "max": 5, "step": 0.1, "label": "商品 3 星級評分", "default": 4.9, "unit": "星" },
+        { "type": "number", "id": "review_count_3", "label": "商品 3 評論數量", "default": 8 },
+        { "type": "header", "content": "商品 4 設定 (選填)" },
+        { "type": "product", "id": "product_4", "label": "選擇商品 4" },
+        { "type": "range", "id": "rating_4", "min": 1, "max": 5, "step": 0.1, "label": "商品 4 星級評分", "default": 5.0, "unit": "星" },
+        { "type": "number", "id": "review_count_4", "label": "商品 4 評論數量", "default": 5 },
+        { "type": "header", "content": "商品 5 設定 (選填)" },
+        { "type": "product", "id": "product_5", "label": "選擇商品 5" },
+        { "type": "range", "id": "rating_5", "min": 1, "max": 5, "step": 0.1, "label": "商品 5 星級評分", "default": 4.7, "unit": "星" },
+        { "type": "number", "id": "review_count_5", "label": "商品 5 評論數量", "default": 15 }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "產品描述 4.0 + 評價/推薦",
+      "blocks": [
+        { "type": "pd2_hero" },
+        { "type": "pd2_image_with_features" },
+        { "type": "pd2_feature_icon", "settings": { "pos_top": 22, "pos_left": 15 }},
+        { "type": "pd2_feature_icon", "settings": { "pos_top": 45, "pos_left": 8 }},
+        { "type": "pd2_feature_icon", "settings": { "pos_top": 78, "pos_left": 85 }},
+        { "type": "pd2_specs_and_image", "settings": {"image_position": "left"} },
+        { "type": "pd2_spec_item" },
+        { "type": "pd2_spec_item" },
+        { "type": "pd2_spec_item" },
+        { "type": "pd2_spec_item" },
+        { "type": "pd2_image_with_text" },
+        { "type": "pd2_image_with_subcards" },
+        { "type": "pd2_charging_info" },
+        { "type": "pd2_image_with_text" },
+        { "type": "pd2_standalone_image" },
+        { "type": "pd2_centered_feature" },
+        { "type": "pd2_dual_mode_charging" },
+        { "type": "pd2_image_with_subcards" },
+        { "type": "pd2_safety_icon" },
+        { "type": "pd2_safety_icon" },
+        { "type": "pd2_safety_icon" },
+        { "type": "pd2_safety_icon" },
+        { "type": "pd2_safety_icon" },
+        { "type": "pd2_safety_icon" },
+        { "type": "pd2_safety_icon" },
+        { "type": "pd2_safety_icon" },
+        { "type": "review_summary" },
+        { "type": "customer_review" },
+        { "type": "customer_review" },
+        { "type": "featured_product" }
+      ]
+    }
+  ]
+}
+{% endschema %}

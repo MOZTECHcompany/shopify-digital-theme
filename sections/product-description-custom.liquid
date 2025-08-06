@@ -1,0 +1,1106 @@
+{%- comment -%}
+  優化重點 v5.5.12 (徹底移除卡片與背景):
+  1. 【徹底移除樣式】根據使用者明確指示，完全刪除/註解掉 'review_summary', 'fast_charging', 'dual_mode_battery' 區塊的灰色背景、白色卡片、陰影、圓角和特殊邊距。
+  2. 【統一佈局】移除了所有 'full-width' 的判斷邏輯和 CSS。現在所有區塊都會被統一包裹在標準的 '.desc-block-wrapper' 內，確保它們都遵守頁面既有的寬度限制，不再有任何區塊會突破版面。
+  3. 【結構簡化】將評價等區塊的 HTML 結構簡化，直接輸出內容，不再有多餘的 wrapper 或 container div。
+  4. 【程式碼清理】移除所有不再需要的 CSS 規則，讓程式碼回歸最乾淨的狀態。
+{%- endcomment -%}
+
+{% liquid
+  # 為了計算評價，我們先提前跑一次迴圈收集所有評價 block
+  assign review_blocks = section.blocks | where: "type", "customer_review"
+  assign total_reviews = review_blocks.size
+  assign total_rating = 0
+  
+  assign five_star_count = 0
+  assign four_star_count = 0
+  assign three_star_count = 0
+  assign two_star_count = 0
+  assign one_star_count = 0
+
+  if total_reviews > 0
+    for review in review_blocks
+      assign rating_value = review.settings.rating | default: 5
+      assign total_rating = total_rating | plus: rating_value
+      case rating_value
+        when 5
+          assign five_star_count = five_star_count | plus: 1
+        when 4
+          assign four_star_count = four_star_count | plus: 1
+        when 3
+          assign three_star_count = three_star_count | plus: 1
+        when 2
+          assign two_star_count = two_star_count | plus: 1
+        when 1
+          assign one_star_count = one_star_count | plus: 1
+      endcase
+    endfor
+    assign average_rating = total_rating | times: 1.0 | divided_by: total_reviews | round: 1
+  else
+    assign average_rating = 0.0
+  endif
+  
+  assign rating_counts = "" | append: five_star_count | append: "," | append: four_star_count | append: "," | append: three_star_count | append: "," | append: two_star_count | append: "," | append: one_star_count | split: ","
+%}
+
+<style>
+  /* --- 區塊通用變數 --- */
+  :root {
+    --pd2-review-star-color: #2BB9ED;
+    --pd2-review-star-color-empty: #E5E7EB;
+  }
+
+  /* --- 原有 CSS --- */
+  @media screen and (min-width: 770px){
+  .product_description .product_desc{width:100%;padding:0 0;}
+  .product_description .product_desc .desc_content_1 .desc_head_tip{font-size:16px;color:#2cb9ee;font-style:normal;padding:4px 10px;border-radius:15px;border:1px solid #2cb9ee;line-height:1.2;}
+  .product_description .product_desc .desc_content_1 .desc_h3_title{font-size:2.4vw;color:#333;font-weight:bold;margin-top:10px;}
+  .product_description .product_desc .desc_content_1 .desc_h2_title{font-size:1.3vw;color:#333;font-weight:bold;}
+  .product_description .product_desc .desc_content_1 .desc_h1_title{font-size:1vw;color:#333;line-height:1.4;text-align:center;margin-top:15px;}
+  }
+
+  @media screen and (min-width: 1200px){
+  .product_description{width:100%;padding:10vh 0 0;background:#fff;}
+  .product_description .product_desc .desc_content_1{width:100%;padding:15vh 20% 0;display:flex;flex-direction: column;align-items:center;}
+  .product_description .product_desc .desc_content_1 .desc_h2_title{font-size:1.3vw;color:#333;font-weight:bold;}
+  .product_description .product_desc .desc_content_1 .desc_h1_title{font-size:1vw;color:#333;line-height:1.4;text-align:center;margin-top:15px;}
+  }
+  @media screen and (max-width: 1199px){
+  .product_description{width:100%;padding:60px 0 0;background:#fff;}
+  .product_description .product_desc .desc_content_1{width:100%;padding:50px 5vw 0;display:flex;flex-direction: column;align-items:center;}
+  .product_description .product_desc .desc_content_1 .desc_h2_title{font-size:1.6vw;color:#333;font-weight:bold;}
+  .product_description .product_desc .desc_content_1 .desc_h1_title{font-size:12px;color:#333;line-height:1.4;text-align:center;margin-top:15px;}
+  }
+  @media screen and (max-width: 770px){
+  .product_description{width:100%;padding-top:50px;background:#fff;}
+  .product_description .product_desc{width:100%;padding-top:50px;}
+  .product_description .desc_content_1{width:100%;padding:25px 20px;display:flex;flex-direction:column;align-items:center;}
+  .product_description .desc_content_1 .desc_head_tip{ padding:2px 15px;color:#2cb9ee;border-radius:20px;border:1px solid #2cb9ee;font-style:normal; }
+  .product_description .desc_content_1 .desc_h3_title{font-size:20px;color:#333;font-weight:bold;text-align:center;margin-top:10px;}
+  .product_description .desc_content_1 .desc_h2_title{font-size:16px;color:#333;font-weight:bold;text-align:center;margin-top:10px;}
+  .product_description .desc_content_1 .desc_h1_title{font-size:14px;color:#666;text-align:center;margin-top:10px;}
+  }
+  
+  .desc-block-wrapper { 
+    padding-top: var(--padding-top-desktop); 
+    padding-bottom: var(--padding-bottom-desktop); 
+    padding-left: 5vw; /* 恢復標準左右間距 */
+    padding-right: 5vw;
+  }
+
+  .feature-icon-grid {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 60px;
+  }
+  .feature-icon-grid__item {
+    text-align: center; flex: 0 0 calc((100% - 5 * 60px) / 6); max-width: 180px; min-width: 90px;
+  }
+  .feature-icon-grid__image { max-width: 60px; height: 60px; object-fit: contain; margin: 0 auto 20px; }
+  .feature-icon-grid__text { font-size: 16px; font-weight: 500; line-height: 1.5; color: #333; }
+
+  .product_description .desc_content_1 { text-align: center; padding: 0; }
+  .product_description .desc_content_1 .heading-tag { 
+    display: inline-block; padding: 8px 18px; border: 1px solid #00C1FF; border-radius: 20px;
+    background-color: transparent; color: #00C1FF; font-size: 0.85em; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2rem;
+  }
+  .product_description .desc_content_1 .main-heading { 
+    font-size: 3.2em; line-height: 1.2; margin-top: 0; margin-bottom: 1rem; font-weight: 700; color: #333;
+  }
+  .product_description .desc_content_1 .sub-heading { 
+    font-size: 1.8em; line-height: 1.4; margin-bottom: 2rem; font-weight: normal; color: #555;
+  }
+  .product_description .desc_content_1 .description-text { 
+    font-size: 1.1em; line-height: 1.6; color: #666; max-width: 650px; margin-left: auto; margin-right: auto;
+  }
+  .product_description .desc_content_1 .description-text.rte p { margin-left: auto; margin-right: auto; }
+  
+  .two-column-content { display: flex; align-items: center; gap: 5vw; }
+  .two-column-content.layout--image-right { flex-direction: row-reverse; }
+  .two-column-content__image-wrapper, .two-column-content__text-wrapper { flex: 1; }
+  .two-column-content__image { width: 100%; height: auto; display: block; border-radius: 20px; }
+  .two-column-content__tag { display: inline-block; margin-bottom: 15px; padding: 4px 12px; border: 1px solid; border-radius: 20px; font-size: 14px; line-height: 1.4; font-weight: 500; }
+  .two-column-content__heading { font-size: 32px; font-weight: bold; line-height: 1.2; margin: 0; }
+  .two-column-content__subheading { font-size: 20px; margin: 10px 0 15px; color: #555; }
+  .two-column-content__text { line-height: 1.6; color: #333; }
+  .showcase-grid { padding: 0; }
+  .showcase-grid__heading { text-align: center; font-size: 36px; font-weight: bold; margin: 0 0 50px; }
+  .showcase-grid__container { display: flex; gap: 30px; align-items: center; }
+  .showcase-grid__text-content { flex: 1; padding-right: 20px; }
+  .showcase-grid__title { font-size: 28px; line-height: 1.3; margin: 0 0 15px; }
+  .showcase-grid__description { line-height: 1.7; color: #555; margin-bottom: 20px; }
+  .showcase-grid__note { font-size: 12px; color: #999; font-style: italic; }
+  .showcase-grid__image-gallery { flex: 1.5; display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+  .showcase-grid__main-image { grid-row: 1 / 3; grid-column: 1 / 2; }
+  .showcase-grid__sub-images { grid-column: 2 / 3; grid-row: 1 / 3; display: flex; flex-direction: column; justify-content: space-between; gap: 20px; }
+  .showcase-grid__main-image img, .showcase-grid__sub-images img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 16px; }
+  .wide-image-content { display: flex; gap: 5vw; align-items: center; }
+  .wide-image-content.layout--image-right { flex-direction: row-reverse; }
+  .wide-image-content__text-wrapper { flex: 1; }
+  .wide-image-content__image-wrapper { flex: 2; }
+  .wide-image-content__image { width: 100%; display: block; border-radius: 24px; }
+  .wide-image-content__title { font-size: 36px; font-weight: bold; line-height: 1.3; margin: 0 0 15px; }
+  .wide-image-content__description { font-size: 16px; line-height: 1.7; color: #555; }
+
+  /* ======================================================= */
+  /* 【評價區塊】移除所有背景與卡片樣式 */
+  /* ======================================================= */
+  .reviews-section__header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;
+    flex-wrap: wrap; gap: 20px; border-bottom: 1px solid #E5E7EB; padding-bottom: 24px;
+  }
+  .reviews-section__title { font-size: 20px; font-weight: 700; color: #111827; margin: 0; }
+  .reviews-section__write-review-btn {
+    background-color: #E5E7EB; color: #4B5563; padding: 8px 16px; border-radius: 8px;
+    text-decoration: none; font-weight: 500; font-size: 14px; transition: all 0.2s;
+    display: inline-flex; align-items: center; gap: 8px; cursor: pointer; border: none;
+  }
+  .reviews-section__write-review-btn:hover { background-color: #D1D5DB; color: #1F2937;}
+  .reviews-section__write-review-btn[disabled] { background-color: #F3F4F6; cursor: not-allowed; }
+  .reviews-section__write-review-btn svg { width: 16px; height: 16px; }
+  .reviews-section__body { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 60px; }
+  .reviews-summary__average-box { display: flex; align-items: center; gap: 16px; margin-bottom: 25px; }
+  .reviews-summary__average-score { font-size: 48px; font-weight: 700; line-height: 1; color: #111827; }
+  .reviews-summary__average-details { display: flex; flex-direction: column; }
+  .reviews-summary__total { font-size: 14px; color: #4B5563; margin-top: 4px; }
+  .reviews-summary__breakdown-item { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; font-size: 14px; }
+  .reviews-summary__breakdown-item .star-rating {
+    color: #4B5563; font-weight: 500; flex-shrink: 0; width: 50px; display: flex; align-items: center; gap: 4px;
+  }
+  .reviews-summary__breakdown-item .star-rating svg { width: 16px; height: 16px; }
+  .progress-bar { flex-grow: 1; height: 8px; background-color: #E5E7EB; border-radius: 4px; overflow: hidden; }
+  .progress-bar__fill { height: 100%; background-color: var(--pd2-review-star-color); border-radius: 4px; transition: width 0.5s ease-in-out; }
+  .reviews-summary__breakdown-count { width: 25px; text-align: right; color: #4B5563; font-weight: 500; }
+  .reviews-list-wrapper { position: relative; min-width: 0; padding: 0 45px; overflow: hidden; }
+  .reviews-list.swiper-container { padding-bottom: 40px; margin: 0; padding-top: 5px; }
+  .reviews-list .swiper-slide { height: auto; }
+  .reviews-list--no-reviews {
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    color: #6B7280; min-height: 250px; border: 2px dashed #D1D5DB; border-radius: 12px;
+    font-size: 16px; padding: 20px;
+  }
+  .review-card {
+    background-color: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 12px; padding: 24px;
+    height: 100%; box-sizing: border-box; display: flex; flex-direction: column;
+  }
+  .review-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .review-card .star-rating { display: flex; gap: 2px; color: var(--pd2-review-star-color); }
+  .review-card .star-rating svg { width: 18px; height: 18px; }
+  .review-card__verified-badge {
+    font-size: 12px; color: #16A34A; background-color: #DCFCE7; font-weight: 500;
+    padding: 4px 8px; border-radius: 99px; display: inline-flex; align-items: center; gap: 4px;
+  }
+  .review-card__verified-badge svg { width: 14px; height: 14px; }
+  .review-card__title { font-weight: 600; margin: 0 0 8px 0; font-size: 16px; color: #111827; }
+  .review-card__content { line-height: 1.6; color: #374151; font-size: 14px; margin-bottom: 16px; flex-grow: 1; }
+  .review-card__author-date { font-size: 14px; color: #6B7280; }
+  .review-swiper-button-prev, .review-swiper-button-next {
+    position: absolute; top: 50%; transform: translateY(-50%) translateY(-20px); z-index: 10; cursor: pointer;
+    color: #9CA3AF; background-color: #FFFFFF; border: 1px solid #E5E7EB; width: 36px; height: 36px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05), 0 1px 2px -1px rgba(0,0,0,0.05); transition: all 0.2s;
+  }
+  .review-swiper-button-prev:hover, .review-swiper-button-next:hover {
+    color: #111827; border-color: #D1D5DB; box-shadow: 0 2px 4px rgba(0,0,0,0.07);
+  }
+  .review-swiper-button-prev { left: 0; }
+  .review-swiper-button-next { right: 0; }
+  .review-swiper-button-prev svg, .review-swiper-button-next svg { width: 18px; height: 18px; }
+  .review-swiper-pagination { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); }
+  .review-swiper-pagination .swiper-pagination-bullet { background: #D1D5DB; opacity: 1; }
+  .review-swiper-pagination .swiper-pagination-bullet-active { background: #111827; }
+  .reviews-summary__average-stars {
+    position: relative; display: inline-block; font-size: 18px; line-height: 1;
+    color: var(--pd2-review-star-color-empty); letter-spacing: 2px;
+  }
+  .reviews-summary__average-stars-filled {
+    position: absolute; left: 0; top: 0; height: 100%;
+    color: var(--pd2-review-star-color); overflow: hidden; white-space: nowrap; width: 0;
+  }
+  
+  /* ======================================================= */
+  /* 【快速充電 & 雙模式電池】移除所有背景與卡片樣式 */
+  /* ======================================================= */
+  .fast-charging-container { 
+    display: flex; align-items: center; gap: 50px;
+    /* 移除以下樣式 */
+    /* max-width: min(100% - 60px, 1600px); */
+    /* margin: 0 auto; */
+    /* background-color: #FFFFFF; */
+    /* border-radius: 20px; */
+    /* box-shadow: 0 15px 35px rgba(0,0,0,0.08); */
+    /* padding: 40px; */
+  }
+  .fast-charging-container.layout--image-right { flex-direction: row-reverse; }
+  .fast-charging__image-wrapper { flex: 1; min-width: 400px; }
+  .fast-charging__image { width: 100%; height: auto; display: block; border-radius: 12px; object-fit: cover; }
+  .fast-charging__text-content { flex: 1; padding-left: 20px; color: #333; }
+  .fast-charging__tag { display: inline-block; padding: 6px 16px; background-color: #E0F7FA; color: #00BCD4; border-radius: 20px; font-size: 0.9em; font-weight: 600; margin-bottom: 1.5rem; white-space: nowrap; }
+  .fast-charging__heading { font-size: 2.8em; font-weight: bold; line-height: 1.2; margin: 0 0 1rem; }
+  .fast-charging__description { font-size: 1.1em; line-height: 1.6; color: #555; margin-bottom: 2.5rem; }
+  .fast-charging__comparisons { display: flex; flex-wrap: wrap; gap: 30px; }
+  .fast-charging__comparison-item { flex: 1; min-width: 250px; padding: 25px; background-color: #F0F8FF; border-radius: 15px; border: 1px solid #D0EEFF; box-shadow: 0 5px 15px rgba(0,0,0,0.05); box-sizing: border-box; }
+  .comparison__title { font-size: 1.2em; font-weight: bold; margin: 0 0 0.5rem; color: #333; }
+  .comparison__title .highlight { color: #00C1FF; font-size: 1.4em; }
+  .comparison__subtitle { font-size: 0.9em; color: #777; margin-bottom: 1.5rem; }
+  .comparison__note { font-size: 0.9em; color: #777; margin-top: 1.5rem; margin-bottom: 0; }
+  .comparison__bars .bar-item { margin-bottom: 1rem; }
+  .comparison__bars .bar-label { font-size: 0.9em; color: #666; display: block; margin-bottom: 0.5rem; }
+  .comparison__bars .progress-bar { height: 25px; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: flex-end; position: relative; }
+  .comparison__bars .progress-bar.custom-blue { background-color: #E0F7FA; }
+  .comparison__bars .progress-bar.custom-red { background-color: #FFEBEE; }
+  .comparison__bars .progress-bar::before { content: ''; height: 100%; position: absolute; left: 0; top: 0; border-radius: 12px; transition: width 0.5s ease-out; z-index: 1; }
+  .comparison__bars .progress-bar.custom-blue::before { background-color: #00C1FF; width: var(--progress-width-blue, 50%); }
+  .comparison__bars .progress-bar.custom-red::before { background-color: #F44336; width: var(--progress-width-red, 20%); }
+  .comparison__bars .progress-bar .percentage { color: #FFF; font-weight: bold; font-size: 0.9em; position: relative; z-index: 2; padding-right: 10px; }
+  .comparison__icons { display: flex; gap: 15px; align-items: center; margin-top: 1.5rem; }
+  .comparison__icons .phone-icon { width: 28px; height: 28px; color: #00C1FF; }
+  .comparison__icons .etc-dots { font-size: 1.5em; font-weight: bold; color: #999; }
+  
+  .dual-mode-battery-container { 
+    display: flex; align-items: center; gap: 50px; 
+    /* 移除以下樣式 */
+    /* max-width: min(100% - 60px, 1600px); */
+    /* margin: 0 auto; */
+    /* background-color: #FFFFFF; */
+    /* border-radius: 20px; */
+    /* box-shadow: 0 15px 35px rgba(0,0,0,0.08); */
+    /* padding: 40px; */
+  }
+  .dual-mode-battery-container.layout--image-left { flex-direction: row; }
+  .dual-mode-battery-container.layout--image-right { flex-direction: row-reverse; }
+  .dual-mode-battery__image-wrapper { flex: 1; min-width: 400px; }
+  .dual-mode-battery__image { width: 100%; height: auto; display: block; border-radius: 12px; object-fit: cover; }
+  .dual-mode-battery__text-content { flex: 1; padding-left: 20px; color: #333; }
+  .dual-mode-battery__tag { display: inline-block; padding: 6px 16px; background-color: #E0F7FA; color: #00BCD4; border-radius: 20px; font-size: 0.9em; font-weight: 600; margin-bottom: 1.5rem; white-space: nowrap; }
+  .dual-mode-battery__heading { font-size: 2.8em; font-weight: bold; line-height: 1.2; margin: 0 0 1rem; }
+  .dual-mode-battery__description { font-size: 1.1em; line-height: 1.6; color: #555; margin-bottom: 2.5rem; }
+  .dual-mode-battery__comparison-cards { display: flex; flex-wrap: wrap; gap: 20px; }
+  .dual-mode-battery__card-item { flex: 1; min-width: 200px; background-color: #F0F8FF; border: 1px solid #D0EEFF; border-radius: 15px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); box-sizing: border-box; text-align: center; }
+  .dual-mode-battery__card-title { font-size: 1.2em; font-weight: bold; color: #333; margin-bottom: 15px; }
+  .dual-mode-battery__card-value { font-size: 2.5em; font-weight: bold; color: #00C1FF; line-height: 1; margin-bottom: 10px; }
+  .dual-mode-battery__card-text { font-size: 1em; color: #666; line-height: 1.4; }
+
+  /* --- 手機版響應式 CSS --- */
+  @media screen and (max-width: 990px) {
+    .product-swiper-button-prev, .product-swiper-button-next { display: none; }
+  }
+  
+  @media screen and (max-width: 770px) {
+    .desc-block-wrapper { 
+        padding-top: var(--padding-top-mobile); 
+        padding-bottom: var(--padding-bottom-mobile); 
+        padding-left: 20px; /* 手機版標準左右間距 */
+        padding-right: 20px;
+    }
+    .two-column-content { flex-direction: column; padding: 0; }
+    .two-column-content.layout--image-right { flex-direction: column; } 
+    .two-column-content__image-wrapper { margin-bottom: 25px; }
+    .two-column-content__text-wrapper { text-align: center; } 
+    .two-column-content__heading { font-size: 28px; }
+    .two-column-content__subheading { font-size: 18px; }
+    .showcase-grid__container { flex-direction: column; }
+    .showcase-grid__text-content { text-align: center; margin-bottom: 30px; padding-right: 0; }
+    .showcase-grid__image-gallery { display: flex; flex-direction: column; width: 100%; gap: 15px; }
+    .showcase-grid__sub-images { display: grid; grid-template-columns: 1fr 1fr; width: 100%; gap: 15px; }
+    .wide-image-content { flex-direction: column !important; }
+    .wide-image-content__text-wrapper { text-align: center; order: 1; margin-bottom: 25px; padding: 0; }
+    .wide-image-content__image-wrapper { order: 2; }
+    .wide-image-content__title { font-size: 28px; }
+    .feature-icon-grid { flex-direction: row; gap: 30px 30px; }
+    .feature-icon-grid__item { flex: 0 0 calc((100% - 1 * 30px) / 2); max-width: 50%; margin-bottom: 0; }
+    .feature-icon-grid__image { max-width: 50px; height: 50px; margin-bottom: 15px; }
+    .feature-icon-grid__text { font-size: 14px; }
+    .product_description .desc_content_1 .heading-tag { margin-bottom: 1.5rem; }
+    .product_description .desc_content_1 .main-heading { font-size: 2em; line-height: 1.3; margin-bottom: 0.8rem; }
+    .product_description .desc_content_1 .sub-heading { font-size: 1.2em; margin-bottom: 1.5rem; }
+    .product_description .desc_content_1 .description-text { font-size: 1em; }
+
+    /* 評價區塊手機版 */
+    .reviews-section__header { flex-direction: column; align-items: flex-start; gap: 15px; padding-bottom: 20px; margin-bottom: 20px; }
+    .reviews-section__body { grid-template-columns: 1fr; gap: 30px; }
+    .reviews-list-wrapper { padding: 0; }
+    .reviews-list.swiper-container { padding-bottom: 30px; }
+    .review-swiper-button-prev, .review-swiper-button-next {
+      width: 32px; height: 32px; transform: translateY(-50%) translateY(-15px);
+    }
+    .review-swiper-button-prev { left: 5px; }
+    .review-swiper-button-next { right: 5px; }
+    .review-swiper-button-prev svg, .review-swiper-button-next svg { width: 16px; height: 16px; }
+
+    .fast-charging-container, .dual-mode-battery-container { flex-direction: column; padding: 0; gap: 30px; }
+    .fast-charging-container.layout--image-right, .dual-mode-battery-container.layout--image-left, .dual-mode-battery-container.layout--image-right { flex-direction: column; }
+    .fast-charging__image-wrapper, .dual-mode-battery__image-wrapper { min-width: unset; width: 100%; }
+    .fast-charging__text-content, .dual-mode-battery__text-content { padding-left: 0; text-align: center; }
+    .fast-charging__heading, .dual-mode-battery__heading { font-size: 2em; }
+    .fast-charging__description, .dual-mode-battery__description { font-size: 1em; text-align: left; padding: 0 10px; }
+    .dual-mode-battery__comparison-cards { flex-direction: column; gap: 15px; }
+    .dual-mode-battery__card-item { width: 100%; min-width: unset; }
+  }
+</style>
+
+<div class="product_description" data-section-id="{{ section.id }}">
+  <div class="product_desc">
+    {% liquid 
+      assign review_section_rendered = false
+    %}
+
+    {% for block in section.blocks %}
+
+      {% if review_section_rendered and block.type == 'customer_review' %}
+        {% continue %}
+      {% endif %}
+
+      {% liquid
+        assign paddingTop = block.settings.padding_top | default: 80
+        assign paddingBottom = block.settings.padding_bottom | default: 80
+        assign paddingTopMobile = block.settings.padding_top_mobile | default: 40
+        assign paddingBottomMobile = block.settings.padding_bottom_mobile | default: 40
+      %}
+      
+      <!-- 移除所有 full-width 判斷，所有區塊都使用同一個標準 wrapper -->
+      <div
+        class="desc-block-wrapper"
+        style="
+          --padding-top-desktop: {{ paddingTop }}px;
+          --padding-bottom-desktop: {{ paddingBottom }}px;
+          --padding-top-mobile: {{ paddingTopMobile }}px;
+          --padding-bottom-mobile: {{ paddingBottomMobile }}px;
+          {%- if block.type == 'fast_charging' or block.type == 'dual_mode_battery' -%}
+            background-color: {{ block.settings.background_color }};
+          {%- endif -%}
+        "
+        {{ block.shopify_attributes }}>
+
+        {% case block.type %}
+
+          {% when 'heading' %}
+            <div class="desc_content_1">
+              {% if block.settings.tag_text != blank %}
+                <span class="heading-tag">{{ block.settings.tag_text }}</span> 
+              {% endif %}
+              {% if block.settings.main_heading != blank %}
+                <h2 class="main-heading">{{ block.settings.main_heading }}</h2> 
+              {% endif %}
+              {% if block.settings.sub_heading != blank %}
+                <p class="sub-heading">{{ block.settings.sub_heading }}</p> 
+              {% endif %}
+              {% if block.settings.description != blank %}
+                <div class="description-text rte">{{ block.settings.description }}</div> 
+              {% endif %}
+            </div>
+
+          {% when 'feature_icon_grid' %}
+            <div class="feature-icon-grid">
+              {% for i in (1..6) %}
+                {% capture image_setting %}icon_{{ i }}_image{% endcapture %}
+                {% capture text_setting %}icon_{{ i }}_text{% endcapture %}
+                {% assign image = block.settings[image_setting] %}
+                {% assign text = block.settings[text_setting] %}
+                {% if image != blank or text != blank %}
+                  <div class="feature-icon-grid__item">
+                    {% if image != blank %}
+                      <img src="{{ image | image_url: width: 120 }}" alt="{{ image.alt | escape }}" class="feature-icon-grid__image" loading="lazy">
+                    {% endif %}
+                    <p class="feature-icon-grid__text">{{ text }}</p>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          
+          {% when 'fast_charging' %}
+            <!-- 移除 -section 和 -container 的外層 -->
+            <div class="fast-charging-container layout--image-{{ block.settings.image_position }}">
+              <div class="fast-charging__image-wrapper">
+                {% if block.settings.image != blank %}
+                  <img src="{{ block.settings.image | image_url: width: 1200 }}" alt="{{ block.settings.image.alt | escape }}" class="fast-charging__image" loading="lazy">
+                {% else %}
+                  {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+                {% endif %}
+              </div>
+              <div class="fast-charging__text-content">
+                {% if block.settings.tag_text != blank %}
+                  <span class="fast-charging__tag">{{ block.settings.tag_text }}</span>
+                {% endif %}
+                {% if block.settings.heading != blank %}
+                  <h2 class="fast-charging__heading">{{ block.settings.heading }}</h2>
+                {% endif %}
+                {% if block.settings.description != blank %}
+                  <div class="fast-charging__description rte">{{ block.settings.description }}</div>
+                {% endif %}
+                <div class="fast-charging__comparisons">
+                  <div class="fast-charging__comparison-item">
+                    <p class="comparison__title">Charge <span class="highlight">{{ block.settings.charge_time_value }}</span> {{ block.settings.charge_time_unit }}</p>
+                    <p class="comparison__subtitle">{{ block.settings.charge_time_description }}</p>
+                    <div class="comparison__bars">
+                      <div class="bar-item">
+                        <span class="bar-label">MOZTECH Universal Charger</span>
+                        <div class="progress-bar custom-blue" style="--progress-width-blue: {{ block.settings.charger_percentage }}%;">
+                          <span class="percentage">{{ block.settings.charger_percentage }}%</span>
+                        </div>
+                      </div>
+                      <div class="bar-item">
+                        <span class="bar-label">Ordinary Power Bank</span>
+                        <div class="progress-bar custom-red" style="--progress-width-red: {{ block.settings.ordinary_percentage }}%;">
+                          <span class="percentage">{{ block.settings.ordinary_percentage }}%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="fast-charging__comparison-item">
+                    <p class="comparison__title">Mobile Phone Charging <span class="highlight">= {{ block.settings.units_value }}</span> units</p>
+                    <p class="comparison__subtitle">{{ block.settings.units_description }}</p>
+                    <p class="comparison__note">{{ block.settings.full_charge_note }}</p>
+                    <div class="comparison__icons">
+                      <svg class="phone-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M7 2c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2H7zm0 2h10v16H7V4zm2 14h6v2H9v-2z"/></svg>
+                      <svg class="phone-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M7 2c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2H7zm0 2h10v16H7V4zm2 14h6v2H9v-2z"/></svg>
+                      <span class="etc-dots">...</span>
+                      <svg class="phone-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M7 2c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2H7zm0 2h10v16H7V4zm2 14h6v2H9v-2z"/></svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+          {% when 'dual_mode_battery' %}
+              <div class="dual-mode-battery-container layout--image-{{ block.settings.image_position }}">
+                <div class="dual-mode-battery__image-wrapper">
+                  {% if block.settings.image != blank %}
+                    <img src="{{ block.settings.image | image_url: width: 1200 }}" alt="{{ block.settings.image.alt | escape }}" class="dual-mode-battery__image" loading="lazy">
+                  {% else %}
+                    {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+                  {% endif %}
+                </div>
+                <div class="dual-mode-battery__text-content">
+                  {% if block.settings.tag_text != blank %}
+                    <span class="dual-mode-battery__tag">{{ block.settings.tag_text }}</span>
+                  {% endif %}
+                  {% if block.settings.heading != blank %}
+                    <h2 class="dual-mode-battery__heading">{{ block.settings.heading }}</h2>
+                  {% endif %}
+                  {% if block.settings.description != blank %}
+                    <div class="dual-mode-battery__description rte">{{ block.settings.description }}</div>
+                  {% endif %}
+                  <div class="dual-mode-battery__comparison-cards">
+                    <div class="dual-mode-battery__card-item">
+                      <p class="dual-mode-battery__card-title">{{ block.settings.card1_title }}</p>
+                      <p class="dual-mode-battery__card-value">{{ block.settings.card1_value }}</p>
+                      <p class="dual-mode-battery__card-text">{{ block.settings.card1_text }}</p>
+                    </div>
+                    <div class="dual-mode-battery__card-item">
+                      <p class="dual-mode-battery__card-title">{{ block.settings.card2_title }}</p>
+                      <p class="dual-mode-battery__card-value">{{ block.settings.card2_value }}</p>
+                      <p class="dual-mode-battery__card-text">{{ block.settings.card2_text }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          
+          {% when 'two_column_content' %}
+            <div class="two-column-content layout--image-{{ block.settings.image_position }}">
+              <div class="two-column-content__image-wrapper">{% if block.settings.image != blank %}<img class="two-column-content__image" src="{{ block.settings.image | image_url: width: 1200 }}" alt="{{ block.settings.image.alt | escape }}" loading="lazy">{% endif %}</div>
+              <div class="two-column-content__text-wrapper">
+                {% if block.settings.show_tag and block.settings.tag_text != blank %}<span class="two-column-content__tag" style="color: {{ block.settings.tag_color }}; border-color: {{ block.settings.tag_color }};">{{ block.settings.tag_text }}</span>{% endif %}
+                {% liquid
+                  assign heading_color = block.settings.heading_color
+                  assign highlight_color = block.settings.highlight_color
+                  assign heading_string = block.settings.heading | default: ''
+                  assign heading_parts = heading_string | split: '['
+                  assign before_bracket = heading_parts[0]
+                  if heading_parts.size > 1
+                    assign after_bracket_parts = heading_parts[1] | split: ']'
+                    assign highlighted_text = after_bracket_parts[0]
+                    assign after_highlight = after_bracket_parts[1]
+                  else
+                    assign highlighted_text = ''
+                    assign after_highlight = ''
+                  endif
+                %}
+                {% if block.settings.heading != blank %}<h3 class="two-column-content__heading" style="color: {{ heading_color }};">{{ before_bracket }}<span style="color: {{ highlight_color }};">{{ highlighted_text }}</span>{{ after_highlight }}</h3>{% endif %}
+                {% if block.settings.subheading != blank %}<p class="two-column-content__subheading">{{ block.settings.subheading }}</p>{% endif %}
+                {% if block.settings.text != blank %}<div class="two-column-content__text">{{ block.settings.text }}</div>{% endif %}
+              </div>
+            </div>
+
+          {% when 'showcase_grid' %}
+             <div class="showcase-grid">
+              {% if block.settings.heading != blank %}<h2 class="showcase-grid__heading">{{ block.settings.heading }}</h2>{% endif %}
+              <div class="showcase-grid__container">
+                <div class="showcase-grid__text-content">
+                  {% liquid
+                    assign highlight_color = block.settings.highlight_color
+                    assign title_string = block.settings.title | default: ''
+                    assign title_parts = title_string | split: '['
+                    assign before_bracket = title_parts[0]
+                    if title_parts.size > 1
+                      assign after_bracket_parts = title_parts[1] | split: ']'
+                      assign highlighted_text = after_bracket_parts[0]
+                      assign after_highlight = after_bracket_parts[1]
+                    endif
+                  %}
+                  <h3 class="showcase-grid__title">{{ before_bracket }}<span style="color: {{ highlight_color }}">{{ highlighted_text }}</span>{{ after_highlight }}</h3>
+                  <div class="showcase-grid__description">{{ block.settings.description }}</div>
+                  <p class="showcase-grid__note">{{ block.settings.note }}</p>
+                </div>
+                <div class="showcase-grid__image-gallery">
+                  <div class="showcase-grid__main-image">{% if block.settings.main_image != blank %}<img src="{{ block.settings.main_image | image_url: width: 1000 }}" alt="{{ block.settings.main_image.alt | escape }}">{% endif %}</div>
+                  <div class="showcase-grid__sub-images">
+                    <div class="showcase-grid__sub-image">{% if block.settings.sub_image_1 != blank %}<img src="{{ block.settings.sub_image_1 | image_url: width: 500 }}" alt="{{ block.settings.sub_image_1.alt | escape }}">{% endif %}</div>
+                    <div class="showcase-grid__sub-image">{% if block.settings.sub_image_2 != blank %}<img src="{{ block.settings.sub_image_2 | image_url: width: 500 }}" alt="{{ block.settings.sub_image_2.alt | escape }}">{% endif %}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          {% when 'wide_image_content' %}
+            <div class="wide-image-content layout--image-{{ block.settings.image_position }}">
+              <div class="wide-image-content__text-wrapper">
+                {% liquid
+                  assign title_color = block.settings.title_color
+                  assign highlight_color = block.settings.highlight_color
+                  assign title_string = block.settings.title | default: ''
+                  assign title_parts = title_string | split: '['
+                  assign before_bracket = title_parts[0]
+                  if title_parts.size > 1
+                    assign after_bracket_parts = title_parts[1] | split: ']'
+                    assign highlighted_text = after_bracket_parts[0]
+                    assign after_highlight = after_bracket_parts[1]
+                  endif
+                %}
+                <h3 class="wide-image-content__title" style="color: {{ title_color }}">{{ before_bracket }}<span style="color: {{ highlight_color }}">{{ highlighted_text }}</span>{{ after_highlight }}</h3>
+                <div class="wide-image-content__description">{{ block.settings.description }}</div>
+              </div>
+              <div class="wide-image-content__image-wrapper">{% if block.settings.image != blank %}<img src="{{ block.settings.image | image_url: width: 1600 }}" class="wide-image-content__image" alt="{{ block.settings.image.alt | escape }}">{% endif %}</div>
+            </div>
+
+          {% when 'single_image' %}
+            <div class="single-image-wrapper single-image-wrapper--{{ block.settings.width }}">
+              {% if block.settings.image != blank %}
+                <img class="single-image__image" 
+                     src="{{ block.settings.image | image_url: width: 2400 }}" 
+                     alt="{{ block.settings.image.alt | escape }}" 
+                     loading="lazy">
+              {% else %}
+                {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+              {% endif %}
+            </div>
+          
+          {% when 'review_summary' %}
+            <div>
+                <div class="reviews-section__header">
+                  <h2 class="reviews-section__title">{{ block.settings.title }}</h2>
+                   {% if block.settings.write_review_link != blank %}
+                      <a href="{{ block.settings.write_review_link }}" class="reviews-section__write-review-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 16px; height: 16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+                        <span>{{ block.settings.write_review_text }}</span>
+                      </a>
+                    {% else %}
+                      <button class="reviews-section__write-review-btn" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 16px; height: 16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+                        <span>{{ block.settings.write_review_text }}</span>
+                      </button>
+                    {% endif %}
+                </div>
+                <div class="reviews-section__body">
+                  <div class="reviews-summary">
+                    <div class="reviews-summary__average-box">
+                      <div class="reviews-summary__average-score">{{ average_rating | format: '0.0' }}</div>
+                      <div class="reviews-summary__average-details">
+                        <div class="reviews-summary__average-stars">
+                          ★★★★★
+                          {%- assign average_percentage = average_rating | times: 20.0 -%}
+                          <div class="reviews-summary__average-stars-filled" style="width: {{ average_percentage }}%;">★★★★★</div>
+                        </div>
+                        <div class="reviews-summary__total">{{ total_reviews }} reviews</div>
+                      </div>
+                    </div>
+                    <div class="reviews-summary__breakdown-box">
+                       {% for i in (1..5) reversed %}
+                         {% assign star_index = 5 | minus: i %}
+                         {% assign count = rating_counts[star_index] %}
+                         {% if total_reviews > 0 %}
+                           {% assign percentage = count | times: 100.0 | divided_by: total_reviews %}
+                         {% else %}
+                           {% assign percentage = 0 %}
+                         {% endif %}
+                         <div class="reviews-summary__breakdown-item">
+                           <span class="star-rating">{{ i }} <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg></span>
+                           <div class="progress-bar"><div class="progress-bar__fill" style="width: {{ percentage }}%;"></div></div>
+                           <span class="reviews-summary__breakdown-count">{{ count }}</span>
+                         </div>
+                       {% endfor %}
+                    </div>
+                  </div>
+                  <div class="reviews-list-wrapper">
+                    <div class="reviews-list swiper-container {% if total_reviews == 0 %}reviews-list--no-reviews{% endif %}">
+                      <div class="swiper-wrapper">
+                        {% if total_reviews > 0 %}
+                          {% for review_block in review_blocks %}
+                            <div class="swiper-slide">
+                              <div class="review-card" {{ review_block.shopify_attributes }}>
+                                <div class="review-card__header">
+                                   <div class="star-rating">
+                                    {% for i in (1..review_block.settings.rating) %}
+                                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                                    {% endfor %}
+                                   </div>
+                                   {% if review_block.settings.is_verified %}
+                                     <span class="review-card__verified-badge">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+                                        <span>Verified Purchase</span>
+                                     </span>
+                                   {% endif %}
+                                </div>
+                                {% if review_block.settings.title != blank %}<h3 class="review-card__title">{{ review_block.settings.title }}</h3>{% endif %}
+                                <div class="review-card__content">{{ review_block.settings.content }}</div>
+                                <p class="review-card__author-date">{{ review_block.settings.author }}{% if review_block.settings.date != blank %} • {{ review_block.settings.date }}{% endif %}</p>
+                              </div>
+                            </div>
+                          {% endfor %}
+                        {% else %}
+                           <p>{{ block.settings.no_reviews_text }}</p>
+                        {% endif %}
+                      </div>
+                    </div>
+                    {% if total_reviews > 1 %}
+                      <div class="review-swiper-button-prev">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                      </div>
+                      <div class="review-swiper-button-next">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                      </div>
+                      <div class="review-swiper-pagination"></div>
+                    {% endif %}
+                  </div>
+                </div>
+            </div>
+            {% assign review_section_rendered = true %}
+          
+          {% when 'featured_product' %}
+            <div class="featured-product-section" style="background-color: {{ block.settings.background_color }};">
+              <div class="featured-product-swiper swiper-container">
+                <div class="swiper-wrapper">
+                  {% for i in (1..5) %}
+                    {% capture product_id %}product_{{ i }}{% endcapture %}
+                    {% assign product_obj = block.settings[product_id] %}
+                    
+                    {% if product_obj != blank %}
+                      <div class="swiper-slide">
+                        <div class="featured-product__slide-content">
+                          <div class="featured-product__image-wrapper">
+                            {% if product_obj.featured_image != blank %}
+                              <img class="featured-product__image" src="{{ product_obj.featured_image | image_url: width: 800 }}" alt="{{ product_obj.featured_image.alt | escape }}" loading="lazy">
+                            {% else %}
+                              {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                            {% endif %}
+                          </div>
+                          <div class="featured-product__text-wrapper">
+                            <div class="featured-product__rating">
+                              {% capture rating_id %}rating_{{ i }}{% endcapture %}
+                              {% capture review_count_id %}review_count_{{ i }}{% endcapture %}
+                              {% assign rating_val = block.settings[rating_id] %}
+                              {% assign review_count_val = block.settings[review_count_id] %}
+                              <span class="rating-score">{{ rating_val | format: '0.0' }}</span>
+                              <div class="stars">
+                                {% for j in (1..5) %}
+                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.0006 18.26L4.94715 22.2082L6.52248 14.2799L0.587891 8.7918L8.61483 7.84006L12.0006 0.5L15.3864 7.84006L23.4133 8.7918L17.4787 14.2799L19.054 22.2082L12.0006 18.26Z"></path></svg>
+                                {% endfor %}
+                              </div>
+                              <span>{{ review_count_val }} Reviews</span>
+                            </div>
+                            <h2 class="featured-product__title">{{ product_obj.title }}</h2>
+                            <div class="featured-product__price">
+                              {% assign max_compare_at_price = 0 %}
+                              {% for variant in product_obj.variants %}
+                                {% if variant.compare_at_price > max_compare_at_price %}
+                                  {% assign max_compare_at_price = variant.compare_at_price %}
+                                {% endif %}
+                              {% endfor %}
+                              <span class="current_price">{{ product_obj.price_max | money }}</span>
+                              {% if max_compare_at_price > product_obj.price_max %}
+                                <span class="compare_price">{{ max_compare_at_price | money }}</span>
+                              {% endif %}
+                            </div>
+                            <a href="{{ product_obj.url }}" class="featured-product__button">
+                              {{ block.settings.button_text }}
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+              <div class="product-swiper-button-prev">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+              </div>
+              <div class="product-swiper-button-next">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+              </div>
+              <div class="product-swiper-pagination"></div>
+            </div>
+          
+          {% when 'customer_review' %}
+            {% comment %} This block is a data source and should not render anything here. {% endcomment %}
+        {% endcase %}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  function initReviewSwiper(sectionId) {
+    const swiperElement = document.querySelector(`[data-section-id="${sectionId}"] .reviews-list.swiper-container`);
+    const totalSlides = {{ total_reviews | default: 0 }};
+    if (swiperElement && !swiperElement.swiper && totalSlides > 0) {
+      new Swiper(swiperElement, {
+        loop: totalSlides > 1,
+        autoHeight: true,
+        spaceBetween: 20,
+        navigation: {
+          nextEl: `[data-section-id="${sectionId}"] .review-swiper-button-next`,
+          prevEl: `[data-section-id="${sectionId}"] .review-swiper-button-prev`,
+        },
+        pagination: {
+          el: `[data-section-id="${sectionId}"] .review-swiper-pagination`,
+          clickable: true,
+        },
+      });
+    }
+  }
+
+  function initProductSwiper(sectionId) {
+    const swiperElement = document.querySelector(`[data-section-id="${sectionId}"] .featured-product-swiper.swiper-container`);
+    if (swiperElement && !swiperElement.swiper) {
+      const slideCount = swiperElement.querySelectorAll('.swiper-slide').length;
+      if (slideCount > 0) {
+        new Swiper(swiperElement, {
+          loop: slideCount > 1,
+          slidesPerView: 1,
+          spaceBetween: 30,
+          navigation: {
+            nextEl: `[data-section-id="${sectionId}"] .product-swiper-button-next`,
+            prevEl: `[data-section-id="${sectionId}"] .product-swiper-button-prev`,
+          },
+          pagination: {
+            el: `[data-section-id="${sectionId}"] .product-swiper-pagination`,
+            clickable: true,
+          },
+        });
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    initReviewSwiper('{{ section.id }}');
+    initProductSwiper('{{ section.id }}');
+  });
+
+  document.addEventListener('shopify:section:load', function (event) {
+    if (event.detail.sectionId === '{{ section.id }}') {
+      initReviewSwiper(event.detail.sectionId);
+      initProductSwiper(event.detail.sectionId);
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "優化版商品描述 v5.5.8",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "1. 區塊標題",
+      "settings": [
+        { "type": "header", "content": "標題內容" },
+        { "type": "text", "id": "tag_text", "label": "小標題 (Tag)", "default": "All Functions", "info": "顯示在最上方，如圖片中的 'All Functions'。" },
+        { "type": "text", "id": "main_heading", "label": "主標題", "default": "A Universal Charger", "info": "最主要的標題，字體較大。" },
+        { "type": "text", "id": "sub_heading", "label": "副標題", "default": "The Universal Charger Understands You Best", "info": "次要標題或標語。" },
+        { "type": "richtext", "id": "description", "label": "描述文字", "default": "<p>It is a mobile power bank, charging cable, magnetic wireless charger, transformer and mobile phone holder. For business trips and travel, you can do it all in one.</p>", "info": "詳細的描述文字，支援基本格式。" },
+        { "type": "header", "content": "區塊間距" },
+        { "type": "range", "id": "padding_top", "min": 0, "max": 200, "step": 4, "unit": "px", "label": "上方間距 (桌面)", "default": 80 },
+        { "type": "range", "id": "padding_bottom", "min": 0, "max": 200, "step": 4, "unit": "px", "label": "下方間距 (桌面)", "default": 80 },
+        { "type": "range", "id": "padding_top_mobile", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "上方間距 (手機)", "default": 40 },
+        { "type": "range", "id": "padding_bottom_mobile", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "下方間距 (手機)", "default": 40 }
+      ]
+    },
+    {
+      "type": "feature_icon_grid",
+      "name": "2. 特色圖標網格",
+      "limit": 1,
+      "settings": [
+        { "type": "header", "content": "圖標 1" },
+        { "type": "image_picker", "id": "icon_1_image", "label": "圖標 1 圖片" },
+        { "type": "text", "id": "icon_1_text", "label": "圖標 1 文字" },
+        { "type": "header", "content": "圖標 2" },
+        { "type": "image_picker", "id": "icon_2_image", "label": "圖標 2 圖片" },
+        { "type": "text", "id": "icon_2_text", "label": "圖標 2 文字" },
+        { "type": "header", "content": "圖標 3" },
+        { "type": "image_picker", "id": "icon_3_image", "label": "圖標 3 圖片" },
+        { "type": "text", "id": "icon_3_text", "label": "圖標 3 文字" },
+        { "type": "header", "content": "圖標 4" },
+        { "type": "image_picker", "id": "icon_4_image", "label": "圖標 4 圖片" },
+        { "type": "text", "id": "icon_4_text", "label": "圖標 4 文字" },
+        { "type": "header", "content": "圖標 5" },
+        { "type": "image_picker", "id": "icon_5_image", "label": "圖標 5 圖片" },
+        { "type": "text", "id": "icon_5_text", "label": "圖標 5 文字" },
+        { "type": "header", "content": "圖標 6" },
+        { "type": "image_picker", "id": "icon_6_image", "label": "圖標 6 圖片" },
+        { "type": "text", "id": "icon_6_text", "label": "圖標 6 文字" },
+        { "type": "header", "content": "區塊間距" },
+        { "type": "range", "id": "padding_top", "min": 0, "max": 200, "step": 4, "unit": "px", "label": "上方間距 (桌面)", "default": 80 },
+        { "type": "range", "id": "padding_bottom", "min": 0, "max": 200, "step": 4, "unit": "px", "label": "下方間距 (桌面)", "default": 80 },
+        { "type": "range", "id": "padding_top_mobile", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "上方間距 (手機)", "default": 40 },
+        { "type": "range", "id": "padding_bottom_mobile", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "下方間距 (手機)", "default": 40 }
+      ]
+    },
+    {
+      "type": "fast_charging",
+      "name": "3. 快速充電特色",
+      "settings": [
+        { "type": "header", "content": "內容設定" },
+        { "type": "image_picker", "id": "image", "label": "左側圖片" },
+        { "type": "radio", "id": "image_position", "label": "圖片位置 (桌面版)", "options": [{ "value": "left", "label": "左" },{ "value": "right", "label": "右" }], "default": "left" },
+        { "type": "text", "id": "tag_text", "label": "小標籤文字", "default": "Fast Charging" },
+        { "type": "text", "id": "heading", "label": "主標題", "default": "Dual-Protocol Fast Charging 18W Lightning Speed" },
+        { "type": "richtext", "id": "description", "label": "詳細描述", "default": "<p>Provides Type-, USB-A18W high-power charging, the phone isinstantly recharged, and uses HQ5+ fast charging technology, stable output intelligent power distribution, 30 minutes to charge 50%</p>" },
+        { "type": "header", "content": "充電時間比較" },
+        { "type": "text", "id": "charge_time_value", "label": "充電時間數值", "default": "30" },
+        { "type": "text", "id": "charge_time_unit", "label": "充電時間單位", "default": "min" },
+        { "type": "text", "id": "charge_time_description", "label": "充電時間說明", "default": "Take iPhone 14 for example" },
+        { "type": "range", "id": "charger_percentage", "min": 0, "max": 100, "step": 1, "unit": "%", "label": "MOZTECH 充電器百分比", "default": 50 },
+        { "type": "range", "id": "ordinary_percentage", "min": 0, "max": 100, "step": 1, "unit": "%", "label": "普通行動電源百分比", "default": 20 },
+        { "type": "header", "content": "手機充電次數比較" },
+        { "type": "text", "id": "units_value", "label": "充電單位數值", "default": "2" },
+        { "type": "text", "id": "units_description", "label": "充電單位說明", "default": "Take iPhone 14 for example" },
+        { "type": "text", "id": "full_charge_note", "label": "充電注意事項", "default": "When fully charged from 20%-100% about 2-3 times" },
+        { "type": "header", "content": "設計選項" },
+        { "type": "color", "id": "background_color", "label": "區塊背景顏色", "default": "#FFFFFF" },
+        { "type": "range", "id": "padding_top", "min": 0, "max": 200, "step": 4, "unit": "px", "label": "上方間距 (桌面)", "default": 80 },
+        { "type": "range", "id": "padding_bottom", "min": 0, "max": 200, "step": 4, "unit": "px", "label": "下方間距 (桌面)", "default": 80 },
+        { "type": "range", "id": "padding_top_mobile", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "上方間距 (手機)", "default": 40 },
+        { "type": "range", "id": "padding_bottom_mobile", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "下方間距 (手機)", "default": 40 }
+      ]
+    },
+    {
+      "type": "dual_mode_battery",
+      "name": "4. 雙模式電池儲存",
+      "settings": [
+        { "type": "header", "content": "內容設定" },
+        { "type": "image_picker", "id": "image", "label": "左側圖片" },
+        { "type": "radio", "id": "image_position", "label": "圖片位置 (桌面版)", "options": [{ "value": "left", "label": "左" },{ "value": "right", "label": "右" }], "default": "right" },
+        { "type": "text", "id": "tag_text", "label": "小標籤文字", "default": "Easy to Charge" },
+        { "type": "text", "id": "heading", "label": "主標題", "default": "Dual-Mode Battery Storage" },
+        { "type": "richtext", "id": "description", "label": "詳細描述", "default": "<p>The AC plug and Type-C port are two ways to store power to ensure that you are always fully charged.</p><p>*AC input can be output at the same time, Type-C input cannot be output at the same time.</p>" },
+        { "type": "header", "content": "卡片 1 (左側)" },
+        { "type": "text", "id": "card1_title", "label": "卡片標題", "default": "Charge with AC Plug" },
+        { "type": "text", "id": "card1_value", "label": "數值", "default": "7-8" },
+        { "type": "text", "id": "card1_unit", "label": "單位", "default": "hours" },
+        { "type": "text", "id": "card1_text", "label": "說明文字", "default": "Charges after plugging into socket" },
+        { "type": "header", "content": "卡片 2 (右側)" },
+        { "type": "text", "id": "card2_title", "label": "卡片標題", "default": "Charge via Type-C Port" },
+        { "type": "text", "id": "card2_value", "label": "數值", "default": "5-6" },
+        { "type": "text", "id": "card2_unit", "label": "單位", "default": "hours" },
+        { "type": "text", "id": "card2_text", "label": "說明文字", "default": "Charges with charger and cable" },
+        { "type": "header", "content": "設計選項" },
+        { "type": "color", "id": "background_color", "label": "區塊背景顏色", "default": "#FFFFFF" },
+        { "type": "range", "id": "padding_top", "min": 0, "max": 200, "step": 4, "unit": "px", "label": "上方間距 (桌面)", "default": 80 },
+        { "type": "range", "id": "padding_bottom", "min": 0, "max": 200, "step": 4, "unit": "px", "label": "下方間距 (桌面)", "default": 80 },
+        { "type": "range", "id": "padding_top_mobile", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "上方間距 (手機)", "default": 40 },
+        { "type": "range", "id": "padding_bottom_mobile", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "下方間距 (手機)", "default": 40 }
+      ]
+    },
+    {
+      "type": "wide_image_content",
+      "name": "6. 左右圖文 (舊版，請用two_column)",
+      "settings": [
+        { "type": "radio", "id": "image_position", "label": "圖片位置 (電腦版)", "options": [{ "value": "left", "label": "左" },{ "value": "right", "label": "右" }], "default": "right" },
+        { "type": "header", "content": "文字內容" },
+        { "type": "text", "id": "title", "label": "標題", "info": "用 [方括號] 將文字包起來即可變色，例如：Up To [15W] Wireless Charging。" , "default": "Up To [15W] Wireless Charging"},
+        { "type": "color", "id": "title_color", "label": "標題整體顏色", "default": "#000000" },
+        { "type": "color", "id": "highlight_color", "label": "標題高亮顏色", "default": "#3498db" },
+        { "type": "richtext", "id": "description", "label": "內文描述", "default": "<p>Supports magnetic wireless charging for precise charging positioning and can be expanded to support all wireless charging smart devices! (Including Android system phones)</p>" },
+        { "type": "header", "content": "圖片內容" },
+        { "type": "image_picker", "id": "image", "label": "圖片" },
+        { "type": "header", "content": "區塊間距" },
+        { "type": "range", "id": "padding_top", "min": 0, "max": 200, "step": 4, "unit": "px", "label": "上方間距 (桌面)", "default": 80 },
+        { "type": "range", "id": "padding_bottom", "min": 0, "max": 200, "step": 4, "unit": "px", "label": "下方間距 (桌面)", "default": 80 },
+        { "type": "range", "id": "padding_top_mobile", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "上方間距 (手機)", "default": 40 },
+        { "type": "range", "id": "padding_bottom_mobile", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "下方間距 (手機)", "default": 40 }
+      ]
+    },
+    {
+      "type": "single_image",
+      "name": "9. 單張圖片",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "圖片" },
+        {
+          "type": "select",
+          "id": "width",
+          "label": "圖片寬度",
+          "options": [
+            { "value": "standard", "label": "標準寬度" },
+            { "value": "full_width", "label": "滿版寬度" }
+          ],
+          "default": "standard"
+        },
+        { "type": "header", "content": "區塊間距" },
+        { "type": "range", "id": "padding_top", "min": 0, "max": 200, "step": 4, "unit": "px", "label": "上方間距 (桌面)", "default": 80 },
+        { "type": "range", "id": "padding_bottom", "min": 0, "max": 200, "step": 4, "unit": "px", "label": "下方間距 (桌面)", "default": 80 },
+        { "type": "range", "id": "padding_top_mobile", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "上方間距 (手機)", "default": 40 },
+        { "type": "range", "id": "padding_bottom_mobile", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "下方間距 (手機)", "default": 40 }
+      ]
+    },
+    {
+      "type": "review_summary",
+      "name": "10. 🚀 評價區塊 (容器)",
+      "limit": 1,
+      "settings": [
+        { "type": "paragraph", "content": "請先新增此區塊，它會自動抓取下方的「└ 評價項目」並以輪播方式顯示。" },
+        { "type": "text", "id": "title", "label": "區塊標題", "default": "Customer Reviews" },
+        { "type": "text", "id": "write_review_text", "label": "撰寫評價按鈕文字", "default": "Click to review" },
+        {
+          "type": "url",
+          "id": "write_review_link",
+          "label": "撰寫評價按鈕連結",
+          "info": "請在此貼上評價 App 提供的表單連結或錨點連結 (例如: #judgeme_review_form)。如果留空，按鈕將不可點擊。"
+        },
+        { "type": "text", "id": "no_reviews_text", "label": "沒有評價時的提示文字", "default": "No reviews yet. Be the first to share your thoughts!" },
+        { "type": "header", "content": "設計選項" },
+        { "type": "range", "id": "padding_top", "min": 0, "max": 200, "step": 4, "unit": "px", "label": "上方間距 (桌面)", "default": 80 },
+        { "type": "range", "id": "padding_bottom", "min": 0, "max": 200, "step": 4, "unit": "px", "label": "下方間距 (桌面)", "default": 80 },
+        { "type": "range", "id": "padding_top_mobile", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "上方間距 (手機)", "default": 40 },
+        { "type": "range", "id": "padding_bottom_mobile", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "下方間距 (手機)", "default": 40 }
+      ]
+    },
+    {
+      "type": "customer_review",
+      "name": "  └ 評價項目",
+      "settings": [
+        { "type": "paragraph", "content": "此區塊為「評價區塊(容器)」的資料來源，請務必新增在容器下方。" },
+        { "type": "range", "id": "rating", "min": 1, "max": 5, "step": 1, "label": "星級評分", "default": 5 },
+        { "type": "text", "id": "author", "label": "評論者姓名", "default": "Customer Name" },
+        { "type": "text", "id": "title", "label": "評論標題 (選填)" },
+        { "type": "textarea", "id": "content", "label": "評論內容", "default": "This is a great product! Highly recommended." },
+        { "type": "text", "id": "date", "label": "評論日期 (選填)", "default": "2023-10-27" },
+        { "type": "checkbox", "id": "is_verified", "label": "是否為已驗證購買?", "default": true }
+      ]
+    },
+    {
+      "type": "featured_product",
+      "name": "11. 🚀 商品輪播推薦 ",
+      "limit": 1,
+      "settings": [
+        { "type": "header", "content": "一般設定" },
+        { "type": "color", "id": "background_color", "label": "背景顏色", "default": "#34b4e7" },
+        { "type": "text", "id": "button_text", "label": "按鈕文字", "default": "Buy Now" },
+        { "type": "header", "content": "商品 1 設定" },
+        { "type": "product", "id": "product_1", "label": "選擇商品 1" },
+        { "type": "range", "id": "rating_1", "min": 1, "max": 5, "step": 0.1, "label": "商品 1 星級評分", "default": 5.0, "unit": "星" },
+        { "type": "number", "id": "review_count_1", "label": "商品 1 評論數量", "default": 3 },
+        { "type": "header", "content": "商品 2 設定 (選填)" },
+        { "type": "product", "id": "product_2", "label": "選擇商品 2" },
+        { "type": "range", "id": "rating_2", "min": 1, "max": 5, "step": 0.1, "label": "商品 2 星級評分", "default": 4.8, "unit": "星" },
+        { "type": "number", "id": "review_count_2", "label": "商品 2 評論數量", "default": 12 },
+        { "type": "header", "content": "商品 3 設定 (選填)" },
+        { "type": "product", "id": "product_3", "label": "選擇商品 3" },
+        { "type": "range", "id": "rating_3", "min": 1, "max": 5, "step": 0.1, "label": "商品 3 星級評分", "default": 4.9, "unit": "星" },
+        { "type": "number", "id": "review_count_3", "label": "商品 3 評論數量", "default": 8 },
+        { "type": "header", "content": "商品 4 設定 (選填)" },
+        { "type": "product", "id": "product_4", "label": "選擇商品 4" },
+        { "type": "range", "id": "rating_4", "min": 1, "max": 5, "step": 0.1, "label": "商品 4 星級評分", "default": 5.0, "unit": "星" },
+        { "type": "number", "id": "review_count_4", "label": "商品 4 評論數量", "default": 5 },
+        { "type": "header", "content": "商品 5 設定 (選填)" },
+        { "type": "product", "id": "product_5", "label": "選擇商品 5" },
+        { "type": "range", "id": "rating_5", "min": 1, "max": 5, "step": 0.1, "label": "商品 5 星級評分", "default": 4.7, "unit": "星" },
+        { "type": "number", "id": "review_count_5", "label": "商品 5 評論數量", "default": 15 }
+      ]
+    },
+    {
+      "type": "bottom_hero_banner",
+      "name": "12. 底部 Hero Banner (已棄用)",
+      "settings": [
+        { "type": "header", "content": "背景圖片" },
+        { "type": "image_picker", "id": "image_pc", "label": "電腦版背景圖片" },
+        { "type": "image_picker", "id": "image_mobile", "label": "手機版背景圖片 (選填)", "info": "若未上傳，手機版將使用電腦版圖片。" },
+        { "type": "header", "content": "內容與顏色" },
+        { "type": "image_picker", "id": "logo", "label": "Logo 圖片" },
+        { "type": "text", "id": "heading", "label": "主標題", "default": "Universal Charger" },
+        { "type": "color", "id": "heading_color", "label": "主標題顏色", "default": "#FFFFFF" },
+        { "type": "text", "id": "subheading", "label": "副標題", "default": "Beyond Your Imagination" },
+        { "type": "color", "id": "subheading_color", "label": "副標題顏色", "default": "#FFFFFF" },
+        { "type": "header", "content": "區塊間距" },
+        { "type": "range", "id": "padding_top", "min": 0, "max": 200, "step": 4, "unit": "px", "label": "上方間距 (桌面)", "default": 80 },
+        { "type": "range", "id": "padding_bottom", "min": 0, "max": 200, "step": 4, "unit": "px", "label": "下方間距 (桌面)", "default": 80 },
+        { "type": "range", "id": "padding_top_mobile", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "上方間距 (手機)", "default": 40 },
+        { "type": "range", "id": "padding_bottom_mobile", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "下方間距 (手機)", "default": 40 }
+      ]
+    },
+    {
+      "type": "two_column_content",
+      "name": "5. 設備同時充 (新)",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "圖片" },
+        { "type": "radio", "id": "image_position", "label": "圖片位置 (桌面版)", "options": [{ "value": "left", "label": "左" },{ "value": "right", "label": "右" }], "default": "left" },
+        { "type": "header", "content": "標籤 (選填)" },
+        { "type": "checkbox", "id": "show_tag", "label": "是否顯示標籤?", "default": true },
+        { "type": "text", "id": "tag_text", "label": "標籤文字", "default": "Nose Hair Trimming" },
+        { "type": "color", "id": "tag_color", "label": "標籤顏色 (文字與邊框)", "default": "#2cb9ee" },
+        { "type": "header", "content": "主要內容" },
+        { "type": "text", "id": "heading", "label": "主標題", "default": "Nose Hair [Trimming] Set", "info": "用 [方括號] 將文字包起來即可變色。" },
+        { "type": "color", "id": "heading_color", "label": "主標題顏色", "default": "#333333" },
+        { "type": "color", "id": "highlight_color", "label": "主標題高亮顏色", "default": "#2cb9ee" },
+        { "type": "text", "id": "subheading", "label": "副標題", "default": "Multi-Purpose in One Device, Convenient and Fast" },
+        { "type": "richtext", "id": "text", "label": "內文", "default": "<p>With minimalist design and ultra-compact footprint perfectly integrated into room space, making life more organized and charging more convenient.</p>" },
+        { "type": "header", "content": "區塊間距" },
+        { "type": "range", "id": "padding_top", "min": 0, "max": 200, "step": 4, "unit": "px", "label": "上方間距 (桌面)", "default": 80 },
+        { "type": "range", "id": "padding_bottom", "min": 0, "max": 200, "step": 4, "unit": "px", "label": "下方間距 (桌面)", "default": 80 },
+        { "type": "range", "id": "padding_top_mobile", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "上方間距 (手機)", "default": 40 },
+        { "type": "range", "id": "padding_bottom_mobile", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "下方間距 (手機)", "default": 40 }
+      ]
+    },
+    {
+      "type": "showcase_grid",
+      "name": "7. 特色展示 (三圖)",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "整體大標題", "default": "Play Without Fear" },
+        { "type": "header", "content": "左側文字區塊" },
+        { "type": "text", "id": "title", "label": "標題", "info": "用 [方括號] 將文字包起來即可變色，例如：Semiconductor [Guided Cooling]。" , "default": "Semiconductor [Guided Cooling] for Rapid Temperature Reduction"},
+        { "type": "color", "id": "highlight_color", "label": "標題高亮顏色", "default": "#3498db" },
+        { "type": "richtext", "id": "description", "label": "內文描述", "default": "<p>Semiconductor guided cooling combined with 4000RPM for rapid cooling, can achieve a temperature of up to 22°C</p>" },
+        { "type": "text", "id": "note", "label": "備註文字", "default": "*This data is the temperature of the Magent Frost Cooler body" },
+        { "type": "header", "content": "右側圖片區塊" },
+        { "type": "image_picker", "id": "main_image", "label": "左側大圖" },
+        { "type": "image_picker", "id": "sub_image_1", "label": "右側上方小圖" },
+        { "type": "image_picker", "id": "sub_image_2", "label": "右側下方小圖" },
+        { "type": "header", "content": "區塊間距" },
+        { "type": "range", "id": "padding_top", "min": 0, "max": 200, "step": 4, "unit": "px", "label": "上方間距 (桌面)", "default": 80 },
+        { "type": "range", "id": "padding_bottom", "min": 0, "max": 200, "step": 4, "unit": "px", "label": "下方間距 (桌面)", "default": 80 },
+        { "type": "range", "id": "padding_top_mobile", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "上方間距 (手機)", "default": 40 },
+        { "type": "range", "id": "padding_bottom_mobile", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "下方間距 (手機)", "default": 40 }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "優化版商品描述 v5.5.8",
+      "blocks": [
+        { "type": "heading" },
+        { "type": "feature_icon_grid" },
+        { "type": "fast_charging" },
+        { "type": "dual_mode_battery" },
+        { "type": "wide_image_content" },
+        { "type": "two_column_content" },
+        { "type": "showcase_grid" },
+        { "type": "single_image" },
+        { "type": "review_summary" },
+        { "type": "customer_review" },
+        { "type": "customer_review" },
+        { "type": "customer_review" },
+        { "type": "featured_product" },
+        { "type": "bottom_hero_banner" }
+      ]
+    }
+  ]
+}
+{% endschema %}

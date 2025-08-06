@@ -1,0 +1,132 @@
+<div
+	class='age-verification popup'
+	data-exit-animation='popupExitFade'
+	data-body-scroll-disable='true'
+	data-open-trigger='none'
+	data-id='{{ section.id }}'
+	data-limit-display='1'
+	data-limit-lifetime='30'
+>
+	<div class='age-verification__wrapper popup-wrap'>
+		<div class='container'>
+			<div class='age-verification__content'>
+				<div class='age-verification__question show'>
+					{% if section.settings.heading %}
+						<h2 class='popup-heading age-verification__heading {{ section.settings.heading_size }}'>
+							{{ section.settings.heading }}
+						</h2>
+					{% endif %}
+					{% if section.settings.text %}
+						<div class='popup-text'>
+							{{ section.settings.text }}
+						</div>
+					{% endif %}
+					<div class='age-verification__buttons'>
+						<button class='button button--tertiary age-verification__button-no focus-inset'>
+							{{ section.settings.button_label_no }}
+						</button>
+						<button class='button button--primary age-verification__popup-close focus-inset'>
+							{{ section.settings.button_label_yes }}
+						</button>
+					</div>
+				</div>
+
+				<div class='age-verification__declined'>
+					<div class='age-declined__wrapper'>
+						{% if section.settings.heading_declined %}
+							<h2 class='popup-heading age-verification__heading h1'>
+								{{ section.settings.heading_declined }}
+							</h2>
+						{% endif %}
+						{% if section.settings.text_declined %}
+							<div class='popup-text'>
+								{{ section.settings.text_declined }}
+							</div>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% schema %}
+{
+	"name": "年齡驗證",
+	"limit": 1,
+	"enabled_on": {
+		"groups": ["custom.overlay"]
+	},
+	"settings": [
+		{
+			"type": "header",
+			"content": "驗證內容設定"
+		},
+		{
+			"type": "text",
+			"id": "heading",
+			"default": "您是否已達法定年齡？",
+			"label": "標題"
+		},
+		{
+			"type": "select",
+			"id": "heading_size",
+			"options": [
+				{
+					"value": "h3",
+					"label": "小"
+				},
+				{
+					"value": "h2",
+					"label": "中"
+				},
+				{
+					"value": "h1",
+					"label": "大"
+				}
+			],
+			"default": "h1",
+			"label": "標題大小"
+		},
+		{
+			"type": "richtext",
+			"id": "text",
+			"default": "<p>進入本網站前，請先確認您已達到法定年齡。</p>",
+			"label": "內文"
+		},
+		{
+			"type": "text",
+			"id": "button_label_no",
+			"default": "離開",
+			"label": "「否」按鈕文字"
+		},
+		{
+			"type": "text",
+			"id": "button_label_yes",
+			"default": "進入",
+			"label": "「是」按鈕文字"
+		},
+		{
+			"type": "header",
+			"content": "驗證失敗內容"
+		},
+		{
+			"type": "text",
+			"id": "heading_declined",
+			"default": "很抱歉，您的年齡不符資格",
+			"label": "標題 (驗證失敗時)"
+		},
+		{
+			"type": "richtext",
+			"id": "text_declined",
+			"default": "<p>您必須達到法定年齡才能瀏覽本網站。</p>",
+			"label": "內文 (驗證失敗時)"
+		}
+	],
+	"presets": [
+		{
+			"name": "年齡驗證"
+		}
+	]
+}
+{% endschema %}

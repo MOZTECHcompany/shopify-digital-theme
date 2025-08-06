@@ -1,0 +1,492 @@
+{{ 'section-video-banner.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign video_ratio = section.settings.video_ratio
+-%}
+
+{%- if video_ratio == 'adapt' and section.settings.video != blank -%}
+  {%- style -%}
+    @media screen and (min-width: 750px) {
+      #Banner-{{ section.id }}.video--overlay::before {
+        padding-bottom: {{ 1 | divided_by: section.settings.video.aspect_ratio | times: 100 }}%;
+        content: '';
+        display: block;
+      }
+    }
+    #Banner-{{ section.id }} .banner__media::before {
+      padding-bottom: {{ 1 | divided_by: section.settings.video.aspect_ratio | times: 100 }}%;
+      content: '';
+      display: block;
+    }
+  {%- endstyle -%}
+{%- elsif video_ratio == 'adapt' and section.settings.video == blank -%}
+  {%- style -%}
+    @media screen and (min-width: 750px) {
+      #Banner-{{ section.id }}.video--overlay::before {
+        padding-bottom: 25%;
+        content: '';
+        display: block;
+      }
+    }
+    #Banner-{{ section.id }}.banner--no-video::before, #Banner-{{ section.id }} .banner__media::before {
+      padding-bottom: 25%;
+      content: '';
+      display: block;
+    }
+  {%- endstyle -%}
+{%- endif -%}
+{%- if video_ratio != 'adapt' %}
+  {% assign aspect_ratio = section.settings.video_ratio | split: '/' %}
+  {% assign temp = aspect_ratio[0] | append: '.0' %}
+  {% assign padding_bottom = aspect_ratio[1] | divided_by: temp | times: 100 | round: 2 %}
+  {%- style -%}
+    @media screen and (min-width: 750px) {
+      #Banner-{{ section.id }}.video--overlay::before {
+        content: '';
+        display: block;
+        padding-bottom: {{ padding_bottom }}%;
+      }
+    }
+
+    #Banner-{{ section.id }}.banner--no-video::before, #Banner-{{ section.id }} .banner__media::before {
+      content: '';
+      display: block;
+      padding-bottom: {{ padding_bottom }}%;
+    }
+  {%- endstyle -%}
+{%- endif -%}
+
+{% style %}
+  {% render 'section-margin' %}
+
+   .banner__overlay {
+    background-color: rgba(var(--color-overlay), {{ section.settings.opacity_overlay }});
+  }
+{% endstyle %}
+
+<div class="video-banner {% if section.settings.full_width %}{% else %}container{% endif %}">
+  <div
+    id="Banner-{{ section.id }}"
+    class="
+      banner video--overlay
+      {% if section.settings.full_width %}banner--container{% endif %}
+      {%- if section.settings.video == blank -%} banner--no-video {% endif %}
+      color-{{ section.settings.color_scheme }}
+    "
+  >
+    {%- if section.settings.video != blank -%}
+      <div class="banner__media media banner__media--{{- section.settings.video_fit -}}">
+        {{
+          section.settings.video
+          | video_tag: image_size: '1100x', autoplay: true, loop: true, controls: false, muted: true
+        }}
+        <span class="banner__overlay"></span>
+      </div>
+    {%- endif -%}
+    <div class="video-banner__wrapper {% if section.settings.text_align != 'left' %}video-banner__column--center{% endif %}">
+      {% if section.settings.full_width %}
+        <div class="container">
+      {% endif %}
+      <div class="video-banner__column">
+        {% render 'section-text',
+          section: section,
+          class: 'video-banner',
+          text_align: section.settings.text_align,
+          heading_level: section.settings.heading_level
+        %}
+        {%- if section.settings.show_button -%}
+          {% render 'button',
+            link: section.settings.button_link,
+            label: section.settings.button_label,
+            style: section.settings.button_style,
+            class: 'video-banner'
+          %}
+        {% endif %}
+      </div>
+      {% if section.settings.full_width %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const playVideo = (section) => {
+      if (!section || !section.classList.contains('video-banner-section')) return;
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          const video = entry.target.querySelector('video');
+          if (!video) return;
+
+          if (entry.isIntersecting) {
+            video.play().catch((err) => console.warn('Autoplay is blocked: ', err));
+          } else {
+            video.pause();
+          }
+        });
+      });
+
+      observer.observe(section);
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      playVideo(document.getElementById('shopify-section-{{ section.id }}'));
+    });
+
+    document.addEventListener('shopify:section:load', function (event) {
+      playVideo(event.target);
+    });
+  })();
+</script>
+
+{% schema %}
+{
+	"name": "影片橫幅",
+	"tag": "section",
+	"class": "video-banner-section spaced-section",
+	"enabled_on": {
+		"templates": ["*"]
+	},
+	"settings": [
+		{
+			"type": "checkbox",
+			"id": "full_width",
+			"default": false,
+			"label": "全螢幕寬度"
+		},
+		{
+			"type": "color_scheme",
+			"id": "color_scheme",
+			"default": "background-3",
+			"label": "色彩配置"
+		},
+		{
+			"type": "text",
+			"id": "subheading",
+			"label": "副標題"
+		},
+		{
+			"type": "select",
+			"id": "subheading_style",
+			"options": [
+				{ "value": "subtitle", "label": "副標題" },
+				{ "value": "subtitle subtitle--secondary", "label": "副標題 (次要)" }
+			],
+			"default": "subtitle",
+			"label": "副標題樣式"
+		},
+		{
+			"type": "select",
+			"id": "subheading_icon",
+			"options": [
+				{ "value": "none", "label": "無" },
+				{ "value": "arrow-bar", "label": "箭頭條" },
+				{ "value": "bag-1", "label": "提袋 1" },
+				{ "value": "bag-2", "label": "提袋 2" },
+				{ "value": "bag-3", "label": "提袋 3" },
+				{ "value": "bar-chart", "label": "長條圖" },
+				{ "value": "bars-upward", "label": "向上長條" },
+				{ "value": "baseball", "label": "棒球" },
+				{ "value": "battery-1", "label": "電池 1" },
+				{ "value": "battery-2", "label": "電池 2" },
+				{ "value": "battery-3", "label": "電池 3" },
+				{ "value": "book", "label": "書本" },
+				{ "value": "card", "label": "卡片" },
+				{ "value": "card-holder", "label": "名片夾" },
+				{ "value": "chart", "label": "圖表" },
+				{ "value": "chart-2", "label": "圖表 2" },
+				{ "value": "chart-3", "label": "圖表 3" },
+				{ "value": "chats", "label": "對話" },
+				{ "value": "check-1", "label": "勾號 1" },
+				{ "value": "check-2", "label": "勾號 2" },
+				{ "value": "check-3", "label": "勾號 3" },
+				{ "value": "check-4", "label": "勾號 4" },
+				{ "value": "circle", "label": "圓圈" },
+				{ "value": "circles", "label": "多個圓圈" },
+				{ "value": "clock-1", "label": "時鐘 1" },
+				{ "value": "clock-2", "label": "時鐘 2" },
+				{ "value": "close", "label": "關閉" },
+				{ "value": "cloud-server", "label": "雲端伺服器" },
+				{ "value": "computer", "label": "電腦" },
+				{ "value": "computer-mouse", "label": "滑鼠" },
+				{ "value": "confetti", "label": "彩紙" },
+				{ "value": "delivery", "label": "運送" },
+				{ "value": "delivery-box", "label": "包裹" },
+				{ "value": "devices", "label": "裝置" },
+				{ "value": "directions", "label": "方向" },
+				{ "value": "dumbbell", "label": "啞鈴" },
+				{ "value": "eye", "label": "眼睛" },
+				{ "value": "facebook", "label": "Facebook" },
+				{ "value": "file-1", "label": "檔案 1" },
+				{ "value": "file-2", "label": "檔案 2" },
+				{ "value": "flag", "label": "旗幟" },
+				{ "value": "folder-1", "label": "資料夾 1" },
+				{ "value": "folder-2", "label": "資料夾 2" },
+				{ "value": "food", "label": "食物" },
+				{ "value": "hand-1", "label": "手 1" },
+				{ "value": "hand-2", "label": "手 2" },
+				{ "value": "hand-3", "label": "手 3" },
+				{ "value": "headphones", "label": "耳機" },
+				{ "value": "instagram", "label": "Instagram" },
+				{ "value": "laptop-1", "label": "筆電 1" },
+				{ "value": "laptop-2", "label": "筆電 2" },
+				{ "value": "leaf", "label": "葉子" },
+				{ "value": "lightning-bolt-1", "label": "閃電 1" },
+				{ "value": "lightning-bolt-2", "label": "閃電 2" },
+				{ "value": "like", "label": "讚" },
+				{ "value": "link", "label": "連結" },
+				{ "value": "lock-1", "label": "鎖 1" },
+				{ "value": "lock-2", "label": "鎖 2" },
+				{ "value": "logout", "label": "登出" },
+				{ "value": "luggage", "label": "行李" },
+				{ "value": "mark", "label": "標記" },
+				{ "value": "medicine", "label": "藥品" },
+				{ "value": "microphone", "label": "麥克風" },
+				{ "value": "moon", "label": "月亮" },
+				{ "value": "pencil", "label": "鉛筆" },
+				{ "value": "phone-1", "label": "電話 1" },
+				{ "value": "phone-2", "label": "電話 2" },
+				{ "value": "phone-3", "label": "電話 3" },
+				{ "value": "phone-4", "label": "電話 4" },
+				{ "value": "pinterest", "label": "Pinterest" },
+				{ "value": "plug", "label": "插頭" },
+				{ "value": "presentation-1", "label": "簡報 1" },
+				{ "value": "presentation-2", "label": "簡報 2" },
+				{ "value": "pulse", "label": "脈搏" },
+				{ "value": "recycle", "label": "回收" },
+				{ "value": "rocket", "label": "火箭" },
+				{ "value": "search", "label": "搜尋" },
+				{ "value": "sending", "label": "傳送" },
+				{ "value": "server-1", "label": "伺服器 1" },
+				{ "value": "server-2", "label": "伺服器 2" },
+				{ "value": "settings", "label": "設定" },
+				{ "value": "shield", "label": "盾牌" },
+				{ "value": "shopping-basket", "label": "購物籃" },
+				{ "value": "shuffle", "label": "隨機播放" },
+				{ "value": "snapchat", "label": "Snapchat" },
+				{ "value": "sound-waves", "label": "聲波" },
+				{ "value": "speaker", "label": "喇叭" },
+				{ "value": "squares-1", "label": "方塊 1" },
+				{ "value": "squares-2", "label": "方塊 2" },
+				{ "value": "stack", "label": "堆疊" },
+				{ "value": "star", "label": "星星" },
+				{ "value": "stopwatch", "label": "碼錶" },
+				{ "value": "sun", "label": "太陽" },
+				{ "value": "tag", "label": "標籤" },
+				{ "value": "telephone-tower", "label": "電信塔" },
+				{ "value": "tik-tok", "label": "TikTok" },
+				{ "value": "tree", "label": "樹" },
+				{ "value": "trend", "label": "趨勢" },
+				{ "value": "trophy", "label": "獎盃" },
+				{ "value": "tumblr", "label": "Tumblr" },
+				{ "value": "tv", "label": "電視" },
+				{ "value": "twitter", "label": "Twitter" },
+				{ "value": "user-1", "label": "使用者 1" },
+				{ "value": "user-2", "label": "使用者 2" },
+				{ "value": "user-3", "label": "使用者 3" },
+				{ "value": "user-4", "label": "使用者 4" },
+				{ "value": "user-5", "label": "使用者 5" },
+				{ "value": "video", "label": "影片" },
+				{ "value": "vimeo", "label": "Vimeo" },
+				{ "value": "wallet", "label": "錢包" },
+				{ "value": "watch", "label": "手錶" },
+				{ "value": "water-1", "label": "水 1" },
+				{ "value": "water-2", "label": "水 2" },
+				{ "value": "water-3", "label": "水 3" },
+				{ "value": "wave-1", "label": "波浪 1" },
+				{ "value": "wave-2", "label": "波浪 2" },
+				{ "value": "wifi-1", "label": "Wi-Fi 1" },
+				{ "value": "wifi-2", "label": "Wi-Fi 2" },
+				{ "value": "window", "label": "視窗" },
+				{ "value": "youtube", "label": "YouTube" }
+			],
+			"default": "none",
+			"label": "副標題圖示"
+		},
+		{
+			"type": "textarea",
+			"id": "heading",
+			"default": "用影片講述您的故事",
+			"label": "標題"
+		},
+		{
+			"type": "select",
+			"id": "heading_size",
+			"options": [
+				{ "value": "h2", "label": "大" },
+				{ "value": "h4", "label": "小" },
+				{ "value": "h3", "label": "中" }
+			],
+			"default": "h2",
+			"label": "標題大小"
+		},
+		{
+			"type": "select",
+			"id": "heading_level",
+			"options": [
+				{ "value": "h1", "label": "H1" },
+				{ "value": "h2", "label": "H2" },
+				{ "value": "h3", "label": "H3" }
+			],
+			"default": "h2",
+			"label": "標題層級 (HTML 標籤)"
+		},
+		{
+			"type": "textarea",
+			"id": "text",
+			"default": "用一段文字描述您的品牌、產品或促銷活動。選擇與您品牌風格和調性相符的內容。",
+			"label": "內文"
+		},
+		{
+			"type": "select",
+			"id": "text_align",
+			"options": [
+				{ "value": "left", "label": "靠左" },
+				{ "value": "center", "label": "置中" }
+			],
+			"default": "left",
+			"label": "文字對齊"
+		},
+		{
+			"type": "header",
+			"content": "按鈕設定"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_button",
+			"default": true,
+			"label": "顯示按鈕"
+		},
+		{
+			"type": "text",
+			"id": "button_label",
+			"default": "按鈕文字",
+			"label": "按鈕文字"
+		},
+		{
+			"type": "select",
+			"id": "button_style",
+			"options": [
+				{
+					"group": "實心按鈕",
+					"value": "primary",
+					"label": "主要"
+				},
+				{
+					"group": "實心按鈕",
+					"value": "secondary",
+					"label": "次要"
+				},
+				{
+					"group": "實心按鈕",
+					"value": "tertiary",
+					"label": "第三"
+				},
+				{
+					"group": "外框/連結按鈕",
+					"value": "simple",
+					"label": "簡潔"
+				},
+				{
+					"group": "外框/連結按鈕",
+					"value": "simple_secondary",
+					"label": "簡潔 (次要)"
+				},
+				{
+					"group": "外框/連結按鈕",
+					"value": "simple_link",
+					"label": "簡潔 (連結樣式)"
+				}
+			],
+			"default": "primary",
+			"label": "按鈕樣式"
+		},
+		{
+			"type": "url",
+			"id": "button_link",
+			"label": "按鈕連結"
+		},
+		{
+			"type": "header",
+			"content": "影片設定"
+		},
+		{
+			"type": "video",
+			"id": "video",
+			"label": "影片"
+		},
+		{
+			"type": "select",
+			"id": "video_ratio",
+			"options": [
+				{ "value": "1/1", "label": "正方形 (1:1)" },
+				{ "value": "3/2", "label": "橫向 (3:2)" },
+				{ "value": "4/3", "label": "橫向 (4:3)" },
+				{ "value": "16/9", "label": "寬螢幕 (16:9)" },
+				{ "value": "21/9", "label": "超寬螢幕 (21:9)" },
+				{ "value": "adapt", "label": "適應影片大小" }
+			],
+			"default": "adapt",
+			"label": "影片比例"
+		},
+		{
+			"type": "select",
+			"id": "video_fit",
+			"label": "影片縮放模式",
+			"options": [
+				{ "value": "contain", "label": "等比例縮放 (Contain)" },
+				{ "value": "cover", "label": "裁切填滿 (Cover)" }
+			],
+			"default": "cover"
+		},
+		{
+			"type": "range",
+			"id": "opacity_overlay",
+			"min": 0,
+			"max": 1,
+			"step": 0.1,
+			"label": "疊加層不透明度",
+			"default": 0.3
+		},
+		{
+			"type": "header",
+			"content": "區塊外距 (Margin)"
+		},
+		{
+			"type": "select",
+			"id": "margin_top",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "超小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "超大" }
+			],
+			"default": "no-indent",
+			"label": "頂部外距"
+		},
+		{
+			"type": "select",
+			"id": "margin_bottom",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "超小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "超大" }
+			],
+			"default": "no-indent",
+			"label": "底部外距"
+		}
+	],
+	"presets": [
+		{
+			"name": "影片橫幅"
+		}
+	]
+}
+{% endschema %}

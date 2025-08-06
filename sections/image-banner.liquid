@@ -1,0 +1,645 @@
+{{ 'section-image-banner.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+	if section.settings.image_mobile != blank
+		assign image_mobile = section.settings.image_mobile
+	elsif section.settings.image != blank
+		assign image_mobile = section.settings.image
+	else
+		assign image_mobile = blank
+	endif
+
+	if section.settings.image != blank
+		assign image_desktop = section.settings.image
+	elsif section.settings.image_mobile != blank
+		assign image_desktop = section.settings.image_mobile
+	else
+		assign image_desktop = blank
+	endif
+
+	# get mobile aspect ratio
+	if section.settings.image_ratio_mobile != 'adapt'
+		assign aspect_ratio_mobile = section.settings.image_ratio_mobile | split: '/'
+		assign temp_mobile = aspect_ratio_mobile[0] | append: '.0'
+		assign padding_bottom_mobile = aspect_ratio_mobile[1] | divided_by: temp_mobile | times: 100 | round: 2
+	elsif section.settings.image_ratio_mobile == 'adapt'
+		if image_mobile != blank
+			assign padding_bottom_mobile = 1 | divided_by: image_mobile.aspect_ratio | times: 100 | round: 2
+		else
+			assign padding_bottom_mobile = 25
+		endif
+	endif
+
+	# get desktop aspect ratio
+	if section.settings.image_ratio != 'adapt'
+		assign aspect_ratio_desktop = section.settings.image_ratio | split: '/'
+		assign temp_desktop = aspect_ratio_desktop[0] | append: '.0'
+		assign padding_bottom_desktop = aspect_ratio_desktop[1] | divided_by: temp_desktop | times: 100 | round: 2
+	elsif section.settings.image_ratio == 'adapt'
+		if image_desktop != blank
+			assign padding_bottom_desktop = 1 | divided_by: image_desktop.aspect_ratio | times: 100 | round: 2
+		else
+			assign padding_bottom_desktop = 25
+		endif
+	endif
+
+	assign scheme_classes = ''
+-%}
+
+{% style %}
+	{% render 'section-margin' %}
+
+	.image-banner #Banner-{{ section.id }}.banner > .banner__media::before {
+	  content: '';
+	  display: block;
+	  width: 0;
+	  padding-bottom: {{ padding_bottom_mobile }}%;
+	}
+
+	@media screen and (min-width: 750px) {
+	  #Banner-{{ section.id }}.banner::before, #Banner-{{ section.id }}.banner .banner__media::before {
+	    content: '';
+	    display: block;
+	    width: 0;
+	    padding-bottom: {{ padding_bottom_desktop }}%;
+	  }
+
+	  {% for scheme in settings.color_schemes -%}
+	    {% assign scheme_classes = scheme_classes | append: ', .color-' | append: scheme.id %}
+	    [data-scheme='dark']	.banner.color-{{ scheme.id }},
+	    .image-banner__icon.color-{{ scheme.id }} {
+	      --color-background: {{ scheme.settings.colors_background_1.red }},{{ scheme.settings.colors_background_1.green }},{{ scheme.settings.colors_background_1.blue }};
+	      --color-foreground: {{ scheme.settings.colors_text.red }}, {{ scheme.settings.colors_text.green }}, {{ scheme.settings.colors_text.blue }};
+	      --color-foreground-secondary: {{ scheme.settings.colors_secondary_text.red }}, {{ scheme.settings.colors_secondary_text.green }}, {{ scheme.settings.colors_secondary_text.blue }};
+	      --color-accent: {{ scheme.settings.colors_text.red }}, {{ scheme.settings.colors_text.green }}, {{ scheme.settings.colors_text.blue }};
+	      --color-foreground-title: {{ scheme.settings.colors_text_title.red }}, {{ scheme.settings.colors_text_title.green }}, {{ scheme.settings.colors_text_title.blue }};
+	      {% if scheme.settings.background_gradient != empty %}
+	        --gradient-background: {{ scheme.settings.background_gradient }};
+	      {% else %}
+	        --gradient-background: {{ scheme.settings.colors_background_1 }};
+	      {% endif %}
+	    }
+	    @media (prefers-color-scheme: dark) {
+	      [data-scheme='auto'] {
+	        .banner.color-{{ scheme.id }},
+	        .image-banner__icon.color-{{ scheme.id }} {
+	          --color-background: {{ scheme.settings.colors_background_1.red }},{{ scheme.settings.colors_background_1.green }},{{ scheme.settings.colors_background_1.blue }};
+	          --color-foreground: {{ scheme.settings.colors_text.red }}, {{ scheme.settings.colors_text.green }}, {{ scheme.settings.colors_text.blue }};
+	          --color-foreground-secondary: {{ scheme.settings.colors_secondary_text.red }}, {{ scheme.settings.colors_secondary_text.green }}, {{ scheme.settings.colors_secondary_text.blue }};
+	          --color-accent: {{ scheme.settings.colors_text.red }}, {{ scheme.settings.colors_text.green }}, {{ scheme.settings.colors_text.blue }};
+	          --color-foreground-title: {{ scheme.settings.colors_text_title.red }}, {{ scheme.settings.colors_text_title.green }}, {{ scheme.settings.colors_text_title.blue }};
+	          {% if scheme.settings.background_gradient != empty %}
+	            --gradient-background: {{ scheme.settings.background_gradient }};
+	          {% else %}
+	            --gradient-background: {{ scheme.settings.colors_background_1 }};
+	          {% endif %}
+	        }
+	      }
+	    }
+	  {% endfor %}
+
+	  #Banner-{{ section.id }}.banner .banner__overlay {
+	    background-color: rgba(var(--color-overlay), {{ section.settings.opacity_overlay }});
+	  }
+	}
+{% endstyle %}
+
+<div class='image-banner {% if section.settings.full_width %}{% else %}container{% endif %}'>
+	<div
+		id='Banner-{{ section.id }}'
+		class='banner banner--{{ section.settings.text_align }} {% if section.settings.full_width %}banner--container{% else %}{% endif %} color-{{ section.settings.color_scheme }} background'
+	>
+		{%- if image_mobile != blank or image_desktop != blank -%}
+			{% liquid
+				assign fetch_priority = 'auto'
+				assign image_loading = 'lazy'
+				if section.index == 1
+					assign fetch_priority = 'high'
+					assign image_loading = 'eager'
+				endif
+				assign widths = '360, 533, 720, 940, 1066, 1200, 1400, 1600, 1800, 2000, 2200, 2400, 2600, 2800, 3000, 3264, 3400, 3584, 3800, 4000, 4200, 4400, 4600, 4800, 5000, 5200, 5400, 5600'
+
+				assign one_image = false
+				if section.settings.image != blank and section.settings.image_mobile == blank
+					assign one_image = true
+				elsif section.settings.image_1 == blank and section.settings.mobile_image_1 != blank
+					assign one_image = true
+				endif
+
+				# get mobile calc ratio
+				if section.settings.image_ratio_mobile != 'adapt'
+					assign aspect_ratio_mobile = section.settings.image_ratio_mobile | split: '/'
+					assign temp_ratio_mobile = aspect_ratio_mobile[0] | append: '.0'
+					assign settings_mobile_aspect_ratio = temp_ratio_mobile | divided_by: aspect_ratio_mobile[1] | round: 2
+				else
+					assign settings_mobile_aspect_ratio = image_mobile.aspect_ratio
+				endif
+
+				assign calc_ratio_mobile = 1
+				if image_mobile.aspect_ratio > settings_mobile_aspect_ratio
+					assign calc_ratio_mobile = image_mobile.aspect_ratio | divided_by: settings_mobile_aspect_ratio | round: 2
+				endif
+
+				# get desktop calc ratio
+				if section.settings.image_ratio != 'adapt'
+					assign aspect_ratio_desktop = section.settings.image_ratio | split: '/'
+					assign temp_ratio_desktop = aspect_ratio_desktop[0] | append: '.0'
+					assign settings_desktop_aspect_ratio = temp_ratio_desktop | divided_by: aspect_ratio_desktop[1] | round: 2
+				else
+					assign settings_desktop_aspect_ratio = image_desktop.aspect_ratio
+				endif
+
+				assign calc_ratio_desktop = 1
+				if image_desktop.aspect_ratio > settings_desktop_aspect_ratio
+					assign calc_ratio_desktop = image_desktop.aspect_ratio | divided_by: settings_desktop_aspect_ratio | round: 2
+				endif
+			%}
+
+			{%- capture sizes -%}
+        (min-width: 750px) calc({{ calc_ratio_desktop }} * 100vw), calc({{ calc_ratio_mobile }} * 100vw)
+      {%- endcapture -%}
+
+			<div class='banner__media media{% if one_image != true %} banner__media--with-mobile-img{% endif %}'>
+				{{
+					image_desktop
+					| image_url: width: image_desktop.width
+					| image_tag:
+						class: 'banner__media-img',
+						loading: 'lazy',
+						widths: widths,
+						sizes: sizes,
+						fetchpriority: fetch_priority,
+						loading: image_loading
+				}}
+				{%- if one_image != true -%}
+					{{
+						image_mobile
+						| image_url: width: image_mobile.width
+						| image_tag:
+							class: 'banner__media-img banner__media-img--mobile',
+							loading: 'lazy',
+							widths: widths,
+							sizes: sizes,
+							fetchpriority: fetch_priority,
+							loading: image_loading
+					}}
+				{%- endif -%}
+				<span class='banner__overlay'></span>
+			</div>
+		{%- endif -%}
+		{%- if section.settings.icon != 'none'
+			or section.settings.subheading != blank
+			or section.settings.heading != blank
+			or section.settings.text_information != blank
+			or section.settings.show_view_all
+		-%}
+			<div class='image-banner__wrapper image-banner__wrapper--{{ section.settings.text_width }} {% if section.settings.full_width %}container{% else %}{% endif %}'>
+				{%- if section.settings.icon != 'none' -%}
+					<div
+						class='
+							image-banner__icon image-banner__icon--{{- section.settings.icon_size }} {% if section.settings.box_shadow %}image-banner__icon--shadow
+							{% endif %} image-banner__icon--{{- section.settings.icon_style }} image-banner__icon--{{- section.settings.icon_fill_type }} color-{{ section.settings.icon_color_scheme }}
+						'
+					>
+						<i
+							class='icon icon-pack icon-{{ section.settings.icon }} {% if section.settings.icon_style == 'colored' and section.settings.icon_fill_type == 'gradient' %} text-gradient {% endif %}'
+						></i>
+					</div>
+				{%- endif -%}
+				{%- if section.settings.subheading != blank -%}
+					<div class='image-banner__subheading {{ section.settings.subheading_style }}'>
+						{{ section.settings.subheading }}
+					</div>
+				{%- endif -%}
+				{%- if section.settings.heading != blank -%}
+					<{{ section.settings.heading_level }} class='image-banner__heading {{ section.settings.heading_size }}'>
+						{{ section.settings.heading }}
+					</{{ section.settings.heading_level }}>
+				{%- endif -%}
+
+				{%- if section.settings.text_information != blank
+					or section.settings.show_view_all
+				-%}
+					<div class='image-banner__information'>
+						{%- if section.settings.text_information != blank -%}
+							<div class='image-banner__text body-large'>
+								{{ section.settings.text_information }}
+							</div>
+						{%- endif -%}
+
+						{%- if section.settings.show_view_all -%}
+							{% render 'button',
+								link: section.settings.button_link,
+								label: section.settings.button_label,
+								style: section.settings.button_style,
+								class: 'image-banner'
+							%}
+						{%- endif -%}
+					</div>
+				{%- endif -%}
+			</div>
+		{%- endif -%}
+	</div>
+</div>
+
+{% schema %}
+{
+	"name": "圖片橫幅",
+	"tag": "section",
+	"class": "image-banner-section spaced-section",
+	"enabled_on": {
+		"templates": ["*"]
+	},
+	"settings": [
+		{
+			"type": "checkbox",
+			"id": "full_width",
+			"default": false,
+			"label": "滿版寬度"
+		},
+		{
+			"type": "color_scheme",
+			"id": "color_scheme",
+			"default": "background-1",
+			"label": "色彩配置"
+		},
+		{
+			"type": "header",
+			"content": "圖片設定"
+		},
+		{
+			"type": "image_picker",
+			"id": "image",
+			"label": "圖片 (桌面版)"
+		},
+		{
+			"type": "image_picker",
+			"id": "image_mobile",
+			"label": "圖片 (手機版)"
+		},
+		{
+			"type": "select",
+			"id": "image_ratio",
+			"options": [
+				{ "value": "1/1", "label": "正方形 (1:1)" },
+				{ "value": "2/1", "label": "橫向 (2:1)" },
+				{ "value": "3/2", "label": "橫向 (3:2)" },
+				{ "value": "4/3", "label": "橫向 (4:3)" },
+				{ "value": "16/9", "label": "橫向 (16:9)" },
+				{ "value": "21/9", "label": "超寬 (21:9)" },
+				{ "value": "adapt", "label": "符合圖片原始比例" }
+			],
+			"default": "adapt",
+			"label": "圖片比例 (桌面版)"
+		},
+		{
+			"type": "select",
+			"id": "image_ratio_mobile",
+			"options": [
+				{ "value": "1/1", "label": "正方形 (1:1)" },
+				{ "value": "2/1", "label": "橫向 (2:1)" },
+				{ "value": "3/2", "label": "橫向 (3:2)" },
+				{ "value": "4/3", "label": "橫向 (4:3)" },
+				{ "value": "16/9", "label": "橫向 (16:9)" },
+				{ "value": "21/9", "label": "超寬 (21:9)" },
+				{ "value": "3/4", "label": "直向 (3:4)" },
+				{ "value": "4/5", "label": "直向 (4:5)" },
+				{ "value": "adapt", "label": "符合圖片原始比例" }
+			],
+			"default": "adapt",
+			"label": "圖片比例 (手機版)"
+		},
+		{
+			"type": "range",
+			"id": "opacity_overlay",
+			"min": 0,
+			"max": 1,
+			"step": 0.1,
+			"default": 0,
+			"label": "圖片遮罩不透明度"
+		},
+		{
+			"type": "select",
+			"id": "icon",
+			"options": [
+				{ "value": "none", "label": "無" },
+				{ "value": "arrow-bar", "label": "箭頭列" },
+				{ "value": "bag-1", "label": "提袋 1" },
+				{ "value": "bag-2", "label": "提袋 2" },
+				{ "value": "bag-3", "label": "提袋 3" },
+				{ "value": "bar-chart", "label": "長條圖" },
+				{ "value": "bars-upward", "label": "向上箭頭" },
+				{ "value": "baseball", "label": "棒球" },
+				{ "value": "battery-1", "label": "電池 1" },
+				{ "value": "battery-2", "label": "電池 2" },
+				{ "value": "battery-3", "label": "電池 3" },
+				{ "value": "book", "label": "書本" },
+				{ "value": "card", "label": "卡片" },
+				{ "value": "card-holder", "label": "名片夾" },
+				{ "value": "chart", "label": "圖表" },
+				{ "value": "chart-2", "label": "圖表 2" },
+				{ "value": "chart-3", "label": "圖表 3" },
+				{ "value": "chats", "label": "對話" },
+				{ "value": "check-1", "label": "勾選 1" },
+				{ "value": "check-2", "label": "勾選 2" },
+				{ "value": "check-3", "label": "勾選 3" },
+				{ "value": "check-4", "label": "勾選 4" },
+				{ "value": "circle", "label": "圓圈" },
+				{ "value": "circles", "label": "多個圓圈" },
+				{ "value": "clock-1", "label": "時鐘 1" },
+				{ "value": "clock-2", "label": "時鐘 2" },
+				{ "value": "close", "label": "關閉" },
+				{ "value": "cloud-server", "label": "雲端伺服器" },
+				{ "value": "computer", "label": "電腦" },
+				{ "value": "computer-mouse", "label": "滑鼠" },
+				{ "value": "confetti", "label": "彩紙" },
+				{ "value": "delivery", "label": "貨車" },
+				{ "value": "delivery-box", "label": "包裹" },
+				{ "value": "devices", "label": "多裝置" },
+				{ "value": "directions", "label": "方向" },
+				{ "value": "dumbbell", "label": "啞鈴" },
+				{ "value": "eye", "label": "眼睛" },
+				{ "value": "facebook", "label": "Facebook" },
+				{ "value": "file-1", "label": "檔案 1" },
+				{ "value": "file-2", "label": "檔案 2" },
+				{ "value": "flag", "label": "旗幟" },
+				{ "value": "folder-1", "label": "資料夾 1" },
+				{ "value": "folder-2", "label": "資料夾 2" },
+				{ "value": "food", "label": "食物" },
+				{ "value": "hand-1", "label": "手 1" },
+				{ "value": "hand-2", "label": "手 2" },
+				{ "value": "hand-3", "label": "手 3" },
+				{ "value": "headphones", "label": "耳機" },
+				{ "value": "instagram", "label": "Instagram" },
+				{ "value": "laptop-1", "label": "筆電 1" },
+				{ "value": "laptop-2", "label": "筆電 2" },
+				{ "value": "leaf", "label": "葉子" },
+				{ "value": "lightning-bolt-1", "label": "閃電 1" },
+				{ "value": "lightning-bolt-2", "label": "閃電 2" },
+				{ "value": "like", "label": "讚" },
+				{ "value": "link", "label": "連結" },
+				{ "value": "lock-1", "label": "鎖 1" },
+				{ "value": "lock-2", "label": "鎖 2" },
+				{ "value": "logout", "label": "登出" },
+				{ "value": "luggage", "label": "行李" },
+				{ "value": "mark", "label": "標記" },
+				{ "value": "medicine", "label": "藥物" },
+				{ "value": "microphone", "label": "麥克風" },
+				{ "value": "moon", "label": "月亮" },
+				{ "value": "pencil", "label": "鉛筆" },
+				{ "value": "phone-1", "label": "手機 1" },
+				{ "value": "phone-2", "label": "手機 2" },
+				{ "value": "phone-3", "label": "手機 3" },
+				{ "value": "phone-4", "label": "手機 4" },
+				{ "value": "pinterest", "label": "Pinterest" },
+				{ "value": "plug", "label": "插頭" },
+				{ "value": "presentation-1", "label": "簡報 1" },
+				{ "value": "presentation-2", "label": "簡報 2" },
+				{ "value": "pulse", "label": "脈搏" },
+				{ "value": "recycle", "label": "回收" },
+				{ "value": "rocket", "label": "火箭" },
+				{ "value": "search", "label": "搜尋" },
+				{ "value": "sending", "label": "傳送" },
+				{ "value": "server-1", "label": "伺服器 1" },
+				{ "value": "server-2", "label": "伺服器 2" },
+				{ "value": "settings", "label": "設定" },
+				{ "value": "shield", "label": "盾牌" },
+				{ "value": "shopping-basket", "label": "購物籃" },
+				{ "value": "shuffle", "label": "隨機播放" },
+				{ "value": "snapchat", "label": "Snapchat" },
+				{ "value": "sound-waves", "label": "聲波" },
+				{ "value": "speaker", "label": "喇叭" },
+				{ "value": "squares-1", "label": "方塊 1" },
+				{ "value": "squares-2", "label": "方塊 2" },
+				{ "value": "stack", "label": "堆疊" },
+				{ "value": "star", "label": "星星" },
+				{ "value": "stopwatch", "label": "碼錶" },
+				{ "value": "sun", "label": "太陽" },
+				{ "value": "tag", "label": "標籤" },
+				{ "value": "telephone-tower", "label": "電塔" },
+				{ "value": "tik-tok", "label": "TikTok" },
+				{ "value": "tree", "label": "樹木" },
+				{ "value": "trend", "label": "趨勢" },
+				{ "value": "trophy", "label": "獎盃" },
+				{ "value": "tumblr", "label": "Tumblr" },
+				{ "value": "tv", "label": "電視" },
+				{ "value": "twitter", "label": "Twitter" },
+				{ "value": "user-1", "label": "使用者 1" },
+				{ "value": "user-2", "label": "使用者 2" },
+				{ "value": "user-3", "label": "使用者 3" },
+				{ "value": "user-4", "label": "使用者 4" },
+				{ "value": "user-5", "label": "使用者 5" },
+				{ "value": "video", "label": "影片" },
+				{ "value": "vimeo", "label": "Vimeo" },
+				{ "value": "wallet", "label": "錢包" },
+				{ "value": "watch", "label": "手錶" },
+				{ "value": "water-1", "label": "水 1" },
+				{ "value": "water-2", "label": "水 2" },
+				{ "value": "water-3", "label": "水 3" },
+				{ "value": "wave-1", "label": "波浪 1" },
+				{ "value": "wave-2", "label": "波浪 2" },
+				{ "value": "wifi-1", "label": "Wi-Fi 1" },
+				{ "value": "wifi-2", "label": "Wi-Fi 2" },
+				{ "value": "window", "label": "視窗" },
+				{ "value": "youtube", "label": "YouTube" }
+			],
+			"default": "none",
+			"label": "圖示"
+		},
+		{
+			"type": "color_scheme",
+			"id": "icon_color_scheme",
+			"default": "background-1",
+			"label": "圖示色彩配置",
+			"info": "僅適用於「彩色」樣式的圖示"
+		},
+		{
+			"type": "select",
+			"id": "icon_size",
+			"options": [
+				{ "value": "normal", "label": "正常" },
+				{ "value": "small", "label": "小" },
+				{ "value": "large", "label": "大" }
+			],
+			"default": "large",
+			"label": "圖示尺寸"
+		},
+		{
+			"type": "select",
+			"id": "icon_style",
+			"options": [
+				{ "value": "subtle", "label": "柔和" },
+				{ "value": "contrast", "label": "高對比" },
+				{ "value": "colored", "label": "彩色" }
+			],
+			"default": "colored",
+			"label": "圖示樣式"
+		},
+		{
+			"type": "select",
+			"id": "icon_fill_type",
+			"options": [
+				{ "value": "solid", "label": "實心" },
+				{ "value": "gradient", "label": "漸層" }
+			],
+			"default": "gradient",
+			"label": "圖示填色類型"
+		},
+		{
+			"type": "checkbox",
+			"id": "box_shadow",
+			"default": false,
+			"label": "為圖示加上陰影"
+		},
+		{
+			"type": "text",
+			"id": "subheading",
+			"label": "副標題"
+		},
+		{
+			"type": "select",
+			"id": "subheading_style",
+			"options": [
+				{ "value": "subtitle", "label": "樣式 1" },
+				{ "value": "subtitle subtitle--secondary", "label": "樣式 2" }
+			],
+			"default": "subtitle",
+			"label": "副標題樣式"
+		},
+		{
+			"type": "inline_richtext",
+			"id": "heading",
+			"default": "圖片橫幅",
+			"label": "主標題",
+			"info": "使用 [ ] 來標示要加上底線的文字。"
+		},
+		{
+			"type": "select",
+			"id": "heading_size",
+			"options": [
+				{ "value": "h4", "label": "特小" },
+				{ "value": "h3", "label": "小" },
+				{ "value": "h2", "label": "中" },
+				{ "value": "h1", "label": "大" }
+			],
+			"default": "h2",
+			"label": "主標題尺寸"
+		},
+		{
+			"type": "select",
+			"id": "heading_level",
+			"options": [
+				{ "value": "h1", "label": "H1" },
+				{ "value": "h2", "label": "H2" },
+				{ "value": "h3", "label": "H3" }
+			],
+			"default": "h2",
+			"label": "主標題的 HTML 標籤"
+		},
+		{
+			"type": "richtext",
+			"id": "text_information",
+			"label": "內文"
+		},
+		{
+			"type": "select",
+			"id": "text_align",
+			"options": [
+				{ "value": "left", "label": "靠左" },
+				{ "value": "top-left", "label": "左上" },
+				{ "value": "bottom-left", "label": "左下" },
+				{ "value": "center", "label": "置中" },
+				{ "value": "right", "label": "靠右" },
+				{ "value": "top-right", "label": "右上" },
+				{ "value": "bottom-right", "label": "右下" }
+			],
+			"default": "left",
+			"label": "文字對齊"
+		},
+		{
+			"type": "select",
+			"id": "text_width",
+			"options": [
+				{ "value": "small", "label": "小" },
+				{ "value": "medium", "label": "中" },
+				{ "value": "large", "label": "大" },
+				{ "value": "full", "label": "滿版" }
+			],
+			"default": "small",
+			"label": "文字區塊寬度"
+		},
+		{
+			"type": "header",
+			"content": "按鈕設定"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_view_all",
+			"default": true,
+			"label": "顯示按鈕"
+		},
+		{
+			"type": "text",
+			"id": "button_label",
+			"default": "按鈕文字",
+			"label": "按鈕文字"
+		},
+		{
+			"type": "select",
+			"id": "button_style",
+			"options": [
+				{ "group": "實心按鈕", "value": "primary", "label": "主要按鈕" },
+				{ "group": "實心按鈕", "value": "secondary", "label": "次要按鈕" },
+				{ "group": "實心按鈕", "value": "tertiary", "label": "第三按鈕" },
+				{ "group": "文字按鈕", "value": "simple", "label": "主要文字按鈕" },
+				{ "group": "文字按鈕", "value": "simple_secondary", "label": "次要文字按鈕" },
+				{ "group": "文字按鈕", "value": "simple_link", "label": "連結樣式" }
+			],
+			"default": "primary",
+			"label": "按鈕樣式"
+		},
+		{
+			"type": "url",
+			"id": "button_link",
+			"label": "按鈕連結"
+		},
+		{
+			"type": "header",
+			"content": "區塊邊界"
+		},
+		{
+			"type": "select",
+			"id": "margin_top",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "特小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "特大" }
+			],
+			"default": "no-indent",
+			"label": "頂部外邊界"
+		},
+		{
+			"type": "select",
+			"id": "margin_bottom",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "特小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "特大" }
+			],
+			"default": "no-indent",
+			"label": "底部外邊界"
+		}
+	],
+	"presets": [
+		{
+			"name": "圖片橫幅"
+		}
+	]
+}
+{% endschema %}

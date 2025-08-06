@@ -1,0 +1,794 @@
+{{ 'component-card.css' | asset_url | stylesheet_tag }}
+{{ 'component-article-card.css' | asset_url | stylesheet_tag }}
+{{ 'section-featured-blog.css' | asset_url | stylesheet_tag }}
+
+{% if section.settings.post_layout == 'columns' or section.settings.post_layout == 'overlay' %}
+  <script src="{{ 'featured-blog.js' | asset_url }}" defer="defer"></script>
+{% endif %}
+
+{%- style -%}
+    {% render 'section-padding' %}
+  {% render 'section-margin' %}
+{%- endstyle -%}
+
+{% liquid
+  assign post_limit = section.settings.post_limit
+
+  if post_limit <= section.settings.blog.articles_count
+    assign posts_exceed_limit = true
+  endif
+
+  assign columns = section.settings.columns
+  assign post_heading_size = section.settings.post_heading_size
+  if section.settings.post_heading_size == 'recommended'
+    if section.settings.post_layout == 'grid' or columns == 4
+      assign post_heading_size = 'h6'
+    elsif columns == 3
+      assign post_heading_size = 'h5'
+    elsif columns == 2
+      assign post_heading_size = 'h4'
+    else
+      assign post_heading_size = 'h3'
+    endif
+  endif
+%}
+
+<div class="blog color-{{ section.settings.color_scheme }} background section-{{ section.id }}-padding">
+  <div class="container">
+    <div
+      class="
+        section-grid
+        {% if section.settings.subheading == blank and section.settings.heading == blank and section.settings.text == blank %}
+        	section-grid_no-text
+        {% endif %}
+      "
+    >
+      {%- if section.settings.subheading != blank
+        or section.settings.heading != blank
+        or section.settings.text != blank
+      -%}
+        <div class="section-top">
+          {% render 'section-text', section: section, class: 'blog', heading_level: section.settings.heading_level %}
+        </div>
+      {% endif %}
+
+      {%- if section.settings.show_view_all -%}
+        {% render 'button',
+          link: section.settings.blog.url,
+          label: section.settings.button_label,
+          style: section.settings.button_style,
+          class: 'blog'
+        %}
+      {%- endif -%}
+
+      <div class="blog__content content">
+        {%- if section.settings.blog != blank and section.settings.blog.articles_count > 0 -%}
+          {% if section.settings.post_layout == 'columns' %}
+            <div
+              class="
+                {% if section.settings.enable_carousel %} blog__slider swiper {% endif %}
+                blog__posts blog__posts--col-{{ section.settings.columns }}
+              "
+              data-columns="{{ section.settings.columns }}"
+            >
+              <div
+                class="
+                  {% if section.settings.enable_carousel %} swiper-wrapper {% else %} blog__posts-wrapper {% endif %}
+                  {% if section.settings.background_card and section.settings.enable_carousel == false %} blog__posts-wrapper--background {% endif %}
+                "
+              >
+                {%- for article in section.settings.blog.articles limit: post_limit -%}
+                  <div class="swiper-slide blog__post article">
+                    {% render 'article-card',
+                      blog: section.settings.blog,
+                      article: article,
+                      image_ratio: section.settings.image_ratio,
+                      post_heading_size: post_heading_size,
+                      show_image: section.settings.show_image,
+                      show_tags: section.settings.show_tags,
+                      show_date: section.settings.show_date,
+                      show_author: section.settings.show_author,
+                      show_excerpt: section.settings.show_excerpt,
+                      background: section.settings.background_card,
+                      color_scheme: section.settings.card_color_scheme,
+                      section_author_image: section.settings.author_image,
+                      overlay: false
+                    %}
+                  </div>
+                {%- endfor -%}
+              </div>
+            </div>
+            {% if section.settings.enable_carousel %}
+              <div class="blog__navigation swiper-navigation no-js-hidden">
+                <div class="blog__button-prev swiper-button-prev color-{{ section.settings.navigation_color_scheme }}">
+                  {% render 'icon-caret-left' %}
+                </div>
+                <div class="blog__button-next swiper-button-next color-{{ section.settings.navigation_color_scheme }}">
+                  {% render 'icon-caret-right' %}
+                </div>
+              </div>
+              <div class="blog__pagination no-js-hidden swiper-pagination"></div>
+            {% endif %}
+          {% elsif section.settings.post_layout == 'overlay' %}
+            <div
+              class="
+                {% if section.settings.enable_carousel %} blog__slider swiper {% endif %}
+                blog__posts blog__posts--col-{{ section.settings.columns }}
+              "
+              data-columns="{{ section.settings.columns }}"
+            >
+              <div class="{% if section.settings.enable_carousel %} swiper-wrapper {% else %} blog__posts-wrapper blog__posts-wrapper--overlay {% endif %}">
+                {%- for article in section.settings.blog.articles limit: post_limit -%}
+                  <div class="swiper-slide blog__post article">
+                    {% render 'article-card',
+                      blog: section.settings.blog,
+                      article: article,
+                      image_ratio: section.settings.image_ratio,
+                      post_heading_size: post_heading_size,
+                      show_image: section.settings.show_image,
+                      show_tags: section.settings.show_tags,
+                      show_date: section.settings.show_date,
+                      show_author: section.settings.show_author,
+                      show_excerpt: section.settings.show_excerpt,
+                      background: section.settings.background_card,
+                      color_scheme: section.settings.card_color_scheme,
+                      section_author_image: section.settings.author_image,
+                      overlay: true
+                    %}
+                  </div>
+                {%- endfor -%}
+              </div>
+            </div>
+            {% if section.settings.enable_carousel %}
+              <div class="blog__navigation swiper-navigation no-js-hidden">
+                <div class="blog__button-prev swiper-button-prev color-{{ section.settings.navigation_color_scheme }}">
+                  {% render 'icon-caret-left' %}
+                </div>
+                <div class="blog__button-next swiper-button-next color-{{ section.settings.navigation_color_scheme }}">
+                  {% render 'icon-caret-right' %}
+                </div>
+              </div>
+              <div class="blog__pagination no-js-hidden swiper-pagination"></div>
+            {% endif %}
+          {% else %}
+            {% liquid
+              assign color_foreground = section.settings.card_color_scheme.settings.colors_text.red | append: ',' | append: section.settings.card_color_scheme.settings.colors_text.green | append: ',' | append: section.settings.card_color_scheme.settings.colors_text.blue
+              assign color_foreground_title = section.settings.card_color_scheme.settings.colors_text_title.red | append: ',' | append: section.settings.card_color_scheme.settings.colors_text_title.green | append: ',' | append: section.settings.card_color_scheme.settings.colors_text_title.blue
+              assign color_background = section.settings.card_color_scheme.settings.colors_background_1.red | append: ',' | append: section.settings.card_color_scheme.settings.colors_background_1.green | append: ',' | append: section.settings.card_color_scheme.settings.colors_background_1.blue
+            %}
+
+            <ul
+              class="
+                blog__posts blog__posts--{{ section.settings.post_layout }} articles-wrapper
+                {% if posts_exceed_limit %} blog__posts--{{ post_limit }}-items
+                {% else %} blog__posts--{{ section.settings.blog.articles_count }}-items{% endif %}
+              "
+              role="list"
+            >
+              {%- for article in section.settings.blog.articles limit: post_limit -%}
+                <li class="blog__post article">
+                  {% render 'article-card',
+                    blog: section.settings.blog,
+                    article: article,
+                    image_ratio: section.settings.image_ratio,
+                    post_heading_size: post_heading_size,
+                    show_image: section.settings.show_image,
+                    show_tags: section.settings.show_tags,
+                    show_date: section.settings.show_date,
+                    show_author: section.settings.show_author,
+                    show_excerpt: section.settings.show_excerpt,
+                    color_scheme: section.settings.card_color_scheme,
+                    section_author_image: section.settings.author_image,
+                    overlay: false
+                  %}
+                </li>
+
+                {% style %}
+                  @media screen and (min-width: 1360px) {
+                  	.blog__posts--grid:not(.blog__posts--2-items):not(.blog__posts--1-items) .article:first-child .article-card .article-card__tags .article-card__tag {
+                  		color: rgba({{ color_foreground }}, 0.8);
+                  	}
+
+                    .blog__posts--grid:not(.blog__posts--2-items):not(.blog__posts--1-items) .article:first-child .article-card .article-card__tags .article-card__tag:hover {
+                      color: rgb({{ color_background }});
+                      background-color: rgb({{ color_foreground }});
+                    }
+
+                  	.blog__posts--grid:not(.blog__posts--2-items):not(.blog__posts--1-items) .article:first-child .article-card .article-card__title {
+                  		color: rgb({{ color_foreground_title }});
+                  	}
+                  	.blog__posts--grid:not(.blog__posts--2-items):not(.blog__posts--1-items) .article:first-child .article-card .article-card__author-name {
+                  		color: rgb({{ color_foreground }});
+                  	}
+                  	.blog__posts--grid:not(.blog__posts--2-items):not(.blog__posts--1-items) .article:first-child .article-card .article-card__excerpt {
+                  		color: rgb({{ color_foreground }});
+                  	}
+                  	.blog__posts--grid:not(.blog__posts--2-items):not(.blog__posts--1-items) .article:first-child .article-card .article-card__meta .article-card__date,
+                  	.blog__posts--grid:not(.blog__posts--2-items):not(.blog__posts--1-items) .article:first-child .article-card .article-card__meta .article-card__comments {
+                  		color: rgb({{ color_foreground }}, 0.6);
+                  	}
+                  }
+                {% endstyle %}
+              {%- endfor -%}
+            </ul>
+          {% endif %}
+        {%- else -%}
+          <div
+            class="
+              {% if section.settings.enable_carousel and section.settings.post_layout != 'grid' %} blog__slider swiper {% endif %}
+              blog__posts blog__posts--{{ section.settings.post_layout }} blog__posts--col-{{ section.settings.columns }}
+              blog__posts--{{ post_limit }}-items
+            "
+            data-columns="{{ section.settings.columns }}"
+          >
+            {% if section.settings.post_layout != 'grid' %}
+              <div
+                class="{% if section.settings.enable_carousel %} swiper-wrapper {% else %} blog__posts-wrapper {% endif %}"
+              >
+            {% endif %}
+            {% for i in (1..post_limit) %}
+              <div class="swiper-slide blog__post article">
+                <article
+                  class="
+                    article-card article-card--{{ section.settings.image_ratio }}
+                    {% if section.settings.post_layout == 'overlay' %} article-card--overlay {% endif %}
+                  "
+                >
+                  <div class="article-card__image media">
+                      {% assign blog_index = forloop.index | modulo: 3 | plus: 1 %}
+                      {{
+                        'blog-apparel-'
+                        | append: blog_index
+                        | placeholder_svg_tag: 'placeholder-svg'
+                      }}
+                  </div>
+                  <div
+                    class="
+                      article-content motion-reduce
+                      {% if section.settings.post_layout == 'overlay' %} article-content--background color-background-3 {% endif %}
+                    "
+                  >
+                    <div class="article-card__info">
+                      <header class="article-card__header">
+                        <h2 class="article-card__title {% if post_heading_size %} {{ post_heading_size }} {% else %} h5 {% endif %}">
+                          精選文章
+                        </h2>
+                        <p class="article-card__excerpt">
+                          文章摘要將會顯示於此。
+                        </p>
+                      </header>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            {%- endfor -%}
+            {% if section.settings.post_layout != 'grid' %}
+              </div>
+            {% endif %}
+          </div>
+          {% if section.settings.enable_carousel and section.settings.post_layout != 'grid' %}
+            <div class="blog__navigation swiper-navigation no-js-hidden">
+              <div class="blog__button-prev swiper-button-prev color-{{ section.settings.navigation_color_scheme }}">
+                {% render 'icon-caret-left' %}
+              </div>
+              <div class="blog__button-next swiper-button-next color-{{ section.settings.navigation_color_scheme }}">
+                {% render 'icon-caret-right' %}
+              </div>
+            </div>
+            <div class="blog__pagination no-js-hidden swiper-pagination"></div>
+          {% endif %}
+          {% if section.settings.post_layout == 'grid' %}
+            {% liquid
+              for scheme in settings.color_schemes
+                if scheme.id == 'background-3'
+                  assign scheme_3 = scheme
+                endif
+              endfor
+
+              assign color_foreground = scheme_3.settings.colors_text.red | append: ',' | append: scheme_3.settings.colors_text.green | append: ',' | append: scheme_3.settings.colors_text.blue
+              assign color_foreground_title = scheme_3.settings.colors_text_title.red | append: ',' | append: scheme_3.settings.colors_text_title.green | append: ',' | append: scheme_3.settings.colors_text_title.blue
+            %}
+            {% style %}
+              @media screen and (min-width: 1360px) {
+              	.blog__posts--grid:not(.blog__posts--2-items):not(.blog__posts--1-items) .article:first-child .article-card .article-card__tags .article-card__tag a {
+              		color: rgb({{ color_foreground }});
+              	}
+
+              	.blog__posts--grid:not(.blog__posts--2-items):not(.blog__posts--1-items) .article:first-child .article-card .article-card__title {
+              		color: rgb({{ color_foreground_title }});
+              	}
+              	.blog__posts--grid:not(.blog__posts--2-items):not(.blog__posts--1-items) .article:first-child .article-card .article-card__author-name {
+              		color: rgb({{ color_foreground }});
+              	}
+              	.blog__posts--grid:not(.blog__posts--2-items):not(.blog__posts--1-items) .article:first-child .article-card .article-card__excerpt {
+              		color: rgba({{ color_foreground }}, 0.7);
+              	}
+              	.blog__posts--grid:not(.blog__posts--2-items):not(.blog__posts--1-items) .article:first-child .article-card .article-card__meta .article-card__date,
+              	.blog__posts--grid:not(.blog__posts--2-items):not(.blog__posts--1-items) .article:first-child .article-card .article-card__meta .article-card__comments {
+              		color: rgb({{ color_foreground }}, 0.5);
+              	}
+              }
+            {% endstyle %}
+          {% endif %}
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "精選網誌文章",
+  "tag": "section",
+  "class": "spaced-section section-featured-blog",
+  "enabled_on": {
+    "templates": ["*"]
+  },
+  "settings": [
+    {
+      "type": "blog",
+      "id": "blog",
+      "label": "網誌"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "background-1",
+      "label": "色彩配置"
+    },
+    {
+      "type": "select",
+      "id": "post_layout",
+      "options": [
+        {
+          "value": "columns",
+          "label": "欄位"
+        },
+        {
+          "value": "overlay",
+          "label": "圖片覆蓋"
+        },
+        {
+          "value": "grid",
+          "label": "網格"
+        }
+      ],
+      "default": "columns",
+      "label": "文章版面配置"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_carousel",
+      "label": "啟用輪播",
+      "info": "在「欄位」和「圖片覆蓋」版面中，此選項可將文章以輪播方式呈現。",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "navigation_color_scheme",
+      "default": "background-1",
+      "label": "輪播導覽色彩"
+    },
+    {
+      "type": "checkbox",
+      "id": "background_card",
+      "label": "為文章卡片加上背景色",
+      "info": "僅適用於未啟用輪播的「欄位」版面。",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 3,
+      "label": "每列顯示的文章數量",
+      "info": "僅適用於「欄位」和「圖片覆蓋」版面。"
+    },
+    {
+      "type": "range",
+      "id": "post_limit",
+      "min": 1,
+      "max": 9,
+      "step": 1,
+      "default": 6,
+      "label": "文章數量上限"
+    },
+    {
+      "type": "color_scheme",
+      "id": "card_color_scheme",
+      "default": "background-2",
+      "label": "文章卡片色彩配置",
+      "info": "僅適用於「網格」和已啟用背景色的「欄位」版面。"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "副標題",
+      "default": "網誌"
+    },
+    {
+      "type": "select",
+      "id": "subheading_style",
+      "options": [
+        {
+          "value": "subtitle",
+          "label": "樣式 1"
+        },
+        {
+          "value": "subtitle subtitle--secondary",
+          "label": "樣式 2"
+        }
+      ],
+      "default": "subtitle",
+      "label": "副標題樣式"
+    },
+    {
+      "type": "select",
+      "id": "subheading_icon",
+      "options": [
+				{ "value": "none", "label": "無" },
+				{ "value": "arrow-bar", "label": "箭頭列" },
+				{ "value": "bag-1", "label": "提袋 1" },
+				{ "value": "bag-2", "label": "提袋 2" },
+				{ "value": "bag-3", "label": "提袋 3" },
+				{ "value": "bar-chart", "label": "長條圖" },
+				{ "value": "bars-upward", "label": "向上箭頭" },
+				{ "value": "baseball", "label": "棒球" },
+				{ "value": "battery-1", "label": "電池 1" },
+				{ "value": "battery-2", "label": "電池 2" },
+				{ "value": "battery-3", "label": "電池 3" },
+				{ "value": "book", "label": "書本" },
+				{ "value": "card", "label": "卡片" },
+				{ "value": "card-holder", "label": "名片夾" },
+				{ "value": "chart", "label": "圖表" },
+				{ "value": "chart-2", "label": "圖表 2" },
+				{ "value": "chart-3", "label": "圖表 3" },
+				{ "value": "chats", "label": "對話" },
+				{ "value": "check-1", "label": "勾選 1" },
+				{ "value": "check-2", "label": "勾選 2" },
+				{ "value": "check-3", "label": "勾選 3" },
+				{ "value": "check-4", "label": "勾選 4" },
+				{ "value": "circle", "label": "圓圈" },
+				{ "value": "circles", "label": "多個圓圈" },
+				{ "value": "clock-1", "label": "時鐘 1" },
+				{ "value": "clock-2", "label": "時鐘 2" },
+				{ "value": "close", "label": "關閉" },
+				{ "value": "cloud-server", "label": "雲端伺服器" },
+				{ "value": "computer", "label": "電腦" },
+				{ "value": "computer-mouse", "label": "滑鼠" },
+				{ "value": "confetti", "label": "彩紙" },
+				{ "value": "delivery", "label": "貨車" },
+				{ "value": "delivery-box", "label": "包裹" },
+				{ "value": "devices", "label": "多裝置" },
+				{ "value": "directions", "label": "方向" },
+				{ "value": "dumbbell", "label": "啞鈴" },
+				{ "value": "eye", "label": "眼睛" },
+				{ "value": "facebook", "label": "Facebook" },
+				{ "value": "file-1", "label": "檔案 1" },
+				{ "value": "file-2", "label": "檔案 2" },
+				{ "value": "flag", "label": "旗幟" },
+				{ "value": "folder-1", "label": "資料夾 1" },
+				{ "value": "folder-2", "label": "資料夾 2" },
+				{ "value": "food", "label": "食物" },
+				{ "value": "hand-1", "label": "手 1" },
+				{ "value": "hand-2", "label": "手 2" },
+				{ "value": "hand-3", "label": "手 3" },
+				{ "value": "headphones", "label": "耳機" },
+				{ "value": "instagram", "label": "Instagram" },
+				{ "value": "laptop-1", "label": "筆電 1" },
+				{ "value": "laptop-2", "label": "筆電 2" },
+				{ "value": "leaf", "label": "葉子" },
+				{ "value": "lightning-bolt-1", "label": "閃電 1" },
+				{ "value": "lightning-bolt-2", "label": "閃電 2" },
+				{ "value": "like", "label": "讚" },
+				{ "value": "link", "label": "連結" },
+				{ "value": "lock-1", "label": "鎖 1" },
+				{ "value": "lock-2", "label": "鎖 2" },
+				{ "value": "logout", "label": "登出" },
+				{ "value": "luggage", "label": "行李" },
+				{ "value": "mark", "label": "標記" },
+				{ "value": "medicine", "label": "藥物" },
+				{ "value": "microphone", "label": "麥克風" },
+				{ "value": "moon", "label": "月亮" },
+				{ "value": "pencil", "label": "鉛筆" },
+				{ "value": "phone-1", "label": "手機 1" },
+				{ "value": "phone-2", "label": "手機 2" },
+				{ "value": "phone-3", "label": "手機 3" },
+				{ "value": "phone-4", "label": "手機 4" },
+				{ "value": "pinterest", "label": "Pinterest" },
+				{ "value": "plug", "label": "插頭" },
+				{ "value": "presentation-1", "label": "簡報 1" },
+				{ "value": "presentation-2", "label": "簡報 2" },
+				{ "value": "pulse", "label": "脈搏" },
+				{ "value": "recycle", "label": "回收" },
+				{ "value": "rocket", "label": "火箭" },
+				{ "value": "search", "label": "搜尋" },
+				{ "value": "sending", "label": "傳送" },
+				{ "value": "server-1", "label": "伺服器 1" },
+				{ "value": "server-2", "label": "伺服器 2" },
+				{ "value": "settings", "label": "設定" },
+				{ "value": "shield", "label": "盾牌" },
+				{ "value": "shopping-basket", "label": "購物籃" },
+				{ "value": "shuffle", "label": "隨機播放" },
+				{ "value": "snapchat", "label": "Snapchat" },
+				{ "value": "sound-waves", "label": "聲波" },
+				{ "value": "speaker", "label": "喇叭" },
+				{ "value": "squares-1", "label": "方塊 1" },
+				{ "value": "squares-2", "label": "方塊 2" },
+				{ "value": "stack", "label": "堆疊" },
+				{ "value": "star", "label": "星星" },
+				{ "value": "stopwatch", "label": "碼錶" },
+				{ "value": "sun", "label": "太陽" },
+				{ "value": "tag", "label": "標籤" },
+				{ "value": "telephone-tower", "label": "電塔" },
+				{ "value": "tik-tok", "label": "TikTok" },
+				{ "value": "tree", "label": "樹木" },
+				{ "value": "trend", "label": "趨勢" },
+				{ "value": "trophy", "label": "獎盃" },
+				{ "value": "tumblr", "label": "Tumblr" },
+				{ "value": "tv", "label": "電視" },
+				{ "value": "twitter", "label": "Twitter" },
+				{ "value": "user-1", "label": "使用者 1" },
+				{ "value": "user-2", "label": "使用者 2" },
+				{ "value": "user-3", "label": "使用者 3" },
+				{ "value": "user-4", "label": "使用者 4" },
+				{ "value": "user-5", "label": "使用者 5" },
+				{ "value": "video", "label": "影片" },
+				{ "value": "vimeo", "label": "Vimeo" },
+				{ "value": "wallet", "label": "錢包" },
+				{ "value": "watch", "label": "手錶" },
+				{ "value": "water-1", "label": "水 1" },
+				{ "value": "water-2", "label": "水 2" },
+				{ "value": "water-3", "label": "水 3" },
+				{ "value": "wave-1", "label": "波浪 1" },
+				{ "value": "wave-2", "label": "波浪 2" },
+				{ "value": "wifi-1", "label": "Wi-Fi 1" },
+				{ "value": "wifi-2", "label": "Wi-Fi 2" },
+				{ "value": "window", "label": "視窗" },
+				{ "value": "youtube", "label": "YouTube" }
+      ],
+      "default": "none",
+      "label": "副標題圖示"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "default": "網誌文章",
+      "label": "主標題",
+      "info": "使用 [ ] 來標示要加上底線的文字。"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "options": [
+        { "value": "h3", "label": "小" },
+        { "value": "h2", "label": "中" }
+      ],
+      "default": "h2",
+      "label": "主標題尺寸"
+    },
+    {
+      "type": "select",
+      "id": "heading_level",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" }
+      ],
+      "default": "h2",
+      "label": "主標題的 HTML 標籤"
+    },
+    {
+      "type": "select",
+      "id": "heading_line",
+      "options": [
+        { "value": "simple", "label": "簡潔線條" },
+        { "value": "rounded", "label": "圓弧線條" },
+        { "value": "background", "label": "背景色塊" },
+        { "value": "none", "label": "無" }
+      ],
+      "default": "simple",
+      "label": "標題底線樣式"
+    },
+    {
+      "type": "color",
+      "id": "line_color",
+      "label": "線條顏色",
+      "default": "#1566E0"
+    },
+    {
+      "type": "checkbox",
+      "id": "word_break",
+      "label": "標題文字自動換行",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "heading_animation",
+      "options": [
+        { "value": "typewriter", "label": "打字機效果" },
+        { "value": "rolling", "label": "滾動效果" },
+        { "value": "appearing", "label": "浮現效果" },
+        { "value": "none", "label": "無" }
+      ],
+      "default": "none",
+      "label": "標題動畫",
+      "info": "僅適用於使用 [ ] 標示的文字。"
+    },
+    {
+      "type": "checkbox",
+      "id": "word_break_an",
+      "label": "動畫文字自動換行",
+      "default": false
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "文字",
+      "default": "您可以在此說明您的網誌內容。"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "options": [
+        { "value": "landscape", "label": "橫向" },
+        { "value": "portrait", "label": "直向" },
+        { "value": "square", "label": "正方形" }
+      ],
+      "default": "landscape",
+      "label": "圖片比例"
+    },
+    {
+      "type": "select",
+      "id": "post_heading_size",
+      "label": "文章標題尺寸",
+      "options": [
+        { "value": "recommended", "label": "自動推薦" },
+        { "value": "h6", "label": "特小" },
+        { "value": "h5", "label": "小" },
+        { "value": "h4", "label": "中" },
+        { "value": "h3", "label": "大" }
+      ],
+      "default": "recommended"
+    },
+    {
+      "type": "image_picker",
+      "id": "author_image",
+      "label": "作者預設圖片",
+      "info": "若文章作者未設定個人圖片，將會使用此處的圖片。"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image",
+      "default": true,
+      "label": "顯示圖片"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tags",
+      "default": true,
+      "label": "顯示標籤"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_date",
+      "default": true,
+      "label": "顯示日期"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_author",
+      "default": true,
+      "label": "顯示作者"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_excerpt",
+      "default": false,
+      "label": "顯示文章摘要"
+    },
+    {
+      "type": "header",
+      "content": "「閱讀全部」按鈕"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "default": true,
+      "label": "顯示按鈕"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "default": "閱讀更多",
+      "label": "按鈕文字"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "options": [
+        { "group": "實心按鈕", "value": "primary", "label": "主要按鈕" },
+        { "group": "實心按鈕", "value": "secondary", "label": "次要按鈕" },
+        { "group": "實心按鈕", "value": "tertiary", "label": "第三按鈕" },
+        { "group": "文字按鈕", "value": "simple", "label": "主要文字按鈕" },
+        { "group": "文字按鈕", "value": "simple_secondary", "label": "次要文字按鈕" },
+        { "group": "文字按鈕", "value": "simple_link", "label": "連結樣式" }
+      ],
+      "default": "primary",
+      "label": "按鈕樣式"
+    },
+    {
+      "type": "header",
+      "content": "區塊間距"
+    },
+    {
+      "type": "select",
+      "id": "padding_top",
+      "options": [
+        { "value": "no-indent", "label": "無" },
+        { "value": "xs", "label": "特小" },
+        { "value": "s", "label": "小" },
+        { "value": "m", "label": "中" },
+        { "value": "l", "label": "大" },
+        { "value": "xl", "label": "特大" }
+      ],
+      "default": "l",
+      "label": "頂部內邊距"
+    },
+    {
+      "type": "select",
+      "id": "padding_bottom",
+      "options": [
+        { "value": "no-indent", "label": "無" },
+        { "value": "xs", "label": "特小" },
+        { "value": "s", "label": "小" },
+        { "value": "m", "label": "中" },
+        { "value": "l", "label": "大" },
+        { "value": "xl", "label": "特大" }
+      ],
+      "default": "l",
+      "label": "底部內邊距"
+    },
+    {
+      "type": "header",
+      "content": "區塊邊界"
+    },
+    {
+      "type": "select",
+      "id": "margin_top",
+      "options": [
+        { "value": "no-indent", "label": "無" },
+        { "value": "xs", "label": "特小" },
+        { "value": "s", "label": "小" },
+        { "value": "m", "label": "中" },
+        { "value": "l", "label": "大" },
+        { "value": "xl", "label": "特大" }
+      ],
+      "default": "no-indent",
+      "label": "頂部外邊界"
+    },
+    {
+      "type": "select",
+      "id": "margin_bottom",
+      "options": [
+        { "value": "no-indent", "label": "無" },
+        { "value": "xs", "label": "特小" },
+        { "value": "s", "label": "小" },
+        { "value": "m", "label": "中" },
+        { "value": "l", "label": "大" },
+        { "value": "xl", "label": "特大" }
+      ],
+      "default": "no-indent",
+      "label": "底部外邊界"
+    }
+  ],
+  "presets": [
+    {
+      "name": "精選網誌文章",
+      "settings": {}
+    }
+  ]
+}
+{% endschema %}

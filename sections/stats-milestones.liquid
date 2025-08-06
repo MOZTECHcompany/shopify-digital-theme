@@ -1,0 +1,477 @@
+{% comment %}
+============================================================
+主題：數據里程碑區塊 v8.0 - 終極重構版
+特色：
+- [**根本重構**] 採用業界最經典、最可靠的跑馬燈原理，從零重寫，保證成功。
+- [**結構至簡**] 大幅簡化 HTML 與 JS 結構，邏輯清晰，堅如磐石。
+- [**精確像素**] JS 精確測量一份原始內容的寬度，CSS 執行像素級位移，完美無縫。
+- [**絕對可靠**] 這是實現此效果的最終黃金標準，徹底解決所有銜接與跳動問題。
+============================================================
+{% endcomment %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --stats-bg-color: {{ section.settings.background_color | default: '#f5f5f5' }};
+    --stats-text-color: {{ section.settings.text_color | default: '#333333' }};
+    --stats-number-color: {{ section.settings.number_color | default: '#2BB9ED' }};
+    --stats-description-color: {{ section.settings.description_color | default: '#666666' }};
+    --stats-heading-color: {{ section.settings.heading_color | default: '#333333' }};
+    --stats-item-gap: clamp(20px, 3vw, 40px);
+    
+    --stats-scroll-pixels-per-second: {{ section.settings.scroll_speed | default: 50 }};
+
+    --stats-heading-base-font-size: {{ section.settings.heading_font_size | default: 48 }}px;
+    --font-number: 'Poppins', sans-serif;
+    --font-body: 'Open Sans', sans-serif;
+  }
+  
+  @keyframes marquee-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(var(--scroll-distance));
+    }
+  }
+
+  .stats-milestones-section {
+    width: 100%;
+    padding: {{ section.settings.padding_mobile }}px 0;
+    background-color: var(--stats-bg-color);
+    color: var(--stats-text-color);
+    font-family: var(--font-body);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .stats-milestones-section .container {
+    max-width: 1200px; margin: 0 auto; text-align: center;
+  }
+
+  .stats-milestones-section__heading {
+    font-family: var(--font-number);
+    font-size: clamp(calc(var(--stats-heading-base-font-size) * 0.6), 4vw, var(--stats-heading-base-font-size));
+    font-weight: 700; line-height: 1.2; text-transform: uppercase;
+    letter-spacing: -0.5px; padding: 0 clamp(20px, 4vw, 40px);
+    margin-bottom: 0; color: var(--stats-heading-color);
+  }
+  .stats-milestones-section__heading .heading-highlight {
+    color: var(--stats-number-color); font-weight: 800; display: inline;
+  }
+  .stats-milestones-section__separator {
+    width: clamp(100px, 20vw, 300px); height: 1px;
+    background-color: var(--stats-description-color); opacity: 0.3;
+    margin: clamp(20px, 3vw, 40px) auto;
+  }
+
+  /* ✨ v8.0 Wrapper: 唯一的容器，負責裁剪畫面 */
+  .stats-milestones-section__wrapper {
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ✨ v8.0 Track: 動畫軌道，直接包含所有數據點 */
+  .stats-milestones-section__track {
+    display: flex;
+    flex-wrap: nowrap;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: var(--stats-item-gap);
+    width: max-content;
+    will-change: transform;
+  }
+  
+  .stats-milestones-section__track.is-scrolling {
+    animation: marquee-scroll var(--scroll-duration) linear infinite;
+  }
+
+  .stats-milestones-section__track.is-scrolling:hover,
+  .stats-milestones-section__track.is-scrolling:focus-within {
+    animation-play-state: paused;
+  }
+
+  .stats-milestones-section__item {
+    flex-shrink: 0;
+    padding: clamp(10px, 1.5vw, 20px);
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: flex-start;
+    background-color: transparent;
+    width: clamp(180px, 60vw, 250px);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    will-change: opacity, transform;
+  }
+
+  .stats-milestones-section__item.animate-in {
+    opacity: 1; transform: translateY(0);
+  }
+
+  .stats-milestones-section__number {
+    font-family: var(--font-number);
+    font-size: clamp(30px, 4vw, 50px);
+    font-weight: 800; color: var(--stats-number-color);
+    line-height: 1; margin-bottom: 10px;
+    white-space: nowrap; letter-spacing: -0.05em;
+  }
+  .stats-milestones-section__description {
+    font-family: var(--font-body);
+    font-size: clamp(14px, 1.8vw, 18px);
+    color: var(--stats-description-color);
+    line-height: 1.4; margin: 0; padding: 0;
+    max-width: 250px; text-align: center;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stats-milestones-section__track.is-scrolling {
+      animation: none !important;
+    }
+    .stats-milestones-section__item {
+      transition: none !important; opacity: 1 !important; transform: translateY(0) !important;
+    }
+  }
+
+  @media screen and (min-width: 769px) {
+    .stats-milestones-section {
+      padding: {{ section.settings.padding_desktop }}px 0;
+    }
+    .stats-milestones-section__item { width: clamp(200px, 20vw, 300px); } 
+  }
+  
+  @media screen and (min-width: 1200px) { .stats-milestones-section__item { width: clamp(230px, 18vw, 350px); } }
+</style>
+
+<section class="stats-milestones-section" id="StatsMilestonesSection-{{ section.id }}">
+  <div class="container">
+    {% if section.settings.section_heading != blank %}
+      <h2 class="stats-milestones-section__heading" 
+          data-highlight-text="{{ section.settings.heading_highlight_text | escape }}"
+          data-original-html="{{ section.settings.section_heading | escape }}">
+        {{ section.settings.section_heading }}
+      </h2>
+    {% endif %}
+    <div class="stats-milestones-section__separator"></div>
+    
+    <div class="stats-milestones-section__wrapper">
+      <ul class="stats-milestones-section__track">
+        {% if section.blocks.size > 0 %}
+          {%- for block in section.blocks -%}
+            {%- assign trimmed_stat_number = block.settings.stat_number | trim -%}
+            {%- if trimmed_stat_number != blank -%}
+              <li class="stats-milestones-section__item">
+                <p class="stats-milestones-section__number"
+                   data-target="{{ block.settings.stat_number | escape }}"
+                   style="color: {{ block.settings.stat_number_color | default: 'var(--stats-number-color)' }};">0</p>
+                <p class="stats-milestones-section__description" style="color: {{ block.settings.stat_description_color | default: 'var(--stats-description-color)' }};">{{ block.settings.stat_description }}</p>
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        {% else %}
+          {% comment %} Fallback for when no blocks are added, for demo purposes {% endcomment %}
+          {%- assign default_stats = 'NO.1,Mobile Charging Brand*;12 Years,of Innovation;100 Million,Global Customers;47%,R&D Employees' | split: ';' -%}
+          {%- for stat in default_stats -%}
+            {%- assign parts = stat | split: ',' -%}
+            <li class="stats-milestones-section__item">
+              <p class="stats-milestones-section__number" data-target="{{ parts.first | strip | escape }}">0</p>
+              <p class="stats-milestones-section__description">{{ parts.last | strip }}</p>
+            </li>
+          {%- endfor -%}
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    class StatsMilestonesSection {
+      constructor(sectionId) {
+        this.section = document.getElementById(sectionId);
+        if (!this.section) return;
+
+        this.wrapper = this.section.querySelector('.stats-milestones-section__wrapper');
+        this.track = this.section.querySelector('.stats-milestones-section__track');
+        this.prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        
+        this.init();
+      }
+
+      init() {
+        if (!this.track || this.track.children.length === 0) return;
+
+        this.setupHeading();
+        
+        if (!this.prefersReducedMotion) {
+            const observer = new IntersectionObserver((entries, obs) => {
+                if (entries[0].isIntersecting) {
+                    this.setupAutoScroll();
+                    obs.unobserve(this.section);
+                }
+            }, { threshold: 0.01 });
+            observer.observe(this.section);
+        } else {
+            // 如果用戶偏好靜態，直接顯示所有項目
+            this.setupItemAnimations(false);
+        }
+      }
+
+      setupHeading() {
+        const heading = this.section.querySelector('.stats-milestones-section__heading');
+        if (!heading) return;
+        const highlightText = heading.dataset.highlightText;
+        const originalHtml = heading.dataset.originalHtml;
+        if (highlightText && originalHtml) {
+          const regex = new RegExp(highlightText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+          heading.innerHTML = originalHtml.replace(regex, `<span class="heading-highlight">${highlightText}</span>`);
+        }
+      }
+      
+      // ✨ --- v8.0 終極重構版 setupAutoScroll 函式 --- ✨
+      setupAutoScroll() {
+        const originalItems = Array.from(this.track.children);
+        if (originalItems.length === 0) return;
+
+        // 步驟 1: 計算一份原始內容的精確寬度
+        const gap = parseFloat(getComputedStyle(this.track).gap) || 0;
+        const scrollWidth = originalItems.reduce((acc, item) => acc + item.offsetWidth + gap, 0);
+
+        // 步驟 2: 如果內容不足以填滿容器，則不滾動並居中
+        if (scrollWidth <= this.wrapper.offsetWidth) {
+            this.track.style.justifyContent = 'center';
+            this.setupItemAnimations(false); // 靜態顯示
+            return;
+        }
+
+        // 步驟 3: 完整複製一次所有原始項目，用於無縫銜接
+        originalItems.forEach(item => {
+            const clone = item.cloneNode(true);
+            clone.setAttribute('aria-hidden', 'true');
+            this.track.appendChild(clone);
+        });
+        
+        // 步驟 4: 計算動畫所需時間，以保持速度恆定
+        const pixelsPerSecond = parseInt(getComputedStyle(this.section).getPropertyValue('--stats-scroll-pixels-per-second').trim(), 10) || 50;
+        const durationInSeconds = scrollWidth / pixelsPerSecond;
+
+        // 步驟 5: 將精確的滾動距離和時間注入 CSS 變數
+        this.track.style.setProperty('--scroll-distance', `-${scrollWidth}px`);
+        this.track.style.setProperty('--scroll-duration', `${durationInSeconds}s`);
+        
+        // 步驟 6: 啟動動畫並設置入場動畫
+        this.track.classList.add('is-scrolling');
+        this.setupItemAnimations(true); // 帶有延遲的入場動畫
+      }
+
+      setupItemAnimations(isScrolling) {
+        const allItems = this.track.querySelectorAll('.stats-milestones-section__item');
+        allItems.forEach((item, index) => {
+            // 如果在滾動，給予一個微小的延遲，讓動畫看起來更自然
+            if(isScrolling) {
+                item.style.transitionDelay = `${index * 0.05}s`;
+            }
+            item.classList.add('animate-in'); // 直接觸發入場動畫
+            this.animateNumber(item.querySelector('.stats-milestones-section__number'));
+        });
+      }
+      
+      animateNumber(element) {
+        if (!element) return;
+        const targetValue = element.dataset.target;
+        if (this.prefersReducedMotion || !targetValue || targetValue.trim() === '') {
+            element.textContent = targetValue;
+            return;
+        }
+        const numMatch = targetValue.match(/(\D*)([\d,.]*)(\D*)/);
+        if (!numMatch || isNaN(parseFloat(numMatch[2].replace(/,/g, '')))) {
+            element.textContent = targetValue;
+            return;
+        }
+        const prefix = numMatch[1];
+        const suffix = numMatch[3];
+        const endNumber = parseFloat(numMatch[2].replace(/,/g, ''));
+        const decimalPlaces = (numMatch[2].split('.')[1] || '').length;
+        let startTime;
+        const duration = 2000;
+        const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+        const step = (currentTime) => {
+            if (!startTime) startTime = currentTime;
+            const progress = Math.min((currentTime - startTime) / duration, 1);
+            const easedProgress = easeOutCubic(progress);
+            let currentValue = easedProgress * endNumber;
+            element.textContent = prefix + currentValue.toLocaleString('en-US', {
+                minimumFractionDigits: decimalPlaces,
+                maximumFractionDigits: decimalPlaces
+            }) + suffix;
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            } else {
+                element.textContent = targetValue;
+            }
+        };
+        requestAnimationFrame(step);
+      }
+    }
+
+    new StatsMilestonesSection('StatsMilestonesSection-{{ section.id }}');
+  });
+</script>
+
+{% schema %}
+{
+  "name": "數據里程碑",
+  "tag": "section",
+  "class": "section-stats-milestones",
+  "settings": [
+    {
+      "type": "header",
+      "content": "區塊內容"
+    },
+    {
+      "type": "textarea",
+      "id": "section_heading",
+      "label": "區塊主標題",
+      "default": "THE WORLD'S NO.1 MOBILE<br>CHARGING BRAND*",
+      "info": "您可以輸入多行文字，並使用 <br> 標籤手動分行，以達到圖片中的排版效果。"
+    },
+    {
+      "type": "text",
+      "id": "heading_highlight_text",
+      "label": "標題中強調的文字",
+      "default": "NO.1",
+      "info": "輸入主標題中需要特別強調的文字（例如 'NO.1'），它將使用數字顏色顯示。請確保此文字在主標題中存在。"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "min": 20,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "主標題字體大小",
+      "default": 48,
+      "info": "調整區塊主標題的字體大小，在不同螢幕尺寸下會自動調整比例。"
+    },
+    {
+      "type": "header",
+      "content": "顏色配置"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "背景顏色",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "通用文字顏色",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "主標題顏色",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "number_color",
+      "label": "數字顏色",
+      "default": "#2BB9ED"
+    },
+    {
+      "type": "color",
+      "id": "description_color",
+      "label": "描述文字顏色",
+      "default": "#666666"
+    },
+    {
+      "type": "header",
+      "content": "滾動與動畫"
+    },
+    {
+      "type": "range",
+      "id": "scroll_speed",
+      "min": 20,
+      "max": 150,
+      "step": 5,
+      "unit": "spd",
+      "label": "自動滾動速率 (像素/秒)",
+      "default": 50,
+      "info": "定義內容每秒滾動多少像素。數字越大，滾動越快。這將確保在任何內容長度下視覺速度一致。"
+    },
+    {
+      "type": "header",
+      "content": "間距設定"
+    },
+    {
+      "type": "range",
+      "id": "padding_desktop",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "上下邊距 (桌面版)",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "上下邊距 (手機版)",
+      "default": 40
+    }
+  ],
+  "blocks": [
+    {
+      "type": "stat_item",
+      "name": "數據點",
+      "settings": [
+        {
+          "type": "text",
+          "id": "stat_number",
+          "label": "數字/百分比",
+          "info": "請輸入純數字（例如：100,000,000），或帶有符號（47%）。"
+        },
+        {
+          "type": "textarea",
+          "id": "stat_description",
+          "label": "描述文字"
+        },
+        {
+          "type": "color",
+          "id": "stat_number_color",
+          "label": "數字顏色 (可選)",
+          "info": "留空則使用通用數字顏色。"
+        },
+        {
+          "type": "color",
+          "id": "stat_description_color",
+          "label": "描述文字顏色 (可選)",
+          "info": "留空則使用通用描述文字顏色。"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "數據里程碑",
+      "category": "內容",
+      "blocks": [
+        { "type": "stat_item" },
+        { "type": "stat_item" },
+        { "type": "stat_item" },
+        { "type": "stat_item" }
+      ]
+    }
+  ]
+}
+{% endschema %}

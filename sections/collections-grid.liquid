@@ -1,0 +1,568 @@
+<link
+	rel='stylesheet'
+	href='{{ 'template-list-collections.css' | asset_url }}'
+	media='print'
+	onload="this.media='all'"
+>
+<noscript>
+	{{- 'template-list-collections.css' | asset_url | stylesheet_tag -}}
+</noscript>
+
+{%- style -%}
+	{% render 'section-padding' %}
+{%- endstyle -%}
+
+<div class='container section-{{ section.id }}-padding'>
+	{% render 'section-text',
+		section: section,
+		text_align: section.settings.text_align,
+		heading_level: section.settings.heading_level
+	%}
+
+	{%- liquid
+		case section.settings.sort
+			when 'products_high', 'products_low'
+				assign collections = collections | sort: 'all_products_count'
+			when 'date', 'date_reversed'
+				assign collections = collections | sort: 'published_at'
+		endcase
+
+		if section.settings.sort == 'products_high' or section.settings.sort == 'date_reversed' or section.settings.sort == 'alphabetical_reversed'
+			assign collections = collections | reverse
+		endif
+	-%}
+
+	<ul
+		class='
+			content collections-list collections-grid collections-grid--{{ section.settings.layout }}
+			collections-grid--{{ section.settings.collections_to_show }}
+			collections-grid--{{ section.settings.columns_mobile }}-mobile
+		'
+		role='list'
+	>
+		{%- for block in section.blocks -%}
+			{% assign collection = block.settings.collection %}
+			<li
+				class='
+					collections-grid__item  collections-grid__item--{{ collection.id }}
+					collections-grid__item--{{ section.settings.layout }}
+					  {% if section.settings.layout == 'overlay' %} color-{{ section.settings.color_scheme }} background {% endif %}
+					{% if section.settings.image_ratio == 'portrait' or section.settings.image_ratio == 'portrait' %} collections-grid__card--portrait {% endif %}
+					collections-grid__item--{{- section.settings.image_ratio }}
+				'
+				{{ block.shopify_attributes }}
+			>
+				{% if section.settings.layout == 'overlay' %}
+					<span
+						class='collections-grid__overlay'
+						style='--opacity: {{ section.settings.overlay_opacity }};'
+					></span>
+				{% endif %}
+
+				{% liquid
+					assign collection_product_image = collection.featured_image
+
+					if block.settings.image
+						assign collection_product_image = block.settings.image
+					endif
+				%}
+
+				{% if section.settings.image_ratio == 'adapt'
+					and collection_product_image != blank
+				%}
+					{% if section.settings.layout == 'overlay' %}
+						{% style %}
+							.collections-grid__item--{{ collection.id }}::after {
+							  padding-bottom: {{ 1 | divided_by: collection_product_image.aspect_ratio | times: 100 }}%;
+							}
+						{% endstyle %}
+					{% else %}
+						{% style %}
+							.collections-grid__item--{{ collection.id }} .collections-grid__image {
+							  padding-bottom: {{ 1 | divided_by: collection_product_image.aspect_ratio | times: 100 }}%;
+							}
+						{% endstyle %}
+					{% endif %}
+				{% endif %}
+
+				<div
+					class='collections-grid__image collections-grid__image--{{ section.settings.image_ratio }} collections-grid__image--{{- section.settings.image_fit -}}'
+				>
+					{%- if collection_product_image != blank -%}
+						{% assign columns = section.settings.collections_to_show %}
+						{%- capture sizes -%}
+              {%- if columns == 6 -%}
+                (min-width: 1600px) calc((100vw - 40px) / 6),
+              {%- endif -%}
+              {%- if columns >= 5 -%}
+                (min-width: 1360px) calc((100vw - 40px) / 5),
+              {% endif %}
+              {%- if columns >= 4 -%}
+                (min-width: 1200px) calc((100vw - 40px) / 4),
+              {%- endif -%}
+              {%- if columns >= 3 -%}
+                (min-width: 990px) calc((100vw - 40px) / 3),
+              {%- endif -%}
+              {%- if columns >= 2 -%}
+                (min-width: 750px) calc((100vw - 40px) / 2),
+              {%- endif -%}
+              calc(100vw - 40px)
+            {%- endcapture -%}
+
+						{{
+							collection_product_image
+							| image_url: width: collection_product_image.width
+							| image_tag:
+								loading: 'lazy',
+								sizes: sizes,
+								widths: '360, 550, 750, 900, 1100, 1420, 1700, 1920, 2200, 2400, 2600'
+						}}
+					{% elsif collection == blank %}
+						{% assign collection_index = forloop.index | modulo: 6 | plus: 1 %}
+						{{
+							'collection-'
+							| append: collection_index
+							| placeholder_svg_tag: 'placeholder-svg placeholder-svg—lined collections-list-image'
+						}}
+					{% endif %}
+				</div>
+				<div class='collections-grid__information'>
+					<h3 class='collections-grid__title {% if section.settings.collections_to_show < 5 %} h5 {% else %} h6 {% endif %}'>
+						{% if collection != blank %}
+							{{- collection.title -}}
+						{% else %}
+							{{- 'general.card.collection_name' | t -}}
+						{% endif %}
+					</h3>
+					{% if section.settings.show_desc %}
+						{% if section.settings.alt_desc
+							and collection.metafields.custom.description != blank
+						%}
+							<p class='collections-grid__desc'>
+								{{-
+									collection.metafields.custom.description
+									| strip_html
+									| truncatewords: 50, '...'
+								-}}
+							</p>
+						{%- elsif collection.description != blank -%}
+							<p class='collections-grid__desc'>
+								{{-
+									collection.description
+									| strip_html
+									| truncatewords: 50, '...'
+								-}}
+							</p>
+						{% endif %}
+					{% endif %}
+				</div>
+				{% if collection != blank %}
+					<a
+						href='{{ collection.url | default: '#' }}'
+						class=' collections-grid__link_overlay'
+						aria-label='{{ collection.title }}'
+					>
+						<span class='visibility-hidden'>{{ collection.title }}</span>
+					</a>
+				{% endif %}
+			</li>
+		{%- endfor -%}
+	</ul>
+</div>
+
+{% schema %}
+{
+	"name": "商品系列網格",
+	"tag": "section",
+	"class": "section-list-collections",
+	"enabled_on": {
+		"templates": ["*"]
+	},
+	"settings": [
+		{
+			"type": "select",
+			"id": "layout",
+			"label": "版面配置",
+			"options": [
+				{ "value": "simple", "label": "基本" },
+				{ "value": "overlay", "label": "疊加層" }
+			],
+			"default": "simple"
+		},
+		{
+			"type": "text",
+			"id": "subheading",
+			"label": "副標題"
+		},
+		{
+			"type": "select",
+			"id": "subheading_style",
+			"options": [
+				{ "value": "subtitle", "label": "副標題" },
+				{ "value": "subtitle subtitle--secondary", "label": "副標題 (次要)" }
+			],
+			"default": "subtitle",
+			"label": "副標題樣式"
+		},
+		{
+			"type": "select",
+			"id": "subheading_icon",
+			"options": [
+				{ "value": "none", "label": "無" },
+				{ "value": "arrow-bar", "label": "箭頭條" },
+				{ "value": "bag-1", "label": "提袋 1" },
+				{ "value": "bag-2", "label": "提袋 2" },
+				{ "value": "bag-3", "label": "提袋 3" },
+				{ "value": "bar-chart", "label": "長條圖" },
+				{ "value": "bars-upward", "label": "向上長條" },
+				{ "value": "baseball", "label": "棒球" },
+				{ "value": "battery-1", "label": "電池 1" },
+				{ "value": "battery-2", "label": "電池 2" },
+				{ "value": "battery-3", "label": "電池 3" },
+				{ "value": "book", "label": "書本" },
+				{ "value": "card", "label": "卡片" },
+				{ "value": "card-holder", "label": "名片夾" },
+				{ "value": "chart", "label": "圖表" },
+				{ "value": "chart-2", "label": "圖表 2" },
+				{ "value": "chart-3", "label": "圖表 3" },
+				{ "value": "chats", "label": "對話" },
+				{ "value": "check-1", "label": "勾號 1" },
+				{ "value": "check-2", "label": "勾號 2" },
+				{ "value": "check-3", "label": "勾號 3" },
+				{ "value": "check-4", "label": "勾號 4" },
+				{ "value": "circle", "label": "圓圈" },
+				{ "value": "circles", "label": "多個圓圈" },
+				{ "value": "clock-1", "label": "時鐘 1" },
+				{ "value": "clock-2", "label": "時鐘 2" },
+				{ "value": "close", "label": "關閉" },
+				{ "value": "cloud-server", "label": "雲端伺服器" },
+				{ "value": "computer", "label": "電腦" },
+				{ "value": "computer-mouse", "label": "滑鼠" },
+				{ "value": "confetti", "label": "彩紙" },
+				{ "value": "delivery", "label": "運送" },
+				{ "value": "delivery-box", "label": "包裹" },
+				{ "value": "devices", "label": "裝置" },
+				{ "value": "directions", "label": "方向" },
+				{ "value": "dumbbell", "label": "啞鈴" },
+				{ "value": "eye", "label": "眼睛" },
+				{ "value": "facebook", "label": "Facebook" },
+				{ "value": "file-1", "label": "檔案 1" },
+				{ "value": "file-2", "label": "檔案 2" },
+				{ "value": "flag", "label": "旗幟" },
+				{ "value": "folder-1", "label": "資料夾 1" },
+				{ "value": "folder-2", "label": "資料夾 2" },
+				{ "value": "food", "label": "食物" },
+				{ "value": "hand-1", "label": "手 1" },
+				{ "value": "hand-2", "label": "手 2" },
+				{ "value": "hand-3", "label": "手 3" },
+				{ "value": "headphones", "label": "耳機" },
+				{ "value": "instagram", "label": "Instagram" },
+				{ "value": "laptop-1", "label": "筆電 1" },
+				{ "value": "laptop-2", "label": "筆電 2" },
+				{ "value": "leaf", "label": "葉子" },
+				{ "value": "lightning-bolt-1", "label": "閃電 1" },
+				{ "value": "lightning-bolt-2", "label": "閃電 2" },
+				{ "value": "like", "label": "讚" },
+				{ "value": "link", "label": "連結" },
+				{ "value": "lock-1", "label": "鎖 1" },
+				{ "value": "lock-2", "label": "鎖 2" },
+				{ "value": "logout", "label": "登出" },
+				{ "value": "luggage", "label": "行李" },
+				{ "value": "mark", "label": "標記" },
+				{ "value": "medicine", "label": "藥品" },
+				{ "value": "microphone", "label": "麥克風" },
+				{ "value": "moon", "label": "月亮" },
+				{ "value": "pencil", "label": "鉛筆" },
+				{ "value": "phone-1", "label": "電話 1" },
+				{ "value": "phone-2", "label": "電話 2" },
+				{ "value": "phone-3", "label": "電話 3" },
+				{ "value": "phone-4", "label": "電話 4" },
+				{ "value": "pinterest", "label": "Pinterest" },
+				{ "value": "plug", "label": "插頭" },
+				{ "value": "presentation-1", "label": "簡報 1" },
+				{ "value": "presentation-2", "label": "簡報 2" },
+				{ "value": "pulse", "label": "脈搏" },
+				{ "value": "recycle", "label": "回收" },
+				{ "value": "rocket", "label": "火箭" },
+				{ "value": "search", "label": "搜尋" },
+				{ "value": "sending", "label": "傳送" },
+				{ "value": "server-1", "label": "伺服器 1" },
+				{ "value": "server-2", "label": "伺服器 2" },
+				{ "value": "settings", "label": "設定" },
+				{ "value": "shield", "label": "盾牌" },
+				{ "value": "shopping-basket", "label": "購物籃" },
+				{ "value": "shuffle", "label": "隨機播放" },
+				{ "value": "snapchat", "label": "Snapchat" },
+				{ "value": "sound-waves", "label": "聲波" },
+				{ "value": "speaker", "label": "喇叭" },
+				{ "value": "squares-1", "label": "方塊 1" },
+				{ "value": "squares-2", "label": "方塊 2" },
+				{ "value": "stack", "label": "堆疊" },
+				{ "value": "star", "label": "星星" },
+				{ "value": "stopwatch", "label": "碼錶" },
+				{ "value": "sun", "label": "太陽" },
+				{ "value": "tag", "label": "標籤" },
+				{ "value": "telephone-tower", "label": "電信塔" },
+				{ "value": "tik-tok", "label": "TikTok" },
+				{ "value": "tree", "label": "樹" },
+				{ "value": "trend", "label": "趨勢" },
+				{ "value": "trophy", "label": "獎盃" },
+				{ "value": "tumblr", "label": "Tumblr" },
+				{ "value": "tv", "label": "電視" },
+				{ "value": "twitter", "label": "Twitter" },
+				{ "value": "user-1", "label": "使用者 1" },
+				{ "value": "user-2", "label": "使用者 2" },
+				{ "value": "user-3", "label": "使用者 3" },
+				{ "value": "user-4", "label": "使用者 4" },
+				{ "value": "user-5", "label": "使用者 5" },
+				{ "value": "video", "label": "影片" },
+				{ "value": "vimeo", "label": "Vimeo" },
+				{ "value": "wallet", "label": "錢包" },
+				{ "value": "watch", "label": "手錶" },
+				{ "value": "water-1", "label": "水 1" },
+				{ "value": "water-2", "label": "水 2" },
+				{ "value": "water-3", "label": "水 3" },
+				{ "value": "wave-1", "label": "波浪 1" },
+				{ "value": "wave-2", "label": "波浪 2" },
+				{ "value": "wifi-1", "label": "Wi-Fi 1" },
+				{ "value": "wifi-2", "label": "Wi-Fi 2" },
+				{ "value": "window", "label": "視窗" },
+				{ "value": "youtube", "label": "YouTube" }
+			],
+			"default": "none",
+			"label": "副標題圖示"
+		},
+		{
+			"type": "inline_richtext",
+			"id": "heading",
+			"label": "標題",
+			"info": "使用方括號 `[文字]` 來突顯標題中的特定單字。"
+		},
+		{
+			"type": "select",
+			"id": "heading_size",
+			"options": [
+				{ "value": "h3", "label": "中" },
+				{ "value": "h2", "label": "大" }
+			],
+			"default": "h2",
+			"label": "標題大小"
+		},
+		{
+			"type": "select",
+			"id": "heading_level",
+			"options": [
+				{ "value": "h1", "label": "H1" },
+				{ "value": "h2", "label": "H2" },
+				{ "value": "h3", "label": "H3" }
+			],
+			"default": "h2",
+			"label": "標題層級 (HTML 標籤)"
+		},
+		{
+			"type": "select",
+			"id": "heading_line",
+			"options": [
+				{ "value": "simple", "label": "簡潔線條" },
+				{ "value": "rounded", "label": "圓角線條" },
+				{ "value": "background", "label": "背景色塊" },
+				{ "value": "none", "label": "無" }
+			],
+			"default": "simple",
+			"label": "標題線條樣式"
+		},
+		{
+			"type": "color",
+			"id": "line_color",
+			"label": "線條顏色",
+			"default": "#1566E0"
+		},
+		{
+			"type": "checkbox",
+			"id": "word_break",
+			"label": "啟用標題自動換行",
+			"default": false
+		},
+		{
+			"type": "select",
+			"id": "heading_animation",
+			"options": [
+				{ "value": "typewriter", "label": "打字機" },
+				{ "value": "rolling", "label": "滾動" },
+				{ "value": "appearing", "label": "浮現" },
+				{ "value": "none", "label": "無" }
+			],
+			"default": "none",
+			"label": "標題動畫",
+			"info": "此動畫僅在頁面首次載入時播放一次。"
+		},
+		{
+			"type": "checkbox",
+			"id": "word_break_an",
+			"label": "啟用動畫文字自動換行",
+			"default": false
+		},
+		{
+			"type": "textarea",
+			"id": "text",
+			"label": "內文"
+		},
+		{
+			"type": "select",
+			"id": "text_align",
+			"label": "文字對齊",
+			"options": [
+				{ "value": "left", "label": "靠左" },
+				{ "value": "center", "label": "置中" }
+			],
+			"default": "left"
+		},
+		{
+			"type": "color_scheme",
+			"id": "color_scheme",
+			"default": "background-3",
+			"label": "卡片色彩配置",
+			"info": "僅適用於「疊加層」版面配置。"
+		},
+		{
+			"type": "select",
+			"id": "image_ratio",
+			"options": [
+				{ "value": "adapt", "label": "適應圖片大小" },
+				{ "value": "landscape", "label": "橫向" },
+				{ "value": "portrait", "label": "直向" },
+				{ "value": "square", "label": "正方形" }
+			],
+			"default": "square",
+			"label": "圖片比例",
+			"info": "設定為「適應圖片大小」將使用商品系列的特色圖片原始比例。"
+		},
+		{
+			"type": "select",
+			"id": "image_fit",
+			"label": "圖片縮放模式",
+			"options": [
+				{ "value": "contain", "label": "等比例縮放 (Contain)" },
+				{ "value": "cover", "label": "裁切填滿 (Cover)" }
+			],
+			"default": "cover"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_desc",
+			"default": true,
+			"label": "顯示描述"
+		},
+		{
+			"type": "checkbox",
+			"id": "alt_desc",
+			"label": "使用備用描述",
+			"info": "使用 `custom.description` meta欄位中的內容取代預設的商品系列描述。",
+			"default": false
+		},
+		{
+			"type": "range",
+			"id": "overlay_opacity",
+			"min": 0,
+			"max": 1,
+			"step": 0.1,
+			"default": 0.3,
+			"label": "疊加層不透明度",
+			"info": "僅適用於「疊加層」版面配置。"
+		},
+		{
+			"type": "range",
+			"id": "collections_to_show",
+			"min": 1,
+			"max": 6,
+			"step": 1,
+			"default": 4,
+			"label": "每列顯示的商品系列數量"
+		},
+		{
+			"type": "header",
+			"content": "行動裝置版面"
+		},
+		{
+			"type": "select",
+			"id": "columns_mobile",
+			"default": "1",
+			"label": "行動裝置上的欄數",
+			"options": [
+				{ "value": "1", "label": "1 欄" },
+				{ "value": "2", "label": "2 欄" }
+			]
+		},
+		{
+			"type": "header",
+			"content": "區塊內距 (Padding)"
+		},
+		{
+			"type": "select",
+			"id": "padding_top",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "超小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "超大" }
+			],
+			"default": "l",
+			"label": "頂部內距"
+		},
+		{
+			"type": "select",
+			"id": "padding_bottom",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "超小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "超大" }
+			],
+			"default": "l",
+			"label": "底部內距"
+		}
+	],
+	"blocks": [
+		{
+			"type": "collection",
+			"name": "商品系列",
+			"settings": [
+				{
+					"type": "collection",
+					"id": "collection",
+					"label": "商品系列"
+				},
+				{
+					"type": "image_picker",
+					"id": "image",
+					"label": "圖片",
+					"info": "留空則使用商品系列的特色圖片。"
+				}
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "商品系列網格",
+			"blocks": [
+				{
+					"type": "collection"
+				},
+				{
+					"type": "collection"
+				},
+				{
+					"type": "collection"
+				},
+				{
+					"type": "collection"
+				}
+			]
+		}
+	]
+}
+{% endschema %}

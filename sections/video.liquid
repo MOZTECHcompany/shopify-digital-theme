@@ -1,0 +1,523 @@
+{{ 'section-video.css' | asset_url | stylesheet_tag }}
+{{ 'component-deferred-media.css' | asset_url | stylesheet_tag }}
+<script src='{{ 'video.js' | asset_url }}' defer='defer'></script>
+
+{% style %}
+	 {% render 'section-margin' %}
+
+	.video-section__overlay {
+	   background-color: rgba(var(--color-overlay), {{ section.settings.opacity_overlay }});
+	 }
+{% endstyle %}
+
+<div class='video-section'>
+	<div class='{% if section.settings.full_width %}{% else %}container{% endif %}'>
+		<noscript>
+			<div
+				class='video-section__media color-background-4'
+				{% if section.settings.cover_image != blank %}
+					style='padding-bottom: {{ 1 | divided_by: section.settings.cover_image.aspect_ratio | times: 100 }}%;'
+				{% endif %}
+			>
+				<a
+					href='{{ section.settings.video_url }}'
+					class='video-section__poster media media--transparent{% if section.settings.cover_image == blank %} video-section__placeholder{% endif %}'
+				>
+					{%- if section.settings.cover_image != blank -%}
+						<img
+							srcset='
+								{%- if section.settings.cover_image.width >= 375 -%}{{ section.settings.cover_image | image_url: width: '375x' }} 375w,{%- endif -%}
+								{%- if section.settings.cover_image.width >= 750 -%}{{ section.settings.cover_image | image_url: width: '750x' }} 750w,{%- endif -%}
+								{%- if section.settings.cover_image.width >= 1100 -%}{{ section.settings.cover_image | image_url: width: '1100x' }} 1100w,{%- endif -%}
+								{%- if section.settings.cover_image.width >= 1500 -%}{{ section.settings.cover_image | image_url: width: '1500x' }} 1500w,{%- endif -%}
+								{%- if section.settings.cover_image.width >= 1780 -%}{{ section.settings.cover_image | image_url: width: '1780x' }} 1780w,{%- endif -%}
+								{%- if section.settings.cover_image.width >= 2000 -%}{{ section.settings.cover_image | image_url: width: '2000x' }} 2000w,{%- endif -%}
+								{%- if section.settings.cover_image.width >= 3000 -%}{{ section.settings.cover_image | image_url: width: '3000x' }} 3000w,{%- endif -%}
+								{%- if section.settings.cover_image.width >= 3840 -%}{{ section.settings.cover_image | image_url: width: '3840x' }} 3840w,{%- endif -%}
+								{{ section.settings.cover_image | image_url: width: 'master' }} {{ section.settings.cover_image.width }}w
+							'
+							src='{{ section.settings.cover_image | image_url: width: '1920x' }}'
+							sizes='{% if section.settings.full_width %}100vw{% else %}(min-width: {{ settings.page_width }}px) {{ settings.page_width | minus: 100 }}px, (min-width: 750px) calc(100vw - 10rem), 100vw{% endif %}'
+							alt="載入影片：{{ section.settings.description | escape }}"
+							loading='lazy'
+							width='{{ section.settings.cover_image.width }}'
+							height='{{ section.settings.cover_image.height }}'
+						>
+					{%- else -%}
+						{{
+							'collection-2'
+							| placeholder_svg_tag: 'placeholder-svg placeholder'
+						}}
+					{%- endif -%}
+
+					<div class='video-section__content'>
+						{% if section.settings.subheading != blank %}
+							<div class='video-section__subheading subtitle'>
+								{{ section.settings.subheading | truncate: 30, '' | escape }}
+							</div>
+						{% endif %}
+
+						{% if section.settings.heading != blank %}
+							<{{ section.settings.heading_level }} class='title title--section video-section__heading'>
+								{{ section.settings.heading | truncate: 30, '' | escape }}
+							</{{ section.settings.heading_level }}>
+						{% endif %}
+						<span class='video-section__play-button'>
+							{% render 'icon-play' %}
+						</span>
+					</div>
+				</a>
+			</div>
+		</noscript>
+		<deferred-media
+			class='color-{{ section.settings.color_scheme }} video-section__media video-section__media--{{ section.settings.height }} video-section__media--{{ section.settings.video_fit }} deferred-media color-inverse no-js-hidden'
+			data-media-id='{{ section.settings.video_url.id }}'
+			{%- if section.settings.video_autoplay -%}
+				data-autoplay='true'
+			{%- endif -%}
+			{% if section.settings.height == 'adapt'
+				and section.settings.video != null
+			%}
+				style='padding-bottom: {{ 1 | divided_by: section.settings.video.aspect_ratio | times: 100 }}%'
+			{% else %}
+				{% if section.settings.height == 'adapt' %}
+					style='aspect-ratio: 16/9;'
+				{% else %}
+					style='aspect-ratio: {{ section.settings.height }};'
+				{% endif %}
+			{% endif %}
+		>
+			{%- if section.settings.video_autoplay != true -%}
+				<button
+					id='Deferred-Poster-Modal-{{ section.settings.video_url.id }}'
+					class='video-section__poster media deferred-media__poster'
+					type='button'
+				>
+					<span class='video-section__overlay'></span>
+					{%- if section.settings.cover_image != blank -%}
+						<img
+							srcset='
+								{%- if section.settings.cover_image.width >= 375 -%}{{ section.settings.cover_image | image_url: width: '375x' }} 375w,{%- endif -%}
+								{%- if section.settings.cover_image.width >= 750 -%}{{ section.settings.cover_image | image_url: width: '750x' }} 750w,{%- endif -%}
+								{%- if section.settings.cover_image.width >= 1100 -%}{{ section.settings.cover_image | image_url: width: '1100x' }} 1100w,{%- endif -%}
+								{%- if section.settings.cover_image.width >= 1500 -%}{{ section.settings.cover_image | image_url: width: '1500x' }} 1500w,{%- endif -%}
+								{%- if section.settings.cover_image.width >= 1780 -%}{{ section.settings.cover_image | image_url: width: '1780x' }} 1780w,{%- endif -%}
+								{%- if section.settings.cover_image.width >= 2000 -%}{{ section.settings.cover_image | image_url: width: '2000x' }} 2000w,{%- endif -%}
+								{%- if section.settings.cover_image.width >= 3000 -%}{{ section.settings.cover_image | image_url: width: '3000x' }} 3000w,{%- endif -%}
+								{%- if section.settings.cover_image.width >= 3840 -%}{{ section.settings.cover_image | image_url: width: '3840x' }} 3840w,{%- endif -%}
+								{{ section.settings.cover_image | image_url: width: 'master' }} {{ section.settings.cover_image.width }}w
+							'
+							src='{{ section.settings.cover_image | image_url: width: '1920x' }}'
+							sizes='{% if section.settings.full_width %}100vw{% else %}(min-width: {{ settings.page_width }}px) {{ settings.page_width | minus: 100 }}px, (min-width: 750px) calc(100vw - 10rem), 100vw{% endif %}'
+							alt="載入影片：{{ section.settings.description | escape }}"
+							loading='lazy'
+							width='{{ section.settings.cover_image.width }}'
+							height='{{ section.settings.cover_image.height }}'
+						>
+					{%- else -%}
+						{{
+							'collection-2'
+							| placeholder_svg_tag: 'placeholder-svg placeholder'
+						}}
+					{%- endif -%}
+					<div class='video-section__content'>
+						{% if section.settings.subheading != blank %}
+							<div class='video-section__subheading {{ section.settings.subheading_style }}'>
+								{% if section.settings.subheading_icon != 'none' %}
+									<i
+										class='icon icon-pack icon-{{ section.settings.subheading_icon }}'
+									></i>
+								{% endif %}
+								{{ section.settings.subheading | truncate: 30, '' | escape }}
+							</div>
+						{% endif %}
+
+						{% if section.settings.heading != blank %}
+							<{{ section.settings.heading_level }} class='title video-section__heading {{ section.settings.heading_size }}'>
+								{{ section.settings.heading | truncate: 30, '' | escape }}
+							</{{ section.settings.heading_level }}>
+						{% endif %}
+						<span class='video-section__play-button'>
+							{% render 'icon-play' %}
+						</span>
+					</div>
+				</button>
+			{%- endif -%}
+			<template>
+				{%- if section.settings.video == null
+					and section.settings.video_url != null
+				-%}
+					{%- if section.settings.video_url.type == 'youtube' -%}
+						<iframe
+							src='https://www.youtube.com/embed/{{ section.settings.video_url.id }}?enablejsapi=1&autoplay=1{%- if section.settings.video_autoplay -%}&mute=1{%- endif -%}{%- if section.settings.video_autoplay != true and section.settings.video_muted -%}&mute=1{%- endif -%}{%- if section.settings.video_controls != true -%}&controls=0{%- endif -%}{%- if section.settings.video_loop -%}&playlist={{ section.settings.video_url.id }}&loop=1{%- endif -%}'
+							class='js-youtube'
+							allow='autoplay; encrypted-media'
+							allowfullscreen
+							title='{{ section.settings.description | escape }}'
+						></iframe>
+					{%- else -%}
+						<iframe
+							src='https://player.vimeo.com/video/{{ section.settings.video_url.id }}?autoplay=true{%- if section.settings.video_autoplay -%}&muted=true{%- endif -%}{%- if section.settings.video_autoplay != true and section.settings.video_muted -%}&muted=true{%- endif -%}{%- if section.settings.video_controls != true -%}&controls=false{%- endif -%}{%- if section.settings.video_loop -%}&loop=true{%- endif -%}'
+							class='js-vimeo'
+							allow='autoplay; encrypted-media'
+							allowfullscreen
+							title='{{ section.settings.description | escape }}'
+						></iframe>
+					{%- endif -%}
+				{%- else -%}
+					{% liquid
+						assign muted = section.settings.video_muted
+						assign playsinline = false
+						assign autoPlay = false
+						if section.settings.video_autoplay
+							assign autoPlay = autoPlay
+							assign muted = true
+							assign playsinline = playsinline
+						endif
+					%}
+					{{
+						section.settings.video
+						| video_tag:
+							image_size: '1300x',
+							autoPlay: autoPlay,
+							muted: muted,
+							playsInline: playsinline,
+							loop: section.settings.video_loop,
+							controls: section.settings.video_controls
+					}}
+				{% endif %}
+			</template>
+		</deferred-media>
+	</div>
+</div>
+
+{% schema %}
+{
+	"name": "影片",
+	"tag": "section",
+	"class": "spaced-section",
+	"enabled_on": {
+		"templates": ["*"]
+	},
+	"settings": [
+		{
+			"type": "color_scheme",
+			"id": "color_scheme",
+			"default": "background-3",
+			"label": "色彩配置"
+		},
+		{
+			"type": "checkbox",
+			"id": "full_width",
+			"default": true,
+			"label": "全螢幕寬度"
+		},
+		{
+			"type": "select",
+			"id": "height",
+			"options": [
+				{ "value": "1/1", "label": "正方形 (1:1)" },
+				{ "value": "3/2", "label": "橫向 (3:2)" },
+				{ "value": "4/3", "label": "橫向 (4:3)" },
+				{ "value": "16/9", "label": "寬螢幕 (16:9)" },
+				{ "value": "21/9", "label": "超寬螢幕 (21:9)" },
+				{ "value": "adapt", "label": "適應影片大小" }
+			],
+			"default": "16/9",
+			"label": "影片比例",
+			"info": "設定為「適應影片大小」時，將使用您上傳的影片原始比例。"
+		},
+		{
+			"type": "select",
+			"id": "video_fit",
+			"label": "影片縮放模式",
+			"options": [
+				{ "value": "contain", "label": "等比例縮放 (Contain)" },
+				{ "value": "cover", "label": "裁切填滿 (Cover)" }
+			],
+			"default": "contain",
+			"info": "設定影片如何填滿其容器。"
+		},
+		{
+			"type": "text",
+			"id": "subheading",
+			"default": "觀看影片",
+			"label": "副標題",
+			"info": "文字長度超過 30 個字元將被截斷。"
+		},
+		{
+			"type": "select",
+			"id": "subheading_style",
+			"options": [
+				{ "value": "subtitle", "label": "副標題" },
+				{ "value": "subtitle subtitle--secondary", "label": "副標題 (次要)" }
+			],
+			"default": "subtitle",
+			"label": "副標題樣式"
+		},
+		{
+			"type": "select",
+			"id": "subheading_icon",
+			"options": [
+				{ "value": "none", "label": "無" },
+				{ "value": "arrow-bar", "label": "箭頭條" },
+				{ "value": "bag-1", "label": "提袋 1" },
+				{ "value": "bag-2", "label": "提袋 2" },
+				{ "value": "bag-3", "label": "提袋 3" },
+				{ "value": "bar-chart", "label": "長條圖" },
+				{ "value": "bars-upward", "label": "向上長條" },
+				{ "value": "baseball", "label": "棒球" },
+				{ "value": "battery-1", "label": "電池 1" },
+				{ "value": "battery-2", "label": "電池 2" },
+				{ "value": "battery-3", "label": "電池 3" },
+				{ "value": "book", "label": "書本" },
+				{ "value": "card", "label": "卡片" },
+				{ "value": "card-holder", "label": "名片夾" },
+				{ "value": "chart", "label": "圖表" },
+				{ "value": "chart-2", "label": "圖表 2" },
+				{ "value": "chart-3", "label": "圖表 3" },
+				{ "value": "chats", "label": "對話" },
+				{ "value": "check-1", "label": "勾號 1" },
+				{ "value": "check-2", "label": "勾號 2" },
+				{ "value": "check-3", "label": "勾號 3" },
+				{ "value": "check-4", "label": "勾號 4" },
+				{ "value": "circle", "label": "圓圈" },
+				{ "value": "circles", "label": "多個圓圈" },
+				{ "value": "clock-1", "label": "時鐘 1" },
+				{ "value": "clock-2", "label": "時鐘 2" },
+				{ "value": "close", "label": "關閉" },
+				{ "value": "cloud-server", "label": "雲端伺服器" },
+				{ "value": "computer", "label": "電腦" },
+				{ "value": "computer-mouse", "label": "滑鼠" },
+				{ "value": "confetti", "label": "彩紙" },
+				{ "value": "delivery", "label": "運送" },
+				{ "value": "delivery-box", "label": "包裹" },
+				{ "value": "devices", "label": "裝置" },
+				{ "value": "directions", "label": "方向" },
+				{ "value": "dumbbell", "label": "啞鈴" },
+				{ "value": "eye", "label": "眼睛" },
+				{ "value": "facebook", "label": "Facebook" },
+				{ "value": "file-1", "label": "檔案 1" },
+				{ "value": "file-2", "label": "檔案 2" },
+				{ "value": "flag", "label": "旗幟" },
+				{ "value": "folder-1", "label": "資料夾 1" },
+				{ "value": "folder-2", "label": "資料夾 2" },
+				{ "value": "food", "label": "食物" },
+				{ "value": "hand-1", "label": "手 1" },
+				{ "value": "hand-2", "label": "手 2" },
+				{ "value": "hand-3", "label": "手 3" },
+				{ "value": "headphones", "label": "耳機" },
+				{ "value": "instagram", "label": "Instagram" },
+				{ "value": "laptop-1", "label": "筆電 1" },
+				{ "value": "laptop-2", "label": "筆電 2" },
+				{ "value": "leaf", "label": "葉子" },
+				{ "value": "lightning-bolt-1", "label": "閃電 1" },
+				{ "value": "lightning-bolt-2", "label": "閃電 2" },
+				{ "value": "like", "label": "讚" },
+				{ "value": "link", "label": "連結" },
+				{ "value": "lock-1", "label": "鎖 1" },
+				{ "value": "lock-2", "label": "鎖 2" },
+				{ "value": "logout", "label": "登出" },
+				{ "value": "luggage", "label": "行李" },
+				{ "value": "mark", "label": "標記" },
+				{ "value": "medicine", "label": "藥品" },
+				{ "value": "microphone", "label": "麥克風" },
+				{ "value": "moon", "label": "月亮" },
+				{ "value": "pencil", "label": "鉛筆" },
+				{ "value": "phone-1", "label": "電話 1" },
+				{ "value": "phone-2", "label": "電話 2" },
+				{ "value": "phone-3", "label": "電話 3" },
+				{ "value": "phone-4", "label": "電話 4" },
+				{ "value": "pinterest", "label": "Pinterest" },
+				{ "value": "plug", "label": "插頭" },
+				{ "value": "presentation-1", "label": "簡報 1" },
+				{ "value": "presentation-2", "label": "簡報 2" },
+				{ "value": "pulse", "label": "脈搏" },
+				{ "value": "recycle", "label": "回收" },
+				{ "value": "rocket", "label": "火箭" },
+				{ "value": "search", "label": "搜尋" },
+				{ "value": "sending", "label": "傳送" },
+				{ "value": "server-1", "label": "伺服器 1" },
+				{ "value": "server-2", "label": "伺服器 2" },
+				{ "value": "settings", "label": "設定" },
+				{ "value": "shield", "label": "盾牌" },
+				{ "value": "shopping-basket", "label": "購物籃" },
+				{ "value": "shuffle", "label": "隨機播放" },
+				{ "value": "snapchat", "label": "Snapchat" },
+				{ "value": "sound-waves", "label": "聲波" },
+				{ "value": "speaker", "label": "喇叭" },
+				{ "value": "squares-1", "label": "方塊 1" },
+				{ "value": "squares-2", "label": "方塊 2" },
+				{ "value": "stack", "label": "堆疊" },
+				{ "value": "star", "label": "星星" },
+				{ "value": "stopwatch", "label": "碼錶" },
+				{ "value": "sun", "label": "太陽" },
+				{ "value": "tag", "label": "標籤" },
+				{ "value": "telephone-tower", "label": "電信塔" },
+				{ "value": "tik-tok", "label": "TikTok" },
+				{ "value": "tree", "label": "樹" },
+				{ "value": "trend", "label": "趨勢" },
+				{ "value": "trophy", "label": "獎盃" },
+				{ "value": "tumblr", "label": "Tumblr" },
+				{ "value": "tv", "label": "電視" },
+				{ "value": "twitter", "label": "Twitter" },
+				{ "value": "user-1", "label": "使用者 1" },
+				{ "value": "user-2", "label": "使用者 2" },
+				{ "value": "user-3", "label": "使用者 3" },
+				{ "value": "user-4", "label": "使用者 4" },
+				{ "value": "user-5", "label": "使用者 5" },
+				{ "value": "video", "label": "影片" },
+				{ "value": "vimeo", "label": "Vimeo" },
+				{ "value": "wallet", "label": "錢包" },
+				{ "value": "watch", "label": "手錶" },
+				{ "value": "water-1", "label": "水 1" },
+				{ "value": "water-2", "label": "水 2" },
+				{ "value": "water-3", "label": "水 3" },
+				{ "value": "wave-1", "label": "波浪 1" },
+				{ "value": "wave-2", "label": "波浪 2" },
+				{ "value": "wifi-1", "label": "Wi-Fi 1" },
+				{ "value": "wifi-2", "label": "Wi-Fi 2" },
+				{ "value": "window", "label": "視窗" },
+				{ "value": "youtube", "label": "YouTube" }
+			],
+			"default": "none",
+			"label": "副標題圖示"
+		},
+		{
+			"type": "text",
+			"id": "heading",
+			"default": "影片",
+			"label": "標題",
+			"info": "文字長度超過 30 個字元將被截斷。"
+		},
+		{
+			"type": "select",
+			"id": "heading_size",
+			"options": [
+				{ "value": "h3", "label": "中" },
+				{ "value": "h2", "label": "大" }
+			],
+			"default": "h2",
+			"label": "標題大小"
+		},
+		{
+			"type": "select",
+			"id": "heading_level",
+			"options": [
+				{ "value": "h1", "label": "H1" },
+				{ "value": "h2", "label": "H2" },
+				{ "value": "h3", "label": "H3" }
+			],
+			"default": "h2",
+			"label": "標題層級 (HTML 標籤)"
+		},
+		{
+			"type": "image_picker",
+			"id": "cover_image",
+			"label": "封面圖片"
+		},
+		{
+			"type": "range",
+			"id": "opacity_overlay",
+			"min": 0,
+			"max": 1,
+			"step": 0.1,
+			"label": "疊加層不透明度",
+			"default": 0.5
+		},
+		{
+			"type": "header",
+			"content": "Shopify 代管影片"
+		},
+		{
+			"type": "video",
+			"id": "video",
+			"label": "影片"
+		},
+		{
+			"type": "header",
+			"content": "外部影片連結"
+		},
+		{
+			"type": "paragraph",
+			"content": "貼上 YouTube 或 Vimeo 連結。"
+		},
+		{
+			"type": "video_url",
+			"id": "video_url",
+			"accept": ["youtube", "vimeo"],
+			"default": "https:\/\/www.youtube.com\/watch?v=_9VUPq3SxOc",
+			"label": "影片連結",
+			"info": "如果同時設定了 Shopify 代管影片和外部連結，將優先使用 Shopify 代管的影片。"
+		},
+		{
+			"type": "checkbox",
+			"id": "video_autoplay",
+			"default": false,
+			"label": "自動播放影片"
+		},
+		{
+			"type": "checkbox",
+			"id": "video_loop",
+			"default": false,
+			"label": "循環播放影片"
+		},
+		{
+			"type": "checkbox",
+			"id": "video_muted",
+			"default": false,
+			"label": "靜音播放影片",
+			"info": "部分瀏覽器要求影片靜音才能自動播放。"
+		},
+		{
+			"type": "checkbox",
+			"id": "video_controls",
+			"default": true,
+			"label": "顯示播放控制器"
+		},
+		{
+			"type": "textarea",
+			"id": "description",
+			"label": "影片描述 (無障礙用途)",
+			"info": "描述影片內容，供搜尋引擎和螢幕閱讀器使用。"
+		},
+		{
+			"type": "header",
+			"content": "區塊外距 (Margin)"
+		},
+		{
+			"type": "select",
+			"id": "margin_top",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "超小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "超大" }
+			],
+			"default": "no-indent",
+			"label": "頂部外距"
+		},
+		{
+			"type": "select",
+			"id": "margin_bottom",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "超小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "超大" }
+			],
+			"default": "no-indent",
+			"label": "底部外距"
+		}
+	],
+	"presets": [
+		{
+			"name": "影片"
+		}
+	]
+}
+{% endschema %}

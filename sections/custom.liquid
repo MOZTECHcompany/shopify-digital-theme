@@ -1,0 +1,591 @@
+{% comment %}
+================================================================================
+主題：沉浸式滾動預覽 - v31.3 (設計師精修版)
+版本說明：
+- [視覺升級] 進行全方位美化，調整字體、字重、字距與垂直間距，實現專業設計感。
+- [表單重塑] 再次優化訂閱表單，確保所有元素在「膠囊」內完美垂直置中，質感升級。
+- [細節打磨] 優化產品圖的陰影效果，使其更柔和、更自然，提升整體高級感。
+================================================================================
+{% endcomment %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+
+<style>
+  main#MainContent, body {
+    overflow: visible !important;
+  }
+  
+  #ScrollStory-{{ section.id }} {
+    --story-bg: {{ section.settings.background_color | default: '#FFFFFF' }};
+    --story-brand-color: {{ section.settings.brand_color | default: 'rgb(var(--color-accent))' }};
+    --story-brand-color-rgb: {{ section.settings.brand_color.red | default: 43 }}, {{ section.settings.brand_color.green | default: 185 }}, {{ section.settings.brand_color.blue | default: 237 }};
+    --story-prologue-bg: {{ section.settings.prologue_background_color | default: '#000000' }};
+    --story-prologue-text-color: {{ section.settings.prologue_text_color | default: '#FFFFFF' }};
+    --story-title-color: {{ section.settings.title_color | default: 'rgb(var(--color-foreground-title))' }};
+    --story-subtitle-color: {{ section.settings.subtitle_color | default: 'rgb(var(--color-foreground-secondary))' }};
+    --story-cta-text-color: {{ section.settings.cta_text_color | default: 'rgb(var(--color-button-text))' }};
+    
+    --story-aura-color-1: {{ section.settings.aura_color_1 | default: '#0077ff' }};
+    --story-aura-color-2: {{ section.settings.aura_color_2 | default: '#ff0077' }};
+    --story-aura-color-3: {{ section.settings.aura_color_3 | default: '#7700ff' }};
+  }
+
+  .scroll-story-wrapper { position: relative; width: 100%; }
+  .scroll-story-canvas {
+    position: relative; top: 0; left: 0;
+    height: 100vh; width: 100%;
+    overflow: hidden;
+    background-color: var(--story-prologue-bg);
+  }
+
+  .scroll-story-aura-container {
+    position: absolute; inset: 0; z-index: 0;
+    opacity: 0; filter: blur(120px);
+  }
+  .scroll-story-aura-element {
+    position: absolute; border-radius: 50%; will-change: transform;
+  }
+  .aura-1 { top: 10%; left: 15%; width: 50vw; height: 50vw; background-color: var(--story-aura-color-1); opacity: 0.25; }
+  .aura-2 { top: 20%; left: 50%; width: 40vw; height: 40vw; background-color: var(--story-aura-color-2); opacity: 0.2; }
+  .aura-3 { bottom: 10%; right: 15%; width: 45vw; height: 45vw; background-color: var(--story-aura-color-3); opacity: 0.22; }
+
+  .scroll-story-slider { position: absolute; inset: 0; z-index: 3; }
+  .scroll-story-prologue-title {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2;
+    font-family: 'Poppins', sans-serif; font-size: clamp(3rem, 12vw, 10rem); font-weight: 800;
+    line-height: 1; text-transform: uppercase; color: var(--story-prologue-text-color); white-space: nowrap;
+    opacity: 0; pointer-events: none;
+    text-shadow: 0 0 8px {{ section.settings.brand_color | color_modify: 'alpha', 0.9 }}, 0 0 20px {{ section.settings.brand_color | color_modify: 'alpha', 0.7 }};
+  }
+
+  .scroll-story-item {
+    position: absolute; inset: 0; box-sizing: border-box; opacity: 0;
+    display: flex; align-items: center; justify-content: center; padding: 5vh 5vw;
+    background-color: var(--story-bg);
+  }
+
+  .story-product-content {
+    display: flex; align-items: center; justify-content: center; gap: 5vw;
+    width: 100%; max-width: 1280px; opacity: 0;
+  }
+
+  .story-product-stage { flex: 0 1 55%; perspective: 1200px; }
+  .story-product-image-wrapper { position: relative; transform-style: preserve-3d; }
+  .image-container { position: relative; max-width: 90%; margin: 0 auto; }
+  .story-product-image { display: block; width: 100%; height: auto; object-fit: contain; filter: drop-shadow(0 30px 25px rgba(0, 0, 0, 0.1)); } /* Softer shadow */
+
+  .story-info-panel { flex: 0 1 45%; text-align: left; max-width: 460px; display: flex; flex-direction: column; align-items: flex-start; }
+  .story-info-badge {
+    display: inline-block; padding: 5px 12px; font-size: 12px; font-weight: 600;
+    background-color: rgb(var(--color-foreground-title)); color: rgb(var(--color-background));
+    border-radius: 20px; margin-bottom: 16px; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+
+  .story-info-title {
+    font-family: 'Inter', sans-serif; /* More impactful font */
+    font-size: clamp(32px, 3.5vw, 44px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.2; margin: 0 0 18px 0; color: var(--story-title-color);
+  }
+
+  .story-info-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(16px, 1.2vw, 18px); color: var(--story-subtitle-color);
+    margin: 0 0 32px 0; line-height: 1.6; /* Increased margin */
+  }
+  
+  .info-cta-container { width: 100%; }
+
+  .info-cta-solidus {
+    display: inline-block; padding: 15px 36px; text-decoration: none;
+    font-weight: 600; font-size: 16px; color: var(--story-cta-text-color); border-radius: 50px;
+    background: linear-gradient(145deg, {{ section.settings.brand_color | color_modify: 'alpha', 0.8 }}, {{ section.settings.brand_color | color_modify: 'alpha', 0.6 }});
+    border: 1px solid transparent;
+    box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.6), inset 0 -2px 3px rgba(var(--story-brand-color-rgb), 0.8), 0 12px 30px rgba(var(--story-brand-color-rgb), 0.3);
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); white-space: nowrap;
+  }
+  @media (hover: hover) {
+    .info-cta-solidus:hover {
+      color: #fff;
+      background: linear-gradient(145deg, {{ section.settings.brand_color | color_modify: 'alpha', 0.9 }}, {{ section.settings.brand_color | color_modify: 'alpha', 0.7 }});
+      transform: translateY(-6px) scale(1.05);
+      box-shadow: inset 0 3px 4px rgba(255, 255, 255, 0.7), inset 0 -3px 5px rgba(var(--story-brand-color-rgb), 0.7), 0 25px 50px rgba(var(--story-brand-color-rgb), 0.4);
+    }
+  }
+
+  /* --- START: Integrated Newsletter Form Styles (v3.1, Designer Polish) --- */
+  .newsletter-form {
+    width: 100%;
+    max-width: 420px;
+  }
+  .newsletter-form__inner {
+    display: flex;
+    align-items: center;
+    background-color: rgba(var(--story-brand-color-rgb), 0.06);
+    border: 1px solid rgba(var(--story-brand-color-rgb), 0.1);
+    border-radius: 50px;
+    padding: 5px;
+    height: 56px; /* Set fixed height for perfect alignment */
+    transition: all 0.3s ease;
+  }
+  .newsletter-form__inner:focus-within {
+    border-color: var(--story-brand-color);
+    box-shadow: 0 0 0 3px rgba(var(--story-brand-color-rgb), 0.2);
+  }
+  .newsletter-form__field-wrapper {
+    flex-grow: 1;
+    height: 100%;
+  }
+  .newsletter-form .field {
+    height: 100%;
+    display: flex;
+  }
+  .field__input {
+    width: 100%;
+    padding: 0 10px 0 20px;
+    border: none !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+    color: var(--story-title-color);
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+  }
+  .field__input::placeholder {
+    color: var(--story-subtitle-color);
+    opacity: 0.7;
+  }
+  .newsletter-form__button {
+    height: 100%;
+    flex-shrink: 0;
+    border: none;
+    padding: 0 26px;
+    border-radius: 50px;
+    background-color: var(--story-brand-color);
+    color: var(--story-cta-text-color);
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  @media (hover: hover) {
+    .newsletter-form__button:hover {
+      background-color: {{ section.settings.brand_color | color_darken: 10 }};
+      transform: scale(1.05);
+    }
+  }
+  .newsletter-form__message {
+    margin-top: 10px;
+    text-align: left;
+    font-size: 1.2rem;
+    padding-left: 20px;
+  }
+  .newsletter-form__message--success {
+    color: rgb(var(--color-success));
+  }
+  .form__message {
+    color: rgb(var(--color-error));
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    line-height: 1;
+  }
+  .form__message svg {
+    width: 1.2rem;
+    height: 1.2rem;
+    margin-right: 0.5rem;
+  }
+  /* --- END: Integrated Newsletter Form Styles --- */
+
+  @media (max-width: 900px) {
+    .story-product-content { flex-direction: column; gap: 4vh; }
+    .story-info-panel { align-items: center; text-align: center; }
+  }
+</style>
+
+<div id="ScrollStory-{{ section.id }}">
+  <div class="scroll-story-wrapper">
+    <div class="scroll-story-canvas">
+      <div class="scroll-story-aura-container" aria-hidden="true">
+        <div class="scroll-story-aura-element aura-1"></div>
+        <div class="scroll-story-aura-element aura-2"></div>
+        <div class="scroll-story-aura-element aura-3"></div>
+      </div>
+      <h2 class="scroll-story-prologue-title" aria-label="{{ section.settings.prologue_title | escape }}">{{ section.settings.prologue_title }}</h2>
+      <div class="scroll-story-slider">
+        {%- for block in section.blocks -%}
+          <div class="scroll-story-item" id="block-{{ block.id }}">
+            <div class="story-product-content">
+              <div class="story-product-stage">
+                <div class="story-product-image-wrapper">
+                  <div class="image-container">
+                    {% if block.settings.image != blank %}
+                      <img 
+                           class="story-product-image"
+                           src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                           data-src="{{ block.settings.image | image_url: width: 1200 }}"
+                           alt="{{ block.settings.image.alt | default: block.settings.title | escape }}"
+                           width="{{ block.settings.image.width }}"
+                           height="{{ block.settings.image.height }}"
+                           loading="lazy"
+                      >
+                    {% else %}
+                      {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="story-info-panel">
+                {%- if block.settings.badge_text != blank -%}
+                  <span class="story-info-badge">{{ block.settings.badge_text }}</span>
+                {%- endif -%}
+                <h3 class="story-info-title">{{ block.settings.title | default: 'Future Product' }}</h3>
+                {%- if block.settings.subtitle != blank -%}
+                  <p class="story-info-subtitle">{{ block.settings.subtitle }}</p>
+                {%- endif -%}
+
+                <div class="info-cta-container">
+                  {%- if block.settings.cta_type == 'subscribe' -%}
+                    
+                    {% comment %} --- START: Integrated Newsletter Form (v3.1) --- {% endcomment %}
+                    {% form 'customer', class: 'newsletter-form' %}
+                      <div class="newsletter-form__inner">
+                        <input type="hidden" name="contact[tags]" value="newsletter,{{ block.settings.title | handle }}">
+                        <div class="newsletter-form__field-wrapper">
+                          <div class="field">
+                            <input
+                              id="NewsletterForm--{{ block.id }}"
+                              type="email"
+                              name="contact[email]"
+                              class="field__input"
+                              value="{{ form.email }}"
+                              aria-required="true"
+                              autocorrect="off"
+                              autocapitalize="off"
+                              autocomplete="email"
+                              pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$"
+                              {% if form.errors %}
+                                autofocus
+                                aria-invalid="true"
+                                aria-describedby="Newsletter-error--{{ block.id }}"
+                              {% endif %}
+                              placeholder="{{ block.settings.cta_placeholder | escape }}"
+                              required
+                            >
+                            <label class="visually-hidden" for="NewsletterForm--{{ block.id }}">
+                              {{ block.settings.cta_placeholder | escape }}
+                            </label>
+                          </div>
+                        </div>
+                        <button
+                          type="submit"
+                          class="newsletter-form__button"
+                          name="commit"
+                        >
+                          <span>{{ block.settings.cta_text | escape }}</span>
+                        </button>
+                      </div>
+                      {%- if form.errors -%}
+                        <small
+                          class="newsletter-form__message form__message"
+                          id="Newsletter-error--{{ block.id }}"
+                        >
+                          {%- render 'icon-error' -%}
+                          {{- form.errors.translated_fields.email | capitalize }}
+                          {{ form.errors.messages.email -}}
+                        </small>
+                      {%- endif -%}
+                      {%- if form.posted_successfully? -%}
+                        <h3
+                          class="newsletter-form__message newsletter-form__message--success form__message"
+                          id="Newsletter-success--{{ block.id }}"
+                          tabindex="-1"
+                          autofocus
+                        >
+                          {% render 'icon-success' -%}
+                          感謝您的訂閱！
+                        </h3>
+                      {%- endif -%}
+                    {% endform %}
+                    {% comment %} --- END: Integrated Newsletter Form --- {% endcomment %}
+
+                  {%- else -%}
+                    {%- if block.settings.cta_text != blank -%}
+                      <a href="{{ block.settings.cta_link | default: '#' }}" class="info-cta-solidus">{{ block.settings.cta_text }}</a>
+                    {%- endif -%}
+                  {%- endif -%}
+                </div>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // The JavaScript part remains unchanged.
+  (function () {
+    "use strict";
+    const SECTION_ID = '{{ section.id }}';
+    const sectionContainer = document.getElementById(`ScrollStory-${SECTION_ID}`);
+    if (!sectionContainer) return;
+
+    let masterTimeline;
+
+    const initializeAnimations = () => {
+      if (masterTimeline) {
+        masterTimeline.kill();
+        ScrollTrigger.getAll().forEach(trigger => {
+          if (trigger.trigger === sectionContainer) trigger.kill();
+        });
+      }
+
+      if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+      gsap.registerPlugin(ScrollTrigger);
+
+      const wrapper = sectionContainer.querySelector('.scroll-story-wrapper');
+      const canvas = sectionContainer.querySelector('.scroll-story-canvas');
+      const prologueTitle = sectionContainer.querySelector('.scroll-story-prologue-title');
+      const items = gsap.utils.toArray(sectionContainer.querySelectorAll('.scroll-story-item'));
+      const auraContainer = sectionContainer.querySelector('.scroll-story-aura-container');
+      const auraElements = gsap.utils.toArray(sectionContainer.querySelectorAll('.scroll-story-aura-element'));
+
+      if (!wrapper || !canvas || items.length === 0) {
+        if(prologueTitle) gsap.set(prologueTitle, { autoAlpha: 1 });
+        return;
+      }
+      
+      const prologueDuration = 1.5;
+      const transitionDuration = 0.6;
+      const itemContentDisplayTime = parseFloat('{{ section.settings.item_display_duration | default: 1.0 }}');
+      const itemTotalTimelineDuration = transitionDuration + itemContentDisplayTime + transitionDuration;
+      const totalItemDuration = items.length * itemTotalTimelineDuration;
+      const totalSectionScrollDuration = prologueDuration + totalItemDuration;
+
+      wrapper.style.height = `${totalSectionScrollDuration * 100}vh`;
+
+      masterTimeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: wrapper,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 1.2,
+        }
+      });
+      
+      masterTimeline.fromTo(canvas, { position: 'relative' }, { position: 'fixed', duration: totalSectionScrollDuration }, 0);
+      masterTimeline.to(canvas, { position: 'relative', duration: 0 }, totalSectionScrollDuration);
+
+      masterTimeline.fromTo(prologueTitle, { autoAlpha: 0, scale: 0.95 }, { autoAlpha: 1, scale: 1, duration: prologueDuration * 0.4, ease: 'power2.out' }, 0);
+      masterTimeline.to(prologueTitle, { autoAlpha: 0, scale: 0.9, yPercent: -10, duration: prologueDuration * 0.4, ease: 'power2.in' }, prologueDuration - (prologueDuration * 0.4));
+      
+      items.forEach((item, i) => {
+        const startTime = prologueDuration + (i * itemTotalTimelineDuration);
+        masterTimeline.fromTo(item, { autoAlpha: 0, scale: 0.98 }, { autoAlpha: 1, scale: 1, duration: transitionDuration, ease: 'power2.out' }, startTime);
+        
+        const content = item.querySelector('.story-product-content');
+        if(content) {
+            masterTimeline.fromTo(content, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: transitionDuration, ease: 'power2.out' }, startTime + (transitionDuration * 0.2));
+            const infoElements = content.querySelectorAll('.story-info-badge, .story-info-title, .story-info-subtitle, .info-cta-container');
+            masterTimeline.from(infoElements, { y: 20, opacity: 0, stagger: 0.1, duration: 0.5, ease: 'power2.out' }, startTime + (transitionDuration * 0.5));
+            const imageWrapper = content.querySelector('.story-product-image-wrapper');
+            if(imageWrapper) {
+              const animationProps = window.matchMedia("(max-width: 900px)").matches 
+                ? { scale: 0.9, opacity: 0 } 
+                : { rotateX: -10, rotateY: 15, scale: 0.9, opacity: 0 };
+              masterTimeline.from(imageWrapper, { ...animationProps, duration: transitionDuration, ease: 'power3.out' }, startTime + (transitionDuration * 0.2));
+            }
+        }
+        
+        if (i < items.length - 1) {
+            masterTimeline.to(item, { autoAlpha: 0, scale: 0.98, duration: transitionDuration, ease: 'power2.in' }, startTime + itemTotalTimelineDuration - transitionDuration);
+        }
+      });
+
+      if (items.length > 0) {
+        masterTimeline.to(auraContainer, { autoAlpha: 1, duration: 0.5 }, prologueDuration + transitionDuration);
+        const lastItemFadeOutStartTime = prologueDuration + totalItemDuration - transitionDuration;
+        masterTimeline.to([items[items.length - 1], auraContainer], { autoAlpha: 0, duration: transitionDuration, ease: 'power1.in' }, lastItemFadeOutStartTime);
+      }
+
+      auraElements.forEach((el, i) => {
+        gsap.to(el, {
+          x: `random(-150, 150)`, y: `random(-150, 150)`, scale: `random(0.8, 1.2)`,
+          duration: 15, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: i * 2
+        });
+      });
+      
+      const handleMouseMove = (e) => {
+        if(window.innerWidth < 900) return;
+        const { clientX, clientY } = e;
+        const x = (clientX / window.innerWidth - 0.5) * 2;
+        const y = (clientY / window.innerHeight - 0.5) * 2;
+        gsap.to(auraElements, {
+          xPercent: (i) => -x * (i + 1) * 5, yPercent: (i) => -y * (i + 1) * 5,
+          duration: 0.8, ease: 'power2.out', stagger: 0.05
+        });
+      };
+      
+      if(window.matchMedia("(pointer: fine)").matches){
+        window.addEventListener('mousemove', handleMouseMove);
+      }
+      
+      const images = sectionContainer.querySelectorAll('.story-product-image[data-src]');
+      images.forEach((img, index) => {
+        ScrollTrigger.create({
+          trigger: wrapper,
+          start: `top+=${(prologueDuration + ((index - 1) * itemTotalTimelineDuration)) * window.innerHeight * 0.8} top`,
+          once: true,
+          onEnter: () => {
+            const highResSrc = img.dataset.src;
+            if(highResSrc && img.src.startsWith('data:image')) {
+              img.src = highResSrc;
+            }
+          }
+        });
+      });
+    };
+    
+    const finalInitialize = () => {
+        const checkGSAP = setInterval(() => {
+            if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+                clearInterval(checkGSAP);
+                setTimeout(() => {
+                    initializeAnimations();
+                    setTimeout(() => ScrollTrigger.refresh(), 500);
+                }, 100);
+            }
+        }, 100);
+    };
+
+    if (document.readyState === 'complete') {
+        finalInitialize();
+    } else {
+        window.addEventListener('load', finalInitialize);
+    }
+    
+    if (typeof Shopify !== 'undefined' && Shopify.designMode) {
+      document.addEventListener('shopify:section:load', (event) => { if (event.target.id.includes(SECTION_ID)) finalInitialize(); });
+      document.addEventListener('shopify:section:reorder', finalInitialize);
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "沉浸式滾動預覽",
+  "settings": [
+    {
+      "type": "header",
+      "content": "通用設定"
+    },
+    {
+      "type": "range",
+      "id": "item_display_duration",
+      "min": 0.5,
+      "max": 5.0,
+      "step": 0.1,
+      "unit": "s",
+      "label": "每個產品穩定顯示秒數",
+      "default": 1.0,
+      "info": "設定每個產品內容在滾動預覽中停留的「穩定」時間 (秒)。"
+    },
+    {
+      "type": "header",
+      "content": "序幕設定 (COMING SOON)"
+    },
+    { "type": "text", "id": "prologue_title", "label": "序幕標題", "default": "COMING SOON" },
+    { "type": "color", "id": "prologue_background_color", "label": "序幕背景顏色", "default": "#000000" },
+    { "type": "color", "id": "prologue_text_color", "label": "序幕標題顏色", "default": "#FFFFFF" },
+    { 
+      "type": "header", 
+      "content": "產品展示設定" 
+    },
+    { "type": "color", "id": "background_color", "label": "產品區塊背景顏色", "default": "#FFFFFF" },
+    { "type": "color", "id": "title_color", "label": "標題顏色", "default": "#2d2d2f" },
+    { "type": "color", "id": "subtitle_color", "label": "副標題顏色", "default": "#5b5b5f" },
+    { 
+      "type": "header", 
+      "content": "品牌主色 (按鈕/輝光)" 
+    },
+    { "type": "color", "id": "brand_color", "label": "品牌主色", "default": "#2BB9ED" },
+    { "type": "color", "id": "cta_text_color", "label": "按鈕文字顏色", "default": "#ffffff" },
+    {
+      "type": "header",
+      "content": "多層次動態光暈顏色"
+    },
+    { "type": "color", "id": "aura_color_1", "label": "光暈顏色 1", "default": "#0077ff" },
+    { "type": "color", "id": "aura_color_2", "label": "光暈顏色 2", "default": "#ff0077" },
+    { "type": "color", "id": "aura_color_3", "label": "光暈顏色 3", "default": "#7700ff" }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "產品項目",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "產品圖片" },
+        { "type": "header", "content": "內容設定" },
+        { "type": "text", "id": "badge_text", "label": "狀態標籤 (可選)", "info": "例如：NEW, COMING SOON" },
+        { "type": "text", "id": "title", "label": "標題", "default": "MOZTECH® Foldable 5-in-1 Wireless Dock" },
+        { "type": "text", "id": "subtitle", "label": "副標題 (可選)", "default": "Say goodbye to messy cables and crowded outlets." },
+        {
+          "type": "header",
+          "content": "動作 (CTA) 設定"
+        },
+        {
+          "type": "select",
+          "id": "cta_type",
+          "label": "動作類型",
+          "options": [
+            { "value": "link", "label": "連結按鈕 (傳統樣式)" },
+            { "value": "subscribe", "label": "訂閱表單 (美化樣式)" }
+          ],
+          "default": "link"
+        },
+        { 
+          "type": "text", 
+          "id": "cta_text", 
+          "label": "按鈕文字", 
+          "default": "Join the Waitlist"
+        },
+        { 
+          "type": "url", 
+          "id": "cta_link", 
+          "label": "按鈕連結 (傳統樣式)",
+          "info": "當「動作類型」為「連結按鈕」時有效。"
+        },
+        {
+          "type": "header",
+          "content": "訂閱表單專用設定"
+        },
+        { 
+          "type": "text", 
+          "id": "cta_placeholder", 
+          "label": "Email 輸入框提示文字", 
+          "default": "Enter your email",
+          "info": "當「動作類型」為「訂閱表單」時有效。"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "沉浸式滾動預覽",
+      "blocks": [{ "type": "item" }, { "type": "item" }]
+    }
+  ]
+}
+{% endschema %}

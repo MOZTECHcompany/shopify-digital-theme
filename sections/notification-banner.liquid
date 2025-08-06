@@ -1,0 +1,563 @@
+{% liquid
+  if section.settings.layout == 'bar'
+    if section.settings.position != 'bottom' and section.settings.position != 'top'
+      assign width = section.settings.width | append: 'px'
+    else
+      assign width = '100%'
+    endif
+  else
+    assign width = section.settings.width | append: 'px'
+  endif
+%}
+
+<div
+  class="
+    notification-banner
+    notification-banner--{{ section.settings.layout }}
+    popup popup--{{ section.settings.position }}
+    notification-banner-image--{{ section.settings.image_position }}
+    {% if section.settings.image == blank %} notification-banner--no-image {% endif %}
+  "
+  {% if section.settings['popup-id'] != blank %}
+    id="{{ section.settings.popup-id }}"
+  {% endif %}
+  data-limit-display="{{ section.settings.limit-display }}"
+  data-limit-lifetime="{{ section.settings.limit-cache }}"
+  data-open-trigger="{{ section.settings.trigger-open }}"
+  data-open-delay-number="{{ section.settings.trigger-open-delay }}"
+  data-open-scroll-position="{{ section.settings.open-scroll-position }}"
+  data-open-scroll-type="{{ section.settings.open-scroll-type }}"
+  {% if section.settings['manual-selector'] != blank %}
+    data-open-manual-selector="{{ section.settings.manual-selector }}"
+  {% endif %}
+  data-close-trigger="{{ section.settings.trigger-close }}"
+  data-close-delay-number="{{ section.settings.trigger-close-delay }}"
+  data-close-scroll-position="{{ section.settings.close-scroll-position }}"
+  data-close-scroll-type="{{ section.settings.close-scroll-type }}"
+  data-open-animation="popupOpen{{ section.settings.open-animation }}"
+  data-exit-animation="popupExit{{ section.settings.exit-animation }}"
+  data-overlay="{{ section.settings.show-overlay }}"
+  data-mobile-disable="{{ section.settings.mobile }}"
+  data-body-scroll-disable="{{ section.settings.scrolling }}"
+  data-overlay-close="{{ section.settings.overlay-close }}"
+  data-esc-close="{{ section.settings.esc-close }}"
+  data-f4-close="{{ section.settings.f4-close }}"
+  data-id="{{ section.id }}"
+  style="width: {{ width }}"
+>
+  <div class="popup-wrap color-{{ section.settings.color_scheme }}">
+    <div class="popup-container">
+      <div class="popup-outer popup-outer-image--{{ section.settings.image_position }} {% if section.settings.background != blank %} popup-outer_bg {% endif %}"
+      {% if section.settings.background != blank %} style = "--background: {{ section.settings.background }};" {% endif %}>
+        {% if section.settings.layout == 'banner' and section.settings.image != blank %}
+          <div
+            class="notification-banner__image"
+            {% if section.settings.image_position == 'top' or section.settings.image_position == 'bottom' %}
+              style="padding-bottom: {{ 1 | divided_by: section.settings.image.aspect_ratio | times: 100 }}%";
+            {% endif %}
+          >
+            {% capture style %}
+            object-fit: {{ section.settings.image_fit }};
+          {% endcapture %}
+            {{
+              section.settings.image
+              | image_url: width: section.settings.image.width
+              | image_tag: loading: 'lazy', widths: '275, 550, 750', style: style
+            }}
+          </div>
+        {% endif %}
+        {% if section.settings.layout == 'banner' %}
+          <div class="notification-banner__content">
+        {% endif %}
+        <div class="popup-wraper-text">
+          {% if section.settings.heading != blank %}
+            <h2 class="popup-heading">
+              {{ section.settings.heading }}
+            </h2>
+          {% endif %}
+          {% if section.settings.text != blank %}
+            <div class="popup-text">
+              {{ section.settings.text }}
+            </div>
+          {% endif %}
+        </div>
+        {% if section.settings.show_button and section.settings.button_label != blank %}
+          {% if section.settings.button_action == 'accept' %}
+            <button class="button button--{{ section.settings.button_style }} popup-button popup-accept focus-inset">
+              {{ section.settings.button_label }}
+            </button>
+          {% else %}
+            <a
+              class="button button--{{ section.settings.button_style }} popup-button focus-inset"
+              target="_blank"
+              {% if section.settings.button_link %}
+                href="{{ section.settings.button_link }}"
+              {% endif %}
+            >
+              {{ section.settings.button_label }}
+            </a>
+          {% endif %}
+        {% endif %}
+        <button
+          type="button"
+          class="link modal-close-button popup-close focus-inset"
+          aria-label="{{ 'accessibility.close' | t | default: '關閉' }}"
+        >
+          {% render 'icon-close' %}
+        </button>
+        {% if section.settings.layout == 'banner' %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% if section.settings['show-overlay'] %}
+  <div class="popup-overlay"></div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "通知橫幅",
+  "enabled_on": {
+    "groups": ["custom.overlay"]
+  },
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "版面配置",
+      "options": [
+        {
+          "value": "box",
+          "label": "方塊彈窗"
+        },
+        {
+          "value": "bar",
+          "label": "橫條"
+        },
+        {
+          "value": "banner",
+          "label": "橫幅"
+        }
+      ],
+      "default": "box"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "圖片",
+      "info": "僅適用於「橫幅」版面配置。"
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "圖片適應方式",
+      "options": [
+        {
+          "value": "contain",
+          "label": "維持比例 (Contain)"
+        },
+        {
+          "value": "cover",
+          "label": "填滿 (Cover)"
+        }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "圖片位置",
+      "options": [
+        {
+          "value": "left",
+          "label": "左側"
+        },
+        {
+          "value": "right",
+          "label": "右側"
+        },
+        {
+          "value": "top",
+          "label": "上方"
+        },
+        {
+          "value": "bottom",
+          "label": "下方"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "default": "通知標題",
+      "label": "標題"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "內文"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_button",
+      "default": false,
+      "label": "顯示按鈕"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "default": "了解更多",
+      "label": "按鈕文字"
+    },
+    {
+      "type": "select",
+      "id": "button_action",
+      "options": [
+        {
+          "value": "link",
+          "label": "連結到網址"
+        },
+        {
+          "value": "accept",
+          "label": "接受並關閉"
+        }
+      ],
+      "default": "accept",
+      "label": "按鈕動作"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "按鈕連結"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "options": [
+        {
+          "value": "primary",
+          "label": "主要"
+        },
+        {
+          "value": "secondary",
+          "label": "次要"
+        },
+        {
+          "value": "tertiary",
+          "label": "第三"
+        }
+      ],
+      "default": "primary",
+      "label": "按鈕樣式"
+    },
+    {
+      "type": "range",
+      "id": "limit-display",
+      "min": 0,
+      "max": 100,
+      "default": 0,
+      "label": "顯示次數限制",
+      "info": "設定此彈窗對單一用戶顯示的總次數。設為 0 表示無限制。"
+    },
+    {
+      "type": "number",
+      "id": "limit-cache",
+      "default": 30,
+      "label": "記憶有效天數",
+      "info": "設定在使用者關閉後，隔幾天才會再次顯示此彈窗。"
+    },
+    {
+      "type": "select",
+      "id": "position",
+      "options": [
+        {
+          "value": "top-left",
+          "label": "左上"
+        },
+        {
+          "value": "top",
+          "label": "頂部置中"
+        },
+        {
+          "value": "top-right",
+          "label": "右上"
+        },
+        {
+          "value": "left",
+          "label": "左側置中"
+        },
+        {
+          "value": "center",
+          "label": "正中央"
+        },
+        {
+          "value": "right",
+          "label": "右側置中"
+        },
+        {
+          "value": "bottom-left",
+          "label": "左下"
+        },
+        {
+          "value": "bottom",
+          "label": "底部置中"
+        },
+        {
+          "value": "bottom-right",
+          "label": "右下"
+        }
+      ],
+      "default": "bottom-left",
+      "label": "彈窗位置"
+    },
+    {
+      "type": "header",
+      "content": "觸發條件"
+    },
+    {
+      "type": "text",
+      "id": "popup-id",
+      "label": "彈窗 ID (手動觸發用)"
+    },
+    {
+      "type": "select",
+      "id": "trigger-open",
+      "label": "開啟觸發方式",
+      "options": [
+        {
+          "value": "delay",
+          "label": "延遲顯示"
+        },
+        {
+          "value": "scroll",
+          "label": "頁面滾動"
+        },
+        {
+          "value": "exit",
+          "label": "離開頁面意圖"
+        },
+        {
+          "value": "manual",
+          "label": "手動觸發"
+        }
+      ],
+      "default": "delay"
+    },
+    {
+      "type": "range",
+      "id": "trigger-open-delay",
+      "label": "延遲秒數 (開啟)",
+      "min": 0,
+      "max": 100,
+      "unit": "秒",
+      "default": 1
+    },
+    {
+      "type": "select",
+      "id": "open-scroll-type",
+      "options": [
+        {
+          "value": "px",
+          "label": "像素 (px)"
+        },
+        {
+          "value": "%",
+          "label": "百分比 (%)"
+        }
+      ],
+      "default": "%",
+      "label": "滾動單位 (開啟)"
+    },
+    {
+      "type": "number",
+      "id": "open-scroll-position",
+      "default": 50,
+      "label": "滾動位置 (開啟)"
+    },
+    {
+      "type": "text",
+      "id": "manual-selector",
+      "label": "手動觸發選擇器",
+      "info": "輸入 CSS 選擇器 (例如 #my-button 或 .my-class)，點擊該元素將會開啟彈窗。"
+    },
+    {
+      "type": "select",
+      "id": "trigger-close",
+      "label": "關閉觸發方式",
+      "options": [
+        {
+          "value": "delay",
+          "label": "延遲關閉"
+        },
+        {
+          "value": "scroll",
+          "label": "頁面滾動"
+        },
+        {
+          "value": "none",
+          "label": "不自動關閉"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "trigger-close-delay",
+      "label": "延遲秒數 (關閉)",
+      "min": 1,
+      "max": 100,
+      "unit": "秒",
+      "default": 30
+    },
+    {
+      "type": "select",
+      "id": "close-scroll-type",
+      "options": [
+        {
+          "value": "px",
+          "label": "像素 (px)"
+        },
+        {
+          "value": "%",
+          "label": "百分比 (%)"
+        }
+      ],
+      "default": "%",
+      "label": "滾動單位 (關閉)"
+    },
+    {
+      "type": "number",
+      "id": "close-scroll-position",
+      "default": 50,
+      "label": "滾動位置 (關閉)"
+    },
+    {
+      "type": "header",
+      "content": "樣式與動畫"
+    },
+    {
+      "type": "color_background",
+      "id": "background",
+      "label": "背景顏色或漸層",
+      "default": "linear-gradient(92deg, #84035F 0%, #2A0524 26.56%, #241359 51.21%, #2A3090 70.3%, #8B079B 100%)"
+    },
+    {
+      "type": "range",
+      "id": "width",
+      "min": 200,
+      "max": 1920,
+      "unit": "px",
+      "step": 20,
+      "default": 260,
+      "label": "寬度"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "background-3",
+      "label": "配色"
+    },
+    {
+      "type": "select",
+      "id": "open-animation",
+      "label": "開啟動畫",
+      "options": [
+        {
+          "value": "Fade",
+          "label": "淡入"
+        },
+        {
+          "value": "Slide",
+          "label": "滑入"
+        },
+        {
+          "value": "Zoom",
+          "label": "縮放"
+        },
+        {
+          "value": "SlideFade",
+          "label": "滑動淡入"
+        }
+      ],
+      "default": "Fade"
+    },
+    {
+      "type": "select",
+      "id": "exit-animation",
+      "label": "關閉動畫",
+      "options": [
+        {
+          "value": "Fade",
+          "label": "淡出"
+        },
+        {
+          "value": "Slide",
+          "label": "滑出"
+        },
+        {
+          "value": "Zoom",
+          "label": "縮小"
+        },
+        {
+          "value": "SlideFade",
+          "label": "滑動淡出"
+        }
+      ],
+      "default": "Fade"
+    },
+    {
+      "type": "checkbox",
+      "id": "show-overlay",
+      "label": "顯示背景遮罩",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "進階設定"
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile",
+      "label": "在行動裝置上停用",
+      "info": "勾選此項，彈窗將不會在手機或小螢幕裝置上顯示。",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "scrolling",
+      "label": "彈窗出現時鎖定頁面滾動",
+      "info": "防止使用者在彈窗開啟時滾動背景頁面。",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "overlay-close",
+      "label": "允許點擊背景遮罩關閉",
+      "info": "使用者可點擊彈窗外的區域來關閉它。此選項需啟用「顯示背景遮罩」。",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "esc-close",
+      "label": "允許按 ESC 鍵關閉",
+      "info": "使用者可按鍵盤上的 'ESC' 鍵關閉彈窗。",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "f4-close",
+      "label": "允許按 F4 鍵關閉",
+      "info": "使用者可按鍵盤上的 'F4' 鍵關閉彈窗。",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "通知橫幅"
+    }
+  ]
+}
+{% endschema %}

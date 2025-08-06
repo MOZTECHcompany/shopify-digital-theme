@@ -1,0 +1,973 @@
+{% liquid
+  if section.settings.layout == 'bar'
+    if section.settings.position != 'bottom' and section.settings.position != 'top'
+      assign width = section.settings.width | append: 'px'
+    else
+      assign width = '100%'
+    endif
+  else
+    assign width = section.settings.width | append: 'px'
+  endif
+%}
+
+<div
+  class="
+    popup-main popup
+    popup--{{ section.settings.position }}
+    popup-main-image--{{ section.settings.image_layout }}
+    {% if section.settings.image == blank %} popup-main--no-image {% endif %}
+  "
+  {% if section.settings['popup-id'] != blank %}
+    id="{{ section.settings.popup-id }}"
+  {% endif %}
+  data-limit-display="{{ section.settings.limit-display }}"
+  data-limit-lifetime="{{ section.settings.limit-cache }}"
+  data-open-trigger="{{ section.settings.trigger-open }}"
+  data-open-delay-number="{{ section.settings.trigger-open-delay }}"
+  data-open-scroll-position="{{ section.settings.open-scroll-position }}"
+  data-open-scroll-type="{{ section.settings.open-scroll-type }}"
+  {% if section.settings['manual-selector'] != blank %}
+    data-open-manual-selector="{{ section.settings.manual-selector }}"
+  {% endif %}
+  data-close-trigger="{{ section.settings.trigger-close }}"
+  data-close-delay-number="{{ section.settings.trigger-close-delay }}"
+  data-close-scroll-position="{{ section.settings.close-scroll-position }}"
+  data-close-scroll-type="{{ section.settings.close-scroll-type }}"
+  data-open-animation="popupOpen{{ section.settings.open-animation }}"
+  data-exit-animation="popupExit{{ section.settings.exit-animation }}"
+  data-overlay="{{ section.settings.show-overlay }}"
+  data-mobile-disable="{{ section.settings.mobile }}"
+  data-body-scroll-disable="{{ section.settings.scrolling }}"
+  data-overlay-close="{{ section.settings.overlay-close }}"
+  data-esc-close="{{ section.settings.esc-close }}"
+  data-f4-close="{{ section.settings.f4-close }}"
+  data-id="{{ section.id }}"
+  style="width: {{ width }}"
+>
+  <div class="popup-wrap color-{{ section.settings.color_scheme }} background">
+    <div class="popup-container">
+      <div
+        class="popup-outer {%- if section.settings.image != blank %} popup-outer_image {% endif %}"
+        {% if section.settings.background != blank %}
+          style="--background: {{ section.settings.background }};"
+        {% endif %}
+      >
+        {% if section.settings.image != blank %}
+          <div class="popup-thumbnail">
+            {% capture style %}
+            object-fit: {{ section.settings.image_fit }};
+          {% endcapture %}
+            {{
+              section.settings.image
+              | image_url: width: section.settings.image.width
+              | image_tag: loading: 'lazy', widths: '275, 550, 750, 990, 1200, 1360, 1600, 1800', style: style
+            }}
+          </div>
+        {% endif %}
+        <div
+          class="popup-content popup-content--{{ section.settings.content_align }} {% if section.settings.background != blank %} popup-content_bg {% endif %}"
+          style="--opacity: {{ section.settings.overlay_opacity }};"
+        >
+          {%- assign content_before_divider = '' -%}
+          {%- assign content_after_divider = '' -%}
+
+          {%- for block in section.blocks -%}
+            {%- capture block_content -%}
+              {%- case block.type -%}
+                {%- when 'popup_heading' -%}
+                  {% if block.settings.heading != blank %}
+                    <h2 class="popup-heading" {{ block.shopify_attributes }}>
+                      {{ block.settings.heading }}
+                    </h2>
+                  {% endif %}
+                {%- when 'popup_description' -%}
+                  {% if block.settings.description != blank %}
+                    <p class="popup-description" {{ block.shopify_attributes }}>
+                      {{ block.settings.description }}
+                    </p>
+                  {% endif %}
+                {%- when 'button' -%}
+                  {% render 'button',
+                    link: block.settings.button_link,
+                    label: block.settings.button_label,
+                    style: block.settings.button_style,
+                    class: 'popup'
+                  %}
+                {%- when 'subscribe_form' -%}
+                  {% form 'customer', class: 'newsletter-form' %}
+                    <div class="newsletter-form__inner {% if section.settings.width <= 500 %} newsletter-form__inner_column {% endif %} color-{{ block.settings.color_scheme }}" {{ block.shopify_attributes }}>
+                      <input type="hidden" name="contact[tags]" value="newsletter">
+                      <div class="newsletter-form__field-wrapper">
+                        <div class="field">
+                          <input
+                            dir="ltr"
+                            id="NewsletterForm--{{ section.id }}"
+                            type="email"
+                            name="contact[email]"
+                            class="field__input field"
+                            value="{{ form.email }}"
+                            aria-required="true"
+                            autocorrect="off"
+                            autocapitalize="off"
+                            autocomplete="email"
+														pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$"
+                            {% if form.errors %}
+                              autofocus
+                              aria-invalid="true"
+                              aria-describedby="Newsletter-error--{{ section.id }}"
+                            {% elsif form.posted_successfully? %}
+                              aria-describedby="Newsletter-success--{{ section.id }}"
+                            {% endif %}
+                            placeholder="{{ block.settings.placeholder_input }}"
+                            required
+                          >
+                          <label class="visually-hidden" for="NewsletterForm--{{ section.id }}">
+                            {{ 'newsletter.label' | t | default: "電子郵件" }}
+                          </label>
+                        </div>
+                        {%- if form.errors -%}
+                          <small
+                            class="newsletter-form__message form__message"
+                            id="Newsletter-error--{{ section.id }}"
+                          >
+                            {%- render 'icon-error' -%}
+                            {{- form.errors.translated_fields.email | capitalize }}
+                            {{ form.errors.messages.email -}}
+                          </small>
+                        {%- endif -%}
+                      </div>
+                      <button
+                        type="submit"
+                        class="button button--{{ block.settings.button_style }} focus-inset"
+                        name="commit"
+                      >
+                        {{ block.settings.button_label }}
+                      </button>
+                    </div>
+                    {%- if form.posted_successfully? -%}
+                      <h3
+                        class="newsletter-form__message newsletter-form__message--success form__message"
+                        id="Newsletter-success--{{ section.id }}"
+                        tabindex="-1"
+                        autofocus
+                      >
+                        {% render 'icon-success' -%}
+                        {{- 'newsletter.success' | t | default: "感謝您的訂閱" }}
+                      </h3>
+                    {%- endif -%}
+                  {% endform %}
+                  {% if block.settings.description != blank %}
+                    <div class = "popup-text" {{ block.shopify_attributes }}>
+                      {{ block.settings.description }}
+                    </div>
+                  {% endif %}
+                {%- when 'social_links' -%}
+                  {% if block.settings.show_twitter and settings.social_twitter_link != blank or
+                    block.settings.show_facebook and settings.social_facebook_link != blank or
+                    block.settings.show_pinterest and settings.social_pinterest_link != blank or
+                    block.settings.show_instagram and settings.social_instagram_link != blank or
+                    block.settings.show_linkedin and settings.social_linkedin_link != blank or
+                    block.settings.show_tiktok and settings.social_tiktok_link != blank or
+                    block.settings.show_tumblr and settings.social_tumblr_link != blank or
+                    block.settings.show_snapchat and settings.social_snapchat_link != blank or
+                    block.settings.show_youtube and settings.social_youtube_link != blank or
+                    block.settings.show_vimeo and settings.social_vimeo_link != blank %}
+                    <ul
+                      class="list-unstyled list-social"
+                      role="list"
+                      {{ block.shopify_attributes }}
+                    >
+                      {%- if block.settings.show_twitter and settings.social_twitter_link != blank -%}
+                        <li class="list-social__item">
+                          <a
+                            href="{{ settings.social_twitter_link }}"
+                            class="link link--text list-social__link"
+                            aria-describedby="a11y-external-message"
+                          >
+                            {%- render 'icon-twitter' -%}
+                            <span class="visually-hidden">
+                              {{- 'general.social.links.twitter' | t | default: "Twitter" -}}
+                            </span>
+                          </a>
+                        </li>
+                      {%- endif -%}
+                      {%- if block.settings.show_facebook and settings.social_facebook_link != blank -%}
+                        <li class="list-social__item">
+                          <a
+                            href="{{ settings.social_facebook_link }}"
+                            class="link link--text list-social__link"
+                            aria-describedby="a11y-external-message"
+                          >
+                            {%- render 'icon-facebook' -%}
+                            <span class="visually-hidden">
+                              {{- 'general.social.links.facebook' | t | default: "Facebook" -}}
+                            </span>
+                          </a>
+                        </li>
+                      {%- endif -%}
+                      {%- if block.settings.show_pinterest and settings.social_pinterest_link != blank -%}
+                        <li class="list-social__item">
+                          <a
+                            href="{{ settings.social_pinterest_link }}"
+                            class="link link--text list-social__link"
+                            aria-describedby="a11y-external-message"
+                          >
+                            {%- render 'icon-pinterest' -%}
+                            <span class="visually-hidden">
+                              {{- 'general.social.links.pinterest' | t | default: "Pinterest" -}}
+                            </span>
+                          </a>
+                        </li>
+                      {%- endif -%}
+                      {%- if block.settings.show_instagram and settings.social_instagram_link != blank -%}
+                        <li class="list-social__item">
+                          <a
+                            href="{{ settings.social_instagram_link }}"
+                            class="link link--text list-social__link"
+                            aria-describedby="a11y-external-message"
+                          >
+                            {%- render 'icon-instagram' -%}
+                            <span class="visually-hidden">
+                              {{- 'general.social.links.instagram' | t | default: "Instagram" -}}
+                            </span>
+                          </a>
+                        </li>
+                      {%- endif -%}
+                     {%- if settings.social_linkedin_link != blank -%}
+                        <li class="list-social__item">
+                          <a
+                            href="{{ settings.social_linkedin_link }}"
+                            class="link link--text list-social__link"
+                            aria-describedby="a11y-external-message"
+                          >
+                            {%- render 'icon-linkedin' -%}
+                            <span class="visually-hidden">
+                              {{- 'general.social.links.linkedin' | t | default: "LinkedIn" -}}
+                            </span>
+                          </a>
+                        </li>
+                      {%- endif -%}
+                      {%- if block.settings.show_tiktok and settings.social_tiktok_link != blank -%}
+                        <li class="list-social__item">
+                          <a
+                            href="{{ settings.social_tiktok_link }}"
+                            class="link link--text list-social__link"
+                            aria-describedby="a11y-external-message"
+                          >
+                            {%- render 'icon-tiktok' -%}
+                            <span class="visually-hidden">
+                              {{- 'general.social.links.tiktok' | t | default: "TikTok" -}}
+                            </span>
+                          </a>
+                        </li>
+                      {%- endif -%}
+                      {%- if block.settings.show_tumblr and settings.social_tumblr_link != blank -%}
+                        <li class="list-social__item">
+                          <a
+                            href="{{ settings.social_tumblr_link }}"
+                            class="link link--text list-social__link"
+                            aria-describedby="a11y-external-message"
+                          >
+                            {%- render 'icon-tumblr' -%}
+                            <span class="visually-hidden">
+                              {{- 'general.social.links.tumblr' | t | default: "Tumblr" -}}
+                            </span>
+                          </a>
+                        </li>
+                      {%- endif -%}
+                      {%- if block.settings.show_snapchat and settings.social_snapchat_link != blank -%}
+                        <li class="list-social__item">
+                          <a
+                            href="{{ settings.social_snapchat_link }}"
+                            class="link link--text list-social__link"
+                            aria-describedby="a11y-external-message"
+                          >
+                            {%- render 'icon-snapchat' -%}
+                            <span class="visually-hidden">
+                              {{- 'general.social.links.snapchat' | t | default: "Snapchat" -}}
+                            </span>
+                          </a>
+                        </li>
+                      {%- endif -%}
+                      {%- if block.settings.show_youtube and settings.social_youtube_link != blank -%}
+                        <li class="list-social__item">
+                          <a
+                            href="{{ settings.social_youtube_link }}"
+                            class="link link--text list-social__link"
+                            aria-describedby="a11y-external-message"
+                          >
+                            {%- render 'icon-youtube' -%}
+                            <span class="visually-hidden">
+                              {{- 'general.social.links.youtube' | t | default: "YouTube" -}}
+                            </span>
+                          </a>
+                        </li>
+                      {%- endif -%}
+                      {%- if block.settings.show_vimeo and settings.social_vimeo_link != blank -%}
+                        <li class="list-social__item">
+                          <a
+                            href="{{ settings.social_vimeo_link }}"
+                            class="link link--text list-social__link"
+                            aria-describedby="a11y-external-message"
+                          >
+                            {%- render 'icon-vimeo' -%}
+                            <span class="visually-hidden">
+                              {{- 'general.social.links.vimeo' | t | default: "Vimeo" -}}
+                            </span>
+                          </a>
+                        </li>
+                      {%- endif -%}
+                    </ul>
+                  {% endif %}
+                {% when 'divider' %}
+                  {%- assign divider_index = forloop.index -%}
+              {% endcase %}
+            {% endcapture %}
+
+            {%- if divider_index == blank or forloop.index < divider_index -%}
+              {%- assign content_before_divider = content_before_divider | append: block_content -%}
+            {%- else -%}
+              {%- assign content_after_divider = content_after_divider | append: block_content -%}
+            {%- endif -%}
+          {% endfor %}
+
+          <div class="popup-wraper-text {% if content_before_divider != blank and content_after_divider != blank -%} popup-wraper-text--columns {% endif %}">
+            {%- if content_before_divider != blank and content_after_divider != blank -%}
+              <div class="popup-column">
+                {{ content_before_divider }}
+              </div>
+              <div class="popup-column">
+                {{ content_after_divider }}
+              </div>
+            {% else %}
+              {{ content_before_divider }}
+              {{ content_after_divider }}
+            {% endif %}
+          </div>
+
+          <button
+            type="button"
+            class="link modal-close-button popup-close focus-inset"
+            aria-label="{{ 'accessibility.close' | t | default: '關閉' }}"
+          >
+            {% render 'icon-close' %}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% if section.settings['show-overlay'] %}
+  <div class="popup-overlay"></div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "彈出式視窗",
+  "enabled_on": {
+    "groups": ["custom.overlay"]
+  },
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "圖片"
+    },
+    {
+      "type": "select",
+      "id": "image_layout",
+      "label": "圖片版面配置",
+      "options": [
+        {
+          "value": "left",
+          "label": "左側"
+        },
+        {
+          "value": "right",
+          "label": "右側"
+        },
+        {
+          "value": "top",
+          "label": "上方"
+        },
+        {
+          "value": "bottom",
+          "label": "下方"
+        }
+      ],
+      "default": "top"
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "圖片適應方式",
+      "options": [
+        {
+          "value": "contain",
+          "label": "維持比例 (Contain)"
+        },
+        {
+          "value": "cover",
+          "label": "填滿 (Cover)"
+        }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "content_align",
+      "label": "內容對齊",
+      "options": [
+        {
+          "value": "left",
+          "label": "靠左"
+        },
+        {
+          "value": "center",
+          "label": "置中"
+        },
+        {
+          "value": "right",
+          "label": "靠右"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "limit-display",
+      "min": 0,
+      "max": 100,
+      "default": 0,
+      "label": "顯示次數限制",
+      "info": "設定此彈窗對單一用戶顯示的總次數。設為 0 表示無限制。"
+    },
+    {
+      "type": "number",
+      "id": "limit-cache",
+      "default": 30,
+      "label": "記憶有效天數",
+      "info": "設定在使用者關閉後，隔幾天才會再次顯示此彈窗。"
+    },
+    {
+      "type": "select",
+      "id": "position",
+      "options": [
+        {
+          "value": "top-left",
+          "label": "左上"
+        },
+        {
+          "value": "top",
+          "label": "頂部置中"
+        },
+        {
+          "value": "top-right",
+          "label": "右上"
+        },
+        {
+          "value": "left",
+          "label": "左側置中"
+        },
+        {
+          "value": "center",
+          "label": "正中央"
+        },
+        {
+          "value": "right",
+          "label": "右側置中"
+        },
+        {
+          "value": "bottom-left",
+          "label": "左下"
+        },
+        {
+          "value": "bottom",
+          "label": "底部置中"
+        },
+        {
+          "value": "bottom-right",
+          "label": "右下"
+        }
+      ],
+      "default": "bottom",
+      "label": "彈窗位置"
+    },
+    {
+      "type": "header",
+      "content": "觸發條件"
+    },
+    {
+      "type": "text",
+      "id": "popup-id",
+      "label": "彈窗 ID (手動觸發用)"
+    },
+    {
+      "type": "select",
+      "id": "trigger-open",
+      "label": "開啟觸發方式",
+      "options": [
+        {
+          "value": "delay",
+          "label": "延遲顯示"
+        },
+        {
+          "value": "scroll",
+          "label": "頁面滾動"
+        },
+        {
+          "value": "exit",
+          "label": "離開頁面意圖"
+        },
+        {
+          "value": "manual",
+          "label": "手動觸發"
+        }
+      ],
+      "default": "delay"
+    },
+    {
+      "type": "range",
+      "id": "trigger-open-delay",
+      "label": "延遲秒數 (開啟)",
+      "min": 0,
+      "max": 100,
+      "unit": "秒",
+      "default": 1
+    },
+    {
+      "type": "select",
+      "id": "open-scroll-type",
+      "options": [
+        {
+          "value": "px",
+          "label": "像素 (px)"
+        },
+        {
+          "value": "%",
+          "label": "百分比 (%)"
+        }
+      ],
+      "default": "%",
+      "label": "滾動單位 (開啟)"
+    },
+    {
+      "type": "number",
+      "id": "open-scroll-position",
+      "default": 50,
+      "label": "滾動位置 (開啟)"
+    },
+    {
+      "type": "text",
+      "id": "manual-selector",
+      "label": "手動觸發選擇器",
+      "info": "輸入 CSS 選擇器 (例如 #my-button 或 .my-class)，點擊該元素將會開啟彈窗。"
+    },
+    {
+      "type": "select",
+      "id": "trigger-close",
+      "label": "關閉觸發方式",
+      "options": [
+        {
+          "value": "delay",
+          "label": "延遲關閉"
+        },
+        {
+          "value": "scroll",
+          "label": "頁面滾動"
+        },
+        {
+          "value": "none",
+          "label": "不自動關閉"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "trigger-close-delay",
+      "label": "延遲秒數 (關閉)",
+      "min": 1,
+      "max": 100,
+      "unit": "秒",
+      "default": 30
+    },
+    {
+      "type": "select",
+      "id": "close-scroll-type",
+      "options": [
+        {
+          "value": "px",
+          "label": "像素 (px)"
+        },
+        {
+          "value": "%",
+          "label": "百分比 (%)"
+        }
+      ],
+      "default": "%",
+      "label": "滾動單位 (關閉)"
+    },
+    {
+      "type": "number",
+      "id": "close-scroll-position",
+      "default": 50,
+      "label": "滾動位置 (關閉)"
+    },
+    {
+      "type": "header",
+      "content": "樣式與動畫"
+    },
+    {
+      "type": "color_background",
+      "id": "background",
+      "label": "背景顏色或漸層",
+      "default": "linear-gradient(92deg, #84035F 0%, #2A0524 26.56%, #241359 51.21%, #2A3090 70.3%, #8B079B 100%)"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "label": "背景遮罩不透明度",
+      "default": 0.1
+    },
+    {
+      "type": "range",
+      "id": "width",
+      "min": 460,
+      "max": 1920,
+      "unit": "px",
+      "step": 20,
+      "default": 1120,
+      "label": "寬度"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "background-3",
+      "label": "配色"
+    },
+    {
+      "type": "select",
+      "id": "open-animation",
+      "label": "開啟動畫",
+      "options": [
+        {
+          "value": "Fade",
+          "label": "淡入"
+        },
+        {
+          "value": "Slide",
+          "label": "滑入"
+        },
+        {
+          "value": "Zoom",
+          "label": "縮放"
+        },
+        {
+          "value": "SlideFade",
+          "label": "滑動淡入"
+        }
+      ],
+      "default": "Fade"
+    },
+    {
+      "type": "select",
+      "id": "exit-animation",
+      "label": "關閉動畫",
+      "options": [
+        {
+          "value": "Fade",
+          "label": "淡出"
+        },
+        {
+          "value": "Slide",
+          "label": "滑出"
+        },
+        {
+          "value": "Zoom",
+          "label": "縮小"
+        },
+        {
+          "value": "SlideFade",
+          "label": "滑動淡出"
+        }
+      ],
+      "default": "Fade"
+    },
+    {
+      "type": "checkbox",
+      "id": "show-overlay",
+      "label": "顯示背景遮罩",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "進階設定"
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile",
+      "label": "在行動裝置上停用",
+      "info": "勾選此項，彈窗將不會在手機或小螢幕裝置上顯示。",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "scrolling",
+      "label": "彈窗出現時鎖定頁面滾動",
+      "info": "防止使用者在彈窗開啟時滾動背景頁面。",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "overlay-close",
+      "label": "允許點擊背景遮罩關閉",
+      "info": "使用者可點擊彈窗外的區域來關閉它。此選項需啟用「顯示背景遮罩」。",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "esc-close",
+      "label": "允許按 ESC 鍵關閉",
+      "info": "使用者可按鍵盤上的 'ESC' 鍵關閉彈窗。",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "f4-close",
+      "label": "允許按 F4 鍵關閉",
+      "info": "使用者可按鍵盤上的 'F4' 鍵關閉彈窗。",
+      "default": false
+    }
+  ],
+  "blocks": [
+    {
+      "type": "popup_heading",
+      "name": "標題",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "default": "標題",
+          "label": "標題文字"
+        }
+      ]
+    },
+    {
+      "type": "popup_description",
+      "name": "說明文字",
+      "settings": [
+        {
+          "type": "text",
+          "id": "description",
+          "default": "簡短說明您的優惠或公告。",
+          "label": "說明文字"
+        }
+      ]
+    },
+    {
+      "type": "divider",
+      "name": "分隔線",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "新增此區塊可將內容分成兩欄。此區塊本身不會顯示任何內容。"
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "按鈕",
+      "settings": [
+        {
+          "type": "select",
+          "id": "button_style",
+          "options": [
+            {
+              "group": "實心按鈕",
+              "value": "primary",
+              "label": "主要"
+            },
+            {
+              "group": "實心按鈕",
+              "value": "secondary",
+              "label": "次要"
+            },
+            {
+              "group": "實心按鈕",
+              "value": "tertiary",
+              "label": "第三"
+            },
+            {
+              "group": "外框 & 連結",
+              "value": "simple",
+              "label": "外框"
+            },
+            {
+              "group": "外框 & 連結",
+              "value": "simple_secondary",
+              "label": "外框 (次要)"
+            },
+            {
+              "group": "外框 & 連結",
+              "value": "simple_link",
+              "label": "純連結"
+            }
+          ],
+          "default": "primary",
+          "label": "按鈕樣式"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "default": "按鈕",
+          "label": "按鈕文字"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "按鈕連結"
+        }
+      ]
+    },
+    {
+      "type": "subscribe_form",
+      "name": "電子報訂閱表單",
+      "settings": [
+        {
+          "type": "color_scheme",
+          "id": "color_scheme",
+          "default": "background-1",
+          "label": "配色"
+        },
+        {
+          "type": "text",
+          "id": "placeholder_input",
+          "default": "您的電子郵件地址",
+          "label": "輸入框提示文字"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "default": "訂閱",
+          "label": "按鈕文字"
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "options": [
+            {
+              "value": "primary",
+              "label": "主要"
+            },
+            {
+              "value": "secondary",
+              "label": "次要"
+            },
+            {
+              "value": "tertiary",
+              "label": "第三"
+            }
+          ],
+          "default": "primary",
+          "label": "按鈕樣式"
+        },
+        {
+          "type": "richtext",
+          "id": "description",
+          "label": "表單下方說明文字"
+        }
+      ]
+    },
+    {
+      "type": "social_links",
+      "name": "社群媒體連結",
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_twitter",
+          "default": true,
+          "label": "顯示 Twitter"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_facebook",
+          "default": true,
+          "label": "顯示 Facebook"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_pinterest",
+          "default": true,
+          "label": "顯示 Pinterest"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_instagram",
+          "default": true,
+          "label": "顯示 Instagram"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_linkedin",
+          "default": false,
+          "label": "顯示 LinkedIn"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_tiktok",
+          "default": false,
+          "label": "顯示 TikTok"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_tumblr",
+          "default": false,
+          "label": "顯示 Tumblr"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_snapchat",
+          "default": false,
+          "label": "顯示 Snapchat"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_youtube",
+          "default": false,
+          "label": "顯示 YouTube"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_vimeo",
+          "default": false,
+          "label": "顯示 Vimeo"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "彈出式視窗",
+      "blocks": [
+        {
+          "type": "popup_heading"
+        },
+        {
+          "type": "popup_description"
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "subscribe_form"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

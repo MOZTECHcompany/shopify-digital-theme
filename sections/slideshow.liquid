@@ -1,0 +1,1019 @@
+{{ 'section-slideshow.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'slideshow.js' | asset_url }}" defer="defer"></script>
+
+{% style %}
+  {% render 'section-padding' %}
+  {% render 'section-margin' %}
+{% endstyle %}
+
+{% if section.settings.heading_line == 'rounded' %}
+  {% assign color = section.settings.line_color | remove: '#' %}
+  {% style %}
+    #shopify-section-{{ section.id }} .titles .title--rounded span[style*="text-decoration:underline"].title--rounded-xs {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="78" height="14" viewBox="0 0 78 14" fill="none"><path d="M3 11C15.1361 4.50757 39.4887 -3.17051 75 11" stroke="%23{{ color }}" stroke-width="6" stroke-linecap="round"/></svg>');
+    }
+
+    #shopify-section-{{ section.id }} .titles .title--rounded span[style*="text-decoration:underline"].title--rounded-s {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="172" height="14" viewBox="0 0 172 14" fill="none"><path d="M3 11C30.9803 4.50757 87.1267 -3.17051 169 11" stroke="%23{{ color }}" stroke-width="6" stroke-linecap="round"/></svg>');
+    }
+
+    #shopify-section-{{ section.id }} .titles .title--rounded span[style*="text-decoration:underline"].title--rounded-m {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="321" height="14" viewBox="0 0 321 14" fill="none"><path d="M3 11C56.0952 4.50757 162.638 -3.17051 318 11" stroke="%23{{ color }}" stroke-width="6" stroke-linecap="round"/></svg>');
+    }
+
+    #shopify-section-{{ section.id }} .titles .title--rounded span[style*="text-decoration:underline"].title--rounded-l {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="373" height="14" viewBox="0 0 373 14" fill="none"><path d="M3 11C64.8602 4.50757 188.991 -3.17051 370 11" stroke="%23{{ color }}" stroke-width="6" stroke-linecap="round"/></svg>');
+    }
+
+    #shopify-section-{{ section.id }} .titles .title--rounded span[style*="text-decoration:underline"].title--rounded-xl {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="568" height="14" viewBox="0 0 568 14" fill="none"><path d="M3 11C97.7286 4.50757 287.814 -3.17051 565 11" stroke="%23{{ color }}" stroke-width="6" stroke-linecap="round"/></svg>');
+    }
+
+    #shopify-section-{{ section.id }} .titles .title--rounded span[style*="text-decoration:underline"].title--rounded-xxl {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="714" height="14" viewBox="0 0 714 14" fill="none"><path d="M3 11C122.338 4.50757 361.805 -3.17051 711 11" stroke="%23{{ color }}" stroke-width="6" stroke-linecap="round"/></svg>');
+    }
+
+    [data-scheme="dark"] {
+      #shopify-section-{{ section.id }} .titles .title--rounded span[style*="text-decoration:underline"].title--rounded-xs {
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="78" height="14" viewBox="0 0 78 14" fill="none"><path d="M3 11C15.1361 4.50757 39.4887 -3.17051 75 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/></svg>');
+      }
+
+      #shopify-section-{{ section.id }} .titles .title--rounded span[style*="text-decoration:underline"].title--rounded-s {
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="172" height="14" viewBox="0 0 172 14" fill="none"><path d="M3 11C30.9803 4.50757 87.1267 -3.17051 169 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/></svg>');
+      }
+
+      #shopify-section-{{ section.id }} .titles .title--rounded span[style*="text-decoration:underline"].title--rounded-m {
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="321" height="14" viewBox="0 0 321 14" fill="none"><path d="M3 11C56.0952 4.50757 162.638 -3.17051 318 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/></svg>');
+      }
+
+      #shopify-section-{{ section.id }} .titles .title--rounded span[style*="text-decoration:underline"].title--rounded-l {
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="373" height="14" viewBox="0 0 373 14" fill="none"><path d="M3 11C64.8602 4.50757 188.991 -3.17051 370 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/></svg>');
+      }
+
+      #shopify-section-{{ section.id }} .titles .title--rounded span[style*="text-decoration:underline"].title--rounded-xl {
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="568" height="14" viewBox="0 0 568 14" fill="none"><path d="M3 11C97.7286 4.50757 287.814 -3.17051 565 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/></svg>');
+      }
+
+      #shopify-section-{{ section.id }} .titles .title--rounded span[style*="text-decoration:underline"].title--rounded-xxl {
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="714" height="14" viewBox="0 0 714 14" fill="none"><path d="M3 11C122.338 4.50757 361.805 -3.17051 711 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/></svg>');
+      }
+    }
+
+    @media (prefers-color-scheme: dark) {
+     [data-scheme="auto"] {
+        #shopify-section-{{ section.id }} .titles .title--rounded span[style*="text-decoration:underline"].title--rounded-xs {
+          background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="78" height="14" viewBox="0 0 78 14" fill="none"><path d="M3 11C15.1361 4.50757 39.4887 -3.17051 75 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/></svg>');
+        }
+
+        #shopify-section-{{ section.id }} .titles .title--rounded span[style*="text-decoration:underline"].title--rounded-s {
+          background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="172" height="14" viewBox="0 0 172 14" fill="none"><path d="M3 11C30.9803 4.50757 87.1267 -3.17051 169 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/></svg>');
+        }
+
+        #shopify-section-{{ section.id }} .titles .title--rounded span[style*="text-decoration:underline"].title--rounded-m {
+          background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="321" height="14" viewBox="0 0 321 14" fill="none"><path d="M3 11C56.0952 4.50757 162.638 -3.17051 318 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/></svg>');
+        }
+
+        #shopify-section-{{ section.id }} .titles .title--rounded span[style*="text-decoration:underline"].title--rounded-l {
+          background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="373" height="14" viewBox="0 0 373 14" fill="none"><path d="M3 11C64.8602 4.50757 188.991 -3.17051 370 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/></svg>');
+        }
+
+        #shopify-section-{{ section.id }} .titles .title--rounded span[style*="text-decoration:underline"].title--rounded-xl {
+          background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="568" height="14" viewBox="0 0 568 14" fill="none"><path d="M3 11C97.7286 4.50757 287.814 -3.17051 565 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/></svg>');
+        }
+
+        #shopify-section-{{ section.id }} .titles .title--rounded span[style*="text-decoration:underline"].title--rounded-xxl {
+          background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="714" height="14" viewBox="0 0 714 14" fill="none"><path d="M3 11C122.338 4.50757 361.805 -3.17051 711 11" stroke="%234A4A4C" stroke-width="6" stroke-linecap="round"/></svg>');
+        }
+      }
+    }
+  {% endstyle %}
+{% endif %}
+
+<div
+  class="
+    slideshow slideshow--{{ section.settings.layout }} section-{{ section.id }}-padding
+    {% if section.settings.enable_border %} section-border {% if section.settings.border_full %} section-border-full {% endif %} {% endif %}
+    color-{{ section.settings.color_scheme }} background
+    {% if section.settings.enable_navigation  %} slideshow--with-nav {% endif %}
+  "
+>
+  {%- if section.settings.subheading != blank or section.settings.heading != blank -%}
+    <div
+      class="
+        slideshow__titles titles titles--{{ section.settings.text_align }}
+        {% if section.settings.heading == blank and section.settings.text == blank %} titles_margin-medium {% endif %}
+      "
+    >
+      <div class="container">
+        {%- if section.settings.subheading != blank -%}
+          <div class="slideshow__subtitle {{ section.settings.subheading_style }}">
+            {% if section.settings.subheading_icon != 'none' %}
+              <i class="icon icon-pack icon-{{ section.settings.subheading_icon }}"></i>
+            {% endif %}
+            {{ section.settings.subheading }}
+          </div>
+        {% endif %}
+        {%- if section.settings.heading != blank -%}
+          <{{ section.settings.heading_level }}
+            class="
+              {{ section.settings.heading_size }} slideshow__title title title--{{ section.settings.heading_line }}
+              {% if section.settings.word_break and section.settings.heading_line != 'none' %} title--word_break {% endif %}
+              {% if section.settings.word_break_an and section.settings.heading_animation != 'none' %} title--word_break_an {% endif %}
+              js-anim-{{ section.settings.heading_animation }}
+            "
+            style="--color-line: {{ section.settings.line_color }}"
+            data-content="{{ section.settings.heading | escape }}"
+          >
+            {% if section.settings.heading_animation == 'none' or section.settings.heading_animation != 'true' %}
+              {{- section.settings.heading -}}
+            {% endif %}
+          </{{ section.settings.heading_level }}>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+
+  {%- if section.settings.text != blank -%}
+    <div class="slideshow__description description body-large description--{{ section.settings.text_align }}">
+      <div class="container">
+        <span>
+          {{- section.settings.text -}}
+        </span>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="content">
+    <div
+      {% if section.settings.full_width == false %}
+        class="container"
+      {% endif %}
+    >
+      <div class="slideshow__container">
+        <div
+          class="
+            slideshow__swiper slideshow__swiper--{{ section.settings.layout }}
+            {% if section.settings.full_width == true %}slideshow__swiper--full-width{% endif %} swiper slideshow__swiper--{{ section.settings.text_align_content }}
+          "
+          data-autoplay="{{ section.settings.enable_autoplay }}"
+          data-loop="false"
+          data-navigation="{{ section.settings.enable_navigation }}"
+          data-pagination="{{ section.settings.enable_pagination }}"
+          data-pagination-type="{{ section.settings.pagination_type }}"
+          data-parallax="{{ section.settings.enable_parallax }}"
+        >
+          <div class="slideshow__wrapper swiper-wrapper">
+            {% liquid
+              assign no_media_all = true
+              for block in section.blocks
+                if section.settings.show_video and block.settings.video != blank
+                  assign no_media_all = false
+                  break
+                elsif block.settings.image != blank
+                  assign no_media_all = false
+                  break
+                endif
+              endfor
+            %}
+
+            {% for block in section.blocks %}
+              {% liquid
+                assign no_media = false
+                if section.settings.show_video and block.settings.video == blank and block.settings.image == blank
+                  assign no_media = true
+                elsif block.settings.image == blank
+                  assign no_media = true
+                endif
+              %}
+              <div
+                class="
+                  slideshow__slide slideshow__slide--{{ section.settings.layout }} swiper-slide
+                  slideshow__slide--{{ section.settings.height }}
+                  slideshow__slide-{{ block.id }} color-{{ block.settings.color_scheme }}
+                  {% if no_media_all %} slideshow__slide--no-image {% endif %}
+                "
+                data-swiper-autoplay="{{ section.settings.slide_duration | times: 1000 }}"
+                {{ block.shopify_attributes }}
+              >
+                {% if section.settings.height != 'adapt' and section.settings.height != 'full_height' %}
+                  {% liquid
+                    assign aspect_ratio = section.settings.height | split: '/'
+                    assign temp = aspect_ratio[0] | append: '.0'
+                    assign padding_bottom = aspect_ratio[1] | divided_by: temp | times: 100 | round: 2
+                  %}
+                {% elsif section.settings.height == 'adapt' %}
+                  {% if block.settings.video != blank and block.settings.show_video %}
+                    {% assign padding_bottom = 1
+                      | divided_by: block.settings.video.aspect_ratio
+                      | times: 100
+                      | round: 2
+                    %}
+                  {% elsif block.settings.image != blank %}
+                    {% assign padding_bottom = 1
+                      | divided_by: block.settings.image.aspect_ratio
+                      | times: 100
+                      | round: 2
+                    %}
+                  {% else %}
+                    {% assign padding_bottom = 0 %}
+                  {% endif %}
+                {% else %}
+                  {% assign padding_bottom = 0 %}
+                {% endif %}
+
+                {%- if section.settings.layout == 'overlay' -%}
+                  {% style %}
+                    .section-{{ section.id }}-padding .slideshow__slide-{{ block.id }}::before {
+                      content: "";
+                      display: block;
+                      padding-bottom: {{ padding_bottom }}%;
+                    }
+                  {% endstyle %}
+                {% else %}
+                  {% style %}
+                    .section-{{ section.id }}-padding .slideshow__slide-{{ block.id }} .media::before {
+                      content: "";
+                      display: block;
+                      padding-bottom: {{ padding_bottom }}%;
+                    }
+
+                     .section-{{ section.id }}-padding .slideshow__slide--no-image::before {
+                      content: "";
+                      display: block;
+                      padding-bottom: {{ padding_bottom }}%;
+                    }
+                  {% endstyle %}
+                {% endif %}
+
+                {% if block.settings.icon != 'none'
+                  or block.settings.heading != blank
+                  or block.settings.description != blank
+                  or block.settings.show_button
+                %}
+                  {% if section.settings.full_width %}
+                    <div class="container {% if no_media %} container--no-image {% endif %}">
+                  {% endif %}
+                  <div
+                    class="
+                      slideshow__content-wrapper
+                      slideshow__content-wrapper--{{ section.settings.text_align_content }}
+                      {% if no_media %} slideshow__content-wrapper--no-image {% endif %}
+                    "
+                    data-swiper-parallax="-700"
+                  >
+                    {% if block.settings.icon != 'none' %}
+                      <div
+                        class="
+                          slideshow__icon
+                          slideshow__icon--{{- section.settings.icon_size }}
+                          slideshow__icon--{{- section.settings.icon_style }}
+                          slideshow__icon--{{- section.settings.icon_fill_type }}
+                        "
+                      >
+                        <i
+                          class="icon icon-pack icon-{{ block.settings.icon }} {% if section.settings.icon_style == 'colored' and section.settings.icon_fill_type == 'gradient' %} text-gradient {% endif %}"
+                        ></i>
+                      </div>
+                    {% endif %}
+                    <div class="slideshow__content-group">
+                      {% if block.settings.heading != blank %}
+                        {% liquid
+                          assign slide_heading_size = block.settings.heading_size
+                          if slide_heading_size == 'recommended'
+                            case section.settings.layout
+                              when 'simple'
+                                assign slide_heading_size = 'h4'
+                              else
+                                assign slide_heading_size = 'h2'
+                            endcase
+                          endif
+                        %}
+                        <{{ block.settings.heading_level }} class="slideshow__title-content {{ slide_heading_size }}">
+                          {{- block.settings.heading -}}
+                        </{{ block.settings.heading_level }}>
+                      {% endif %}
+                      {% if block.settings.description != blank %}
+                        <div class="slideshow__description-content body-large">
+                          {{- block.settings.description -}}
+                        </div>
+                      {% endif %}
+                      {%- if block.settings.show_button -%}
+                        {% render 'button',
+                          link: block.settings.button_link,
+                          label: block.settings.button_label,
+                          style: block.settings.button_style,
+                          class: 'slideshow'
+                        %}
+                      {% endif %}
+                    </div>
+                  </div>
+                  {% if section.settings.full_width %}
+                    </div>
+                  {% endif %}
+                {% endif %}
+
+                <div class="media">
+                  {%- if section.settings.layout == 'overlay' -%}
+                    <div class="slideshow__overlay" style="opacity: {{ block.settings.overlay_opacity }}"></div>
+                  {%- endif -%}
+                  {% capture sizes %}
+                    {% if section.settings.layout == 'simple' %}
+                      (min-width: 990px) calc(66vw - 40px), 
+                    {% endif %}
+                    calc(100vw - 40px)
+                  {% endcapture %}
+                  {%- if block.settings.image != blank -%}
+                    {{
+                      block.settings.image
+                      | image_url: width: block.settings.image.width
+                      | image_tag:
+                        class: 'slideshow__image',
+                        loading: 'lazy',
+                        sizes: sizes,
+                        widths: '550, 720, 990, 1200, 1500, 1800, 2200, 2600, 3000'
+                    }}
+                  {%- endif -%}
+
+                  {%- if block.settings.show_video == true and block.settings.video -%}
+                    <div
+                      class="slideshow__video autoplay"
+                      data-video-id="{{ block.settings.video.id }}"
+                    >
+                      {{
+                        block.settings.video
+                        | video_tag:
+                          image_size: '1920x',
+                          autoplay: false,
+                          loop: block.settings.loop_video,
+                          muted: true,
+                          controls: false
+                      }}
+                    </div>
+                  {%- endif -%}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          <div class="slideshow__bottom {% if section.settings.full_width %} container {% endif %}">
+            {%- if section.blocks.size > 1 and section.settings.enable_navigation -%}
+              {%- if section.settings.pagination_type == 'bullets'
+                or section.settings.pagination_type == 'numbers'
+                or section.settings.enable_pagination == false
+              -%}
+                <div class="slideshow__button-wrapper">
+                  <div
+                    class="
+                      slideshow__button-prev swiper-button-prev
+                      color-{{ section.settings.navigation_color_scheme }}
+                      {% if section.settings.enable_pagination %} mobile-hidden {% endif %}
+                    "
+                  >
+                    {% render 'icon-caret-left' %}
+                  </div>
+                </div>
+              {%- endif -%}
+            {%- endif -%}
+
+            {%- if section.blocks.size > 1 and section.settings.enable_pagination -%}
+              {%- if section.settings.pagination_type == 'bullets' -%}
+                <div
+                  class="slideshow__pagination no-js-hidden swiper-pagination color-{{ section.settings.pagination_color_scheme }}"
+                ></div>
+              {%- endif -%}
+              {%- if section.settings.pagination_type == 'numbers' -%}
+                <div
+                  class="slideshow__pagination-number no-js-hidden color-{{ section.settings.pagination_color_scheme }}"
+                ></div>
+              {%- endif -%}
+            {%- endif -%}
+
+            {%- if section.blocks.size > 1 and section.settings.enable_navigation -%}
+              {%- if section.settings.pagination_type == 'bullets'
+                or section.settings.pagination_type == 'numbers'
+                or section.settings.enable_pagination == false
+              -%}
+                <div class="slideshow__button-wrapper">
+                  <div
+                    class="
+                      slideshow__button-next swiper-button-next
+                      color-{{ section.settings.navigation_color_scheme }}
+                      {% if section.settings.enable_pagination %} mobile-hidden {% endif %}
+                    "
+                  >
+                    {% render 'icon-caret-right' %}
+                  </div>
+                </div>
+              {%- endif -%}
+            {%- endif -%}
+          </div>
+        </div>
+
+        {% if section.settings.enable_pagination %}
+          {% if section.settings.pagination_type == 'tabs' or section.settings.pagination_type == 'tabs_full' %}
+            <div
+              class="
+                slideshow__thumbs-wrapper slideshow__thumbs-wrapper--{{ section.blocks.size }}-items
+                {% if section.settings.full_width and section.settings.layout == 'overlay' %} container {% endif %}
+              "
+            >
+              {% if section.settings.full_width and section.settings.layout == 'simple' %}
+                <div class="container">
+              {% endif %}
+              {%- if section.blocks.size > 1 and section.settings.enable_navigation -%}
+                {%- if section.settings.pagination_type == 'tabs' or section.settings.pagination_type == 'tabs_full' -%}
+                  <div class="slideshow__button-wrapper">
+                    <div
+                      class="
+                        slideshow__button-prev swiper-button-prev
+                        color-{{ section.settings.navigation_color_scheme }}
+                        {% if section.settings.enable_pagination %} mobile-hidden {% endif %}
+                      "
+                    >
+                      {% render 'icon-caret-left' %}
+                    </div>
+                  </div>
+                {%- endif -%}
+              {%- endif -%}
+
+              <div class="{% if  section.settings.pagination_type == 'tabs' %} slideshow__thumbs slideshow__thumbs--{{ section.settings.pagination_width }} {% else %} slideshow__thumbs-full {% endif %} swiper color-{{ section.settings.pagination_color_scheme }}">
+                <div class="swiper-wrapper">
+                  {% for block in section.blocks %}
+                    <div class="slideshow__thumbs-slide swiper-slide">
+                      {% if block.settings.icon != 'none' and section.settings.show_tab_icon %}
+                        <div
+                          class="
+                            slideshow__tab-icon
+                            slideshow__icon--{{- section.settings.icon_style }}
+                            slideshow__icon--{{- section.settings.icon_fill_type }}
+                          "
+                        >
+                          <i
+                            class="icon icon-pack icon-{{ block.settings.icon }} {% if section.settings.icon_style == 'colored' and section.settings.icon_fill_type == 'gradient' %} text-gradient {% endif %}"
+                          ></i>
+                        </div>
+                      {% endif %}
+                      {% if block.settings.tab_heading != blank %}
+                        <div class="slideshow__tab-title {% if  section.settings.pagination_type == 'tabs' %} h6 {% elsif  section.settings.pagination_type == 'tabs_full' %} h5 {% else %} h4 {% endif %}">
+                          {{ block.settings.tab_heading }}
+                        </div>
+                      {% endif %}
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+
+              {%- if section.blocks.size > 1 and section.settings.enable_navigation -%}
+                {%- if section.settings.pagination_type == 'tabs' or section.settings.pagination_type == 'tabs_full' -%}
+                  <div class="slideshow__button-wrapper">
+                    <div
+                      class="
+                        slideshow__button-next swiper-button-next
+                        color-{{ section.settings.navigation_color_scheme }}
+                        {% if section.settings.enable_pagination %} mobile-hidden {% endif %}
+                      "
+                    >
+                      {% render 'icon-caret-right' %}
+                    </div>
+                  </div>
+                {%- endif -%}
+              {%- endif -%}
+              {% if section.settings.full_width and section.settings.layout == 'simple' %}
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "圖片輪播",
+  "tag": "section",
+  "class": "section-slideshow",
+  "enabled_on": {
+    "templates": ["*"]
+  },
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "版面配置",
+      "options": [
+        {
+          "value": "simple",
+          "label": "簡潔 (內容在圖片下方)"
+        },
+        {
+          "value": "overlay",
+          "label": "疊加 (內容在圖片上方)"
+        }
+      ],
+      "default": "overlay"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "default": false,
+      "label": "滿版寬度"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "background-1",
+      "label": "色彩配置"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_border",
+      "label": "顯示邊框",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "border_full",
+      "label": "邊框滿版",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "子標題",
+      "default": "子標題範例"
+    },
+    {
+      "type": "select",
+      "id": "subheading_style",
+      "options": [
+        {
+          "value": "subtitle",
+          "label": "主要樣式"
+        },
+        {
+          "value": "subtitle subtitle--secondary",
+          "label": "次要樣式"
+        }
+      ],
+      "default": "subtitle",
+      "label": "子標題樣式"
+    },
+    {
+      "type": "select",
+      "id": "subheading_icon",
+      "options": [
+        { "value": "none", "label": "無" }, { "value": "arrow-bar", "label": "箭頭條" }, { "value": "bag-1", "label": "購物袋 1" }, { "value": "bag-2", "label": "購物袋 2" }, { "value": "bag-3", "label": "購物袋 3" }, { "value": "bar-chart", "label": "長條圖" }, { "value": "bars-upward", "label": "向上長條" }, { "value": "baseball", "label": "棒球" }, { "value": "battery-1", "label": "電池 1" }, { "value": "battery-2", "label": "電池 2" }, { "value": "battery-3", "label": "電池 3" }, { "value": "book", "label": "書本" }, { "value": "card", "label": "卡片" }, { "value": "card-holder", "label": "名片夾" }, { "value": "chart", "label": "圖表" }, { "value": "chart-2", "label": "圖表 2" }, { "value": "chart-3", "label": "圖表 3" }, { "value": "chats", "label": "對話" }, { "value": "check-1", "label": "勾選 1" }, { "value": "check-2", "label": "勾選 2" }, { "value": "check-3", "label": "勾選 3" }, { "value": "check-4", "label": "勾選 4" }, { "value": "circle", "label": "圓圈" }, { "value": "circles", "label": "多個圓圈" }, { "value": "clock-1", "label": "時鐘 1" }, { "value": "clock-2", "label": "時鐘 2" }, { "value": "close", "label": "關閉" }, { "value": "cloud-server", "label": "雲端伺服器" }, { "value": "computer", "label": "電腦" }, { "value": "computer-mouse", "label": "滑鼠" }, { "value": "confetti", "label": "彩紙" }, { "value": "delivery", "label": "運送" }, { "value": "delivery-box", "label": "包裹" }, { "value": "devices", "label": "裝置" }, { "value": "directions", "label": "方向" }, { "value": "dumbbell", "label": "啞鈴" }, { "value": "eye", "label": "眼睛" }, { "value": "facebook", "label": "Facebook" }, { "value": "file-1", "label": "檔案 1" }, { "value": "file-2", "label": "檔案 2" }, { "value": "flag", "label": "旗幟" }, { "value": "folder-1", "label": "資料夾 1" }, { "value": "folder-2", "label": "資料夾 2" }, { "value": "food", "label": "食物" }, { "value": "hand-1", "label": "手 1" }, { "value": "hand-2", "label": "手 2" }, { "value": "hand-3", "label": "手 3" }, { "value": "headphones", "label": "耳機" }, { "value": "instagram", "label": "Instagram" }, { "value": "laptop-1", "label": "筆電 1" }, { "value": "laptop-2", "label": "筆電 2" }, { "value": "leaf", "label": "葉子" }, { "value": "lightning-bolt-1", "label": "閃電 1" }, { "value": "lightning-bolt-2", "label": "閃電 2" }, { "value": "like", "label": "讚" }, { "value": "link", "label": "連結" }, { "value": "lock-1", "label": "鎖 1" }, { "value": "lock-2", "label": "鎖 2" }, { "value": "logout", "label": "登出" }, { "value": "luggage", "label": "行李" }, { "value": "mark", "label": "標記" }, { "value": "medicine", "label": "藥物" }, { "value": "microphone", "label": "麥克風" }, { "value": "moon", "label": "月亮" }, { "value": "pencil", "label": "鉛筆" }, { "value": "phone-1", "label": "電話 1" }, { "value": "phone-2", "label": "電話 2" }, { "value": "phone-3", "label": "電話 3" }, { "value": "phone-4", "label": "電話 4" }, { "value": "pinterest", "label": "Pinterest" }, { "value": "plug", "label": "插頭" }, { "value": "presentation-1", "label": "簡報 1" }, { "value": "presentation-2", "label": "簡報 2" }, { "value": "pulse", "label": "脈搏" }, { "value": "recycle", "label": "回收" }, { "value": "rocket", "label": "火箭" }, { "value": "search", "label": "搜尋" }, { "value": "sending", "label": "傳送" }, { "value": "server-1", "label": "伺服器 1" }, { "value": "server-2", "label": "伺服器 2" }, { "value": "settings", "label": "設定" }, { "value": "shield", "label": "盾牌" }, { "value": "shopping-basket", "label": "購物籃" }, { "value": "shuffle", "label": "隨機播放" }, { "value": "snapchat", "label": "Snapchat" }, { "value": "sound-waves", "label": "聲波" }, { "value": "speaker", "label": "喇叭" }, { "value": "squares-1", "label": "方塊 1" }, { "value": "squares-2", "label": "方塊 2" }, { "value": "stack", "label": "堆疊" }, { "value": "star", "label": "星星" }, { "value": "stopwatch", "label": "碼錶" }, { "value": "sun", "label": "太陽" }, { "value": "tag", "label": "標籤" }, { "value": "telephone-tower", "label": "電塔" }, { "value": "tik-tok", "label": "TikTok" }, { "value": "tree", "label": "樹" }, { "value": "trend", "label": "趨勢" }, { "value": "trophy", "label": "獎盃" }, { "value": "tumblr", "label": "Tumblr" }, { "value": "tv", "label": "電視" }, { "value": "twitter", "label": "Twitter" }, { "value": "user-1", "label": "使用者 1" }, { "value": "user-2", "label": "使用者 2" }, { "value": "user-3", "label": "使用者 3" }, { "value": "user-4", "label": "使用者 4" }, { "value": "user-5", "label": "使用者 5" }, { "value": "video", "label": "影片" }, { "value": "vimeo", "label": "Vimeo" }, { "value": "wallet", "label": "錢包" }, { "value": "watch", "label": "手錶" }, { "value": "water-1", "label": "水 1" }, { "value": "water-2", "label": "水 2" }, { "value": "water-3", "label": "水 3" }, { "value": "wave-1", "label": "波浪 1" }, { "value": "wave-2", "label": "波浪 2" }, { "value": "wifi-1", "label": "Wi-Fi 1" }, { "value": "wifi-2", "label": "Wi-Fi 2" }, { "value": "window", "label": "視窗" }, { "value": "youtube", "label": "YouTube" }
+      ],
+      "default": "none",
+      "label": "子標題圖示"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "主標題",
+      "info": "使用 <u>...</u> 標籤來為特定文字加上底線。",
+      "default": "圖片輪播標題"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "options": [
+        { "value": "h3", "label": "小" },
+        { "value": "h2", "label": "中" },
+        { "value": "h1", "label": "大" }
+      ],
+      "default": "h2",
+      "label": "主標題大小"
+    },
+    {
+      "type": "select",
+      "id": "heading_level",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" }
+      ],
+      "default": "h2",
+      "label": "主標題 HTML 標籤"
+    },
+    {
+      "type": "select",
+      "id": "heading_line",
+      "options": [
+        { "value": "simple", "label": "簡潔線條" },
+        { "value": "rounded", "label": "圓弧線條" },
+        { "value": "background", "label": "背景色塊" },
+        { "value": "none", "label": "無" }
+      ],
+      "default": "simple",
+      "label": "標題底線樣式"
+    },
+    {
+      "type": "color",
+      "id": "line_color",
+      "label": "底線顏色",
+      "default": "#1566E0"
+    },
+    {
+      "type": "checkbox",
+      "id": "word_break",
+      "label": "啟用標題自動換行",
+      "default": false
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "文字描述",
+      "default": "在這裡填寫您的描述文字"
+    },
+    {
+      "type": "select",
+      "id": "heading_animation",
+      "options": [
+        { "value": "typewriter", "label": "打字機效果" },
+        { "value": "rolling", "label": "滾動效果" },
+        { "value": "appearing", "label": "浮現效果" },
+        { "value": "none", "label": "無" }
+      ],
+      "default": "none",
+      "label": "標題動畫",
+      "info": "為標題的<u>底線文字</u>套用動畫。"
+    },
+    {
+      "type": "checkbox",
+      "id": "word_break_an",
+      "label": "啟用動畫文字自動換行",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "text_align",
+      "label": "標題與描述對齊方式",
+      "options": [
+        { "value": "left", "label": "靠左" },
+        { "value": "center", "label": "置中" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "height",
+      "options": [
+        { "value": "1/1", "label": "正方形 (1:1)" },
+        { "value": "3/2", "label": "橫向 (3:2)" },
+        { "value": "4/3", "label": "橫向 (4:3)" },
+        { "value": "16/9", "label": "寬螢幕 (16:9)" },
+        { "value": "21/9", "label": "超寬螢幕 (21:9)" },
+        { "value": "adapt", "label": "自動適應圖片高度" },
+        { "value": "full_height", "label": "全螢幕高度" }
+      ],
+      "default": "16/9",
+      "label": "圖片比例"
+    },
+    {
+      "type": "select",
+      "id": "text_align_content",
+      "options": [
+        { "value": "top-left", "label": "左上" },
+        { "value": "left", "label": "左中" },
+        { "value": "bottom-left", "label": "左下" },
+        { "value": "top-center", "label": "中上" },
+        { "value": "center", "label": "正中" },
+        { "value": "bottom-center", "label": "中下" }
+      ],
+      "default": "bottom-left",
+      "label": "幻燈片內容對齊"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_autoplay",
+      "default": true,
+      "label": "啟用自動播放"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_parallax",
+      "default": false,
+      "label": "啟用視差效果"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_pagination",
+      "default": true,
+      "label": "啟用分頁指示器"
+    },
+    {
+      "type": "select",
+      "id": "pagination_type",
+      "label": "分頁指示器樣式",
+      "options": [
+        { "value": "numbers", "label": "數字" },
+        { "value": "bullets", "label": "圓點" },
+        { "value": "tabs", "label": "分頁標籤" },
+        { "value": "tabs_full", "label": "滿版分頁標籤" }
+      ],
+      "default": "bullets"
+    },
+    {
+      "type": "color_scheme",
+      "id": "pagination_color_scheme",
+      "default": "background-3",
+      "label": "分頁指示器色彩配置"
+    },
+    {
+      "type": "select",
+      "id": "pagination_width",
+      "label": "分頁標籤寬度",
+      "options": [
+        { "value": "medium", "label": "中" },
+        { "value": "large", "label": "大" },
+        { "value": "extra-large", "label": "特大" },
+        { "value": "full", "label": "滿版" }
+      ],
+      "info": "僅適用於「分頁標籤」樣式。",
+      "default": "medium"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_navigation",
+      "default": false,
+      "label": "啟用左右導覽箭頭"
+    },
+    {
+      "type": "color_scheme",
+      "id": "navigation_color_scheme",
+      "default": "background-1",
+      "label": "導覽箭頭色彩配置"
+    },
+    {
+      "type": "range",
+      "id": "slide_duration",
+      "default": 5,
+      "min": 1,
+      "max": 10,
+      "unit": "秒",
+      "label": "每張投影片停留時間"
+    },
+    {
+      "type": "header",
+      "content": "內容圖示設定"
+    },
+    {
+      "type": "select",
+      "id": "icon_size",
+      "options": [
+        { "value": "recommended", "label": "推薦尺寸" },
+        { "value": "normal", "label": "正常" },
+        { "value": "small", "label": "小" },
+        { "value": "large", "label": "大" },
+        { "value": "extra-large", "label": "特大" }
+      ],
+      "default": "recommended",
+      "label": "圖示尺寸"
+    },
+    {
+      "type": "select",
+      "id": "icon_style",
+      "options": [
+        { "value": "subtle", "label": "柔和" },
+        { "value": "contrast", "label": "對比" },
+        { "value": "colored", "label": "彩色" }
+      ],
+      "default": "contrast",
+      "label": "圖示樣式"
+    },
+    {
+      "type": "select",
+      "id": "icon_fill_type",
+      "options": [
+        { "value": "solid", "label": "單色" },
+        { "value": "gradient", "label": "漸層" }
+      ],
+      "default": "solid",
+      "label": "圖示填色類型"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tab_icon",
+      "label": "在分頁標籤上顯示圖示",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "區塊間距"
+    },
+    {
+      "type": "select",
+      "id": "padding_top",
+      "options": [
+        { "value": "no-indent", "label": "無" },
+        { "value": "xs", "label": "特小" },
+        { "value": "s", "label": "小" },
+        { "value": "m", "label": "中" },
+        { "value": "l", "label": "大" },
+        { "value": "xl", "label": "特大" }
+      ],
+      "default": "no-indent",
+      "label": "頂部內間距"
+    },
+    {
+      "type": "select",
+      "id": "padding_bottom",
+      "options": [
+        { "value": "no-indent", "label": "無" },
+        { "value": "xs", "label": "特小" },
+        { "value": "s", "label": "小" },
+        { "value": "m", "label": "中" },
+        { "value": "l", "label": "大" },
+        { "value": "xl", "label": "特大" }
+      ],
+      "default": "no-indent",
+      "label": "底部內間距"
+    },
+    {
+      "type": "header",
+      "content": "區塊邊界"
+    },
+    {
+      "type": "select",
+      "id": "margin_top",
+      "options": [
+        { "value": "no-indent", "label": "無" },
+        { "value": "xs", "label": "特小" },
+        { "value": "s", "label": "小" },
+        { "value": "m", "label": "中" },
+        { "value": "l", "label": "大" },
+        { "value": "xl", "label": "特大" }
+      ],
+      "default": "no-indent",
+      "label": "頂部外邊界"
+    },
+    {
+      "type": "select",
+      "id": "margin_bottom",
+      "options": [
+        { "value": "no-indent", "label": "無" },
+        { "value": "xs", "label": "特小" },
+        { "value": "s", "label": "小" },
+        { "value": "m", "label": "中" },
+        { "value": "l", "label": "大" },
+        { "value": "xl", "label": "特大" }
+      ],
+      "default": "no-indent",
+      "label": "底部外邊界"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "投影片",
+      "settings": [
+        {
+          "type": "color_scheme",
+          "id": "color_scheme",
+          "default": "background-3",
+          "label": "色彩配置"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "options": [
+            { "value": "none", "label": "無" }, { "value": "arrow-bar", "label": "箭頭條" }, { "value": "bag-1", "label": "購物袋 1" }, { "value": "bag-2", "label": "購物袋 2" }, { "value": "bag-3", "label": "購物袋 3" }, { "value": "bar-chart", "label": "長條圖" }, { "value": "bars-upward", "label": "向上長條" }, { "value": "baseball", "label": "棒球" }, { "value": "battery-1", "label": "電池 1" }, { "value": "battery-2", "label": "電池 2" }, { "value": "battery-3", "label": "電池 3" }, { "value": "book", "label": "書本" }, { "value": "card", "label": "卡片" }, { "value": "card-holder", "label": "名片夾" }, { "value": "chart", "label": "圖表" }, { "value": "chart-2", "label": "圖表 2" }, { "value": "chart-3", "label": "圖表 3" }, { "value": "chats", "label": "對話" }, { "value": "check-1", "label": "勾選 1" }, { "value": "check-2", "label": "勾選 2" }, { "value": "check-3", "label": "勾選 3" }, { "value": "check-4", "label": "勾選 4" }, { "value": "circle", "label": "圓圈" }, { "value": "circles", "label": "多個圓圈" }, { "value": "clock-1", "label": "時鐘 1" }, { "value": "clock-2", "label": "時鐘 2" }, { "value": "close", "label": "關閉" }, { "value": "cloud-server", "label": "雲端伺服器" }, { "value": "computer", "label": "電腦" }, { "value": "computer-mouse", "label": "滑鼠" }, { "value": "confetti", "label": "彩紙" }, { "value": "delivery", "label": "運送" }, { "value": "delivery-box", "label": "包裹" }, { "value": "devices", "label": "裝置" }, { "value": "directions", "label": "方向" }, { "value": "dumbbell", "label": "啞鈴" }, { "value": "eye", "label": "眼睛" }, { "value": "facebook", "label": "Facebook" }, { "value": "file-1", "label": "檔案 1" }, { "value": "file-2", "label": "檔案 2" }, { "value": "flag", "label": "旗幟" }, { "value": "folder-1", "label": "資料夾 1" }, { "value": "folder-2", "label": "資料夾 2" }, { "value": "food", "label": "食物" }, { "value": "hand-1", "label": "手 1" }, { "value": "hand-2", "label": "手 2" }, { "value": "hand-3", "label": "手 3" }, { "value": "headphones", "label": "耳機" }, { "value": "instagram", "label": "Instagram" }, { "value": "laptop-1", "label": "筆電 1" }, { "value": "laptop-2", "label": "筆電 2" }, { "value": "leaf", "label": "葉子" }, { "value": "lightning-bolt-1", "label": "閃電 1" }, { "value": "lightning-bolt-2", "label": "閃電 2" }, { "value": "like", "label": "讚" }, { "value": "link", "label": "連結" }, { "value": "lock-1", "label": "鎖 1" }, { "value": "lock-2", "label": "鎖 2" }, { "value": "logout", "label": "登出" }, { "value": "luggage", "label": "行李" }, { "value": "mark", "label": "標記" }, { "value": "medicine", "label": "藥物" }, { "value": "microphone", "label": "麥克風" }, { "value": "moon", "label": "月亮" }, { "value": "pencil", "label": "鉛筆" }, { "value": "phone-1", "label": "電話 1" }, { "value": "phone-2", "label": "電話 2" }, { "value": "phone-3", "label": "電話 3" }, { "value": "phone-4", "label": "電話 4" }, { "value": "pinterest", "label": "Pinterest" }, { "value": "plug", "label": "插頭" }, { "value": "presentation-1", "label": "簡報 1" }, { "value": "presentation-2", "label": "簡報 2" }, { "value": "pulse", "label": "脈搏" }, { "value": "recycle", "label": "回收" }, { "value": "rocket", "label": "火箭" }, { "value": "search", "label": "搜尋" }, { "value": "sending", "label": "傳送" }, { "value": "server-1", "label": "伺服器 1" }, { "value": "server-2", "label": "伺服器 2" }, { "value": "settings", "label": "設定" }, { "value": "shield", "label": "盾牌" }, { "value": "shopping-basket", "label": "購物籃" }, { "value": "shuffle", "label": "隨機播放" }, { "value": "snapchat", "label": "Snapchat" }, { "value": "sound-waves", "label": "聲波" }, { "value": "speaker", "label": "喇叭" }, { "value": "squares-1", "label": "方塊 1" }, { "value": "squares-2", "label": "方塊 2" }, { "value": "stack", "label": "堆疊" }, { "value": "star", "label": "星星" }, { "value": "stopwatch", "label": "碼錶" }, { "value": "sun", "label": "太陽" }, { "value": "tag", "label": "標籤" }, { "value": "telephone-tower", "label": "電塔" }, { "value": "tik-tok", "label": "TikTok" }, { "value": "tree", "label": "樹" }, { "value": "trend", "label": "趨勢" }, { "value": "trophy", "label": "獎盃" }, { "value": "tumblr", "label": "Tumblr" }, { "value": "tv", "label": "電視" }, { "value": "twitter", "label": "Twitter" }, { "value": "user-1", "label": "使用者 1" }, { "value": "user-2", "label": "使用者 2" }, { "value": "user-3", "label": "使用者 3" }, { "value": "user-4", "label": "使用者 4" }, { "value": "user-5", "label": "使用者 5" }, { "value": "video", "label": "影片" }, { "value": "vimeo", "label": "Vimeo" }, { "value": "wallet", "label": "錢包" }, { "value": "watch", "label": "手錶" }, { "value": "water-1", "label": "水 1" }, { "value": "water-2", "label": "水 2" }, { "value": "water-3", "label": "水 3" }, { "value": "wave-1", "label": "波浪 1" }, { "value": "wave-2", "label": "波浪 2" }, { "value": "wifi-1", "label": "Wi-Fi 1" }, { "value": "wifi-2", "label": "Wi-Fi 2" }, { "value": "window", "label": "視窗" }, { "value": "youtube", "label": "YouTube" }
+          ],
+          "default": "none",
+          "label": "圖示",
+          "info": "在投影片內容中顯示圖示。"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "背景圖片"
+        },
+        {
+          "type": "range",
+          "id": "overlay_opacity",
+          "min": 0,
+          "max": 1,
+          "step": 0.1,
+          "label": "圖片覆蓋層不透明度",
+          "info": "增加文字與背景圖片的對比度。",
+          "default": 0.5
+        },
+        {
+          "type": "header",
+          "content": "影片設定"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_video",
+          "label": "顯示影片",
+          "default": false
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "影片"
+        },
+        {
+          "type": "checkbox",
+          "id": "loop_video",
+          "label": "循環播放影片",
+          "default": true
+        },
+        {
+          "type": "textarea",
+          "id": "heading",
+          "default": "投影片標題",
+          "label": "標題"
+        },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "options": [
+            { "value": "recommended", "label": "推薦尺寸" },
+            { "value": "h1", "label": "大" },
+            { "value": "h2", "label": "中" },
+            { "value": "h3", "label": "小" },
+            { "value": "h4", "label": "特小" }
+          ],
+          "default": "recommended",
+          "label": "標題大小"
+        },
+        {
+          "type": "select",
+          "id": "heading_level",
+          "options": [
+            { "value": "h1", "label": "H1" },
+            { "value": "h2", "label": "H2" },
+            { "value": "h3", "label": "H3" }
+          ],
+          "default": "h2",
+          "label": "標題 HTML 標籤"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "default": "在這裡填寫您的投影片描述。",
+          "label": "描述"
+        },
+        {
+          "type": "text",
+          "id": "tab_heading",
+          "label": "分頁標籤文字",
+          "default": "分頁標籤 1",
+          "info": "當分頁指示器樣式設定為「分頁標籤」時使用。"
+        },
+        {
+          "type": "header",
+          "content": "按鈕設定"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_button",
+          "default": true,
+          "label": "顯示按鈕"
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "options": [
+            { "group": "實心按鈕", "value": "primary", "label": "主要樣式" },
+            { "group": "實心按鈕", "value": "secondary", "label": "次要樣式" },
+            { "group": "實心按鈕", "value": "tertiary", "label": "第三樣式" },
+            { "group": "文字按鈕", "value": "simple", "label": "簡潔樣式" },
+            { "group": "文字按鈕", "value": "simple_secondary", "label": "簡潔次要樣式" },
+            { "group": "文字按鈕", "value": "simple_link", "label": "文字連結樣式" }
+          ],
+          "default": "simple_link",
+          "label": "按鈕樣式"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "default": "按鈕文字",
+          "label": "按鈕文字"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "按鈕連結"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "圖片輪播",
+      "blocks": [
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

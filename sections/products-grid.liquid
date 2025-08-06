@@ -1,0 +1,372 @@
+{{ 'template-collection.css' | asset_url | stylesheet_tag }}
+{{ 'section-products-grid.css' | asset_url | stylesheet_tag }}
+
+<link
+	rel='preload'
+	href='{{ 'component-card.css' | asset_url }}'
+	as='style'
+	onload="this.onload=null;this.rel='stylesheet'"
+>
+<link
+	rel='preload'
+	href='{{ 'component-price.css' | asset_url }}'
+	as='style'
+	onload="this.onload=null;this.rel='stylesheet'"
+>
+<link
+	rel='preload'
+	href='{{ 'component-badge.css' | asset_url }}'
+	as='style'
+	onload="this.onload=null;this.rel='stylesheet'"
+>
+<link
+	rel='preload'
+	href='{{ 'component-rte.css' | asset_url }}'
+	as='style'
+	onload="this.onload=null;this.rel='stylesheet'"
+>
+
+<noscript>{{ 'component-card.css' | asset_url | stylesheet_tag }}</noscript>
+<noscript>{{ 'component-price.css' | asset_url | stylesheet_tag }}</noscript>
+<noscript>{{ 'component-badge.css' | asset_url | stylesheet_tag }}</noscript>
+<noscript>{{ 'component-rte.css' | asset_url | stylesheet_tag }}</noscript>
+
+{%- if settings.quickview_show
+	or settings.show_on_mobile
+	or settings.type_color_swatch == 'custom'
+-%}
+	{{ 'section-main-product.css' | asset_url | stylesheet_tag }}
+{% endif %}
+
+{%- if settings.quickview_show or settings.show_on_mobile -%}
+	<link
+		rel='stylesheet'
+		href='{{ 'component-deferred-media.css' | asset_url }}'
+		media='all'
+	>
+	<link
+		rel='preload'
+		href='{{ 'quick-add.css' | asset_url }}'
+		as='style'
+		onload="this.onload=null;this.rel='stylesheet'"
+	>
+
+	<script src='{{ 'quick-add.js' | asset_url }}' defer='defer'></script>
+	<script src='{{ 'product-form.js' | asset_url }}' defer='defer'></script>
+{% elsif settings.add_to_cart_enabled %}
+	<script src='{{ 'product-form.js' | asset_url }}' defer='defer'></script>
+{%- endif -%}
+
+{%- if settings.quickview_show == false
+	and settings.type_color_swatch == 'custom'
+-%}
+	{{ 'section-main-product.css' | asset_url | stylesheet_tag }}
+{% endif %}
+
+{%- style -%}
+	{% render 'section-padding' %}
+{%- endstyle -%}
+
+{% liquid
+	assign grid_products = collections.all.products
+	case section.settings.sort
+		when 'products_high', 'products_low'
+			assign grid_products = grid_products | sort: 'price_min'
+		when 'date', 'date_reversed'
+			assign grid_products = grid_products | sort: 'published_at'
+	endcase
+
+	if section.settings.sort == 'products_high' or section.settings.sort == 'date_reversed' or section.settings.sort == 'alphabetical_reversed'
+		assign grid_products = grid_products | reverse
+	endif
+%}
+
+<div class='products-grid section-{{ section.id }}-padding'>
+	<div class='container'>
+		<div class='section-grid'>
+			{%- if section.settings.subheading != blank
+				or section.settings.heading != blank
+				or section.settings.text != blank
+			-%}
+				<div class='section-top'>
+					{% render 'section-text',
+						section: section,
+						class: 'products-grid',
+						heading_level: section.settings.heading_level
+					%}
+				</div>
+			{% endif %}
+			{%- if section.settings.button_show -%}
+				{% render 'button',
+					link: section.settings.button_link,
+					label: section.settings.button_label,
+					style: section.settings.button_style,
+					class: 'products-grid'
+				%}
+			{%- endif -%}
+			<div class='products-grid full-width content'>
+				<ul
+					id='products-grid'
+					data-id='{{ section.id }}'
+					class='
+						collection-product-list
+						collection-product-list--{{ section.settings.columns }}-items
+						collection-product-list--{{ section.settings.columns_mobile }}-mobile
+						products--{{ section.settings.columns_mobile }}-mobile
+					'
+				>
+					{% if grid_products.size > 0 %}
+						{%- for product in grid_products
+							limit: section.settings.products_per_page
+						-%}
+							<li class='collection-product-card {% if settings.quickview_hover %}quickview--hover{% endif %}'>
+								{% render 'product-card',
+									product_card_product: product,
+									media_ratio: section.settings.image_ratio,
+									media_fit: section.settings.image_fit,
+									add_border_radius_when_contain: section.settings.add_border_radius_when_contain,
+									show_secondary_image: section.settings.show_secondary_image,
+									show_vendor: section.settings.show_vendor,
+									show_desc: section.settings.show_desc,
+									columns: section.settings.columns,
+									section_id: section.id,
+									add_id: forloop.index
+								%}
+							</li>
+						{%- endfor -%}
+					{% else %}
+						{%- for i in (1..4) -%}
+							<div class='popular-products__item_placeholder collection-popular-card collection-popular-card--placeholder'>
+								{% render 'product-card-placeholder',
+									media_ratio: section.settings.image_ratio,
+									show_vendor: section.settings.show_vendor
+								%}
+							</div>
+						{%- endfor -%}
+					{% endif %}
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% schema %}
+{
+	"name": "商品網格",
+	"tag": "section",
+	"class": "products-grid-section",
+	"disabled_on": {
+		"templates": ["password"],
+		"groups": ["*"]
+	},
+	"settings": [
+		{
+			"type": "range",
+			"id": "products_per_page",
+			"min": 4,
+			"max": 50,
+			"step": 1,
+			"default": 12,
+			"label": "顯示的商品數量"
+		},
+		{
+			"type": "range",
+			"id": "columns",
+			"min": 2,
+			"max": 6,
+			"step": 1,
+			"default": 4,
+			"label": "每列的欄位數"
+		},
+		{
+			"type": "select",
+			"id": "sort",
+			"options": [
+				{ "value": "alphabetical", "label": "字母順序 (A-Z)" },
+				{ "value": "alphabetical_reversed", "label": "字母反序 (Z-A)" },
+				{ "value": "date_reversed", "label": "日期 (新到舊)" },
+				{ "value": "date", "label": "日期 (舊到新)" },
+				{ "value": "products_high", "label": "價格 (高到低)" },
+				{ "value": "products_low", "label": "價格 (低到高)" }
+			],
+			"default": "alphabetical",
+			"label": "排序方式"
+		},
+		{
+			"type": "header",
+			"content": "商品卡片設定"
+		},
+		{
+			"type": "select",
+			"id": "image_ratio",
+			"options": [
+				{ "value": "1/1", "label": "正方形 (1:1)" },
+				{ "value": "3/2", "label": "橫向 (3:2)" },
+				{ "value": "4/5", "label": "直向 (4:5)" },
+				{ "value": "5/4", "label": "橫向 (5:4)" }
+			],
+			"default": "5/4",
+			"label": "圖片比例"
+		},
+		{
+			"type": "select",
+			"id": "image_fit",
+			"label": "圖片縮放模式",
+			"options": [
+				{ "value": "contain", "label": "等比例縮放 (Contain)" },
+				{ "value": "cover", "label": "裁切填滿 (Cover)" }
+			],
+			"default": "cover"
+		},
+		{
+			"type": "checkbox",
+			"id": "add_border_radius_when_contain",
+			"default": false,
+			"label": "當圖片為「等比例縮放」時，為其增加圓角"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_secondary_image",
+			"default": true,
+			"label": "滑鼠懸停時顯示第二張圖片"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_vendor",
+			"default": false,
+			"label": "顯示供應商"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_desc",
+			"default": false,
+			"label": "顯示商品描述",
+			"info": "將會顯示商品描述的前 55 個字元。"
+		},
+		{
+			"type": "header",
+			"content": "區塊標題與文字"
+		},
+		{
+			"type": "text",
+			"id": "subheading",
+			"label": "副標題"
+		},
+		{
+			"type": "inline_richtext",
+			"id": "heading",
+			"label": "標題",
+			"default": "我們的商品"
+		},
+		{
+			"type": "select",
+			"id": "heading_size",
+			"options": [
+				{ "value": "h3", "label": "中" },
+				{ "value": "h2", "label": "大" }
+			],
+			"default": "h3",
+			"label": "標題大小"
+		},
+		{
+			"type": "select",
+			"id": "heading_level",
+			"options": [
+				{ "value": "h1", "label": "H1" },
+				{ "value": "h2", "label": "H2" },
+				{ "value": "h3", "label": "H3" }
+			],
+			"default": "h2",
+			"label": "標題層級 (HTML 標籤)"
+		},
+		{
+			"type": "textarea",
+			"id": "text",
+			"label": "內文"
+		},
+		{
+			"type": "header",
+			"content": "按鈕設定"
+		},
+		{
+			"type": "checkbox",
+			"id": "button_show",
+			"default": true,
+			"label": "顯示按鈕"
+		},
+		{
+			"type": "text",
+			"id": "button_label",
+			"default": "查看全部",
+			"label": "按鈕文字"
+		},
+		{
+			"type": "select",
+			"id": "button_style",
+			"options": [
+				{ "value": "primary", "label": "主要" },
+				{ "value": "secondary", "label": "次要" },
+				{ "value": "tertiary", "label": "第三" }
+			],
+			"default": "primary",
+			"label": "按鈕樣式"
+		},
+		{
+			"type": "url",
+			"id": "button_link",
+			"label": "按鈕連結"
+		},
+		{
+			"type": "header",
+			"content": "行動裝置版面"
+		},
+		{
+			"type": "select",
+			"id": "columns_mobile",
+			"default": "2",
+			"label": "行動裝置上的欄數",
+			"options": [
+				{ "value": "1", "label": "1 欄" },
+				{ "value": "2", "label": "2 欄" }
+			]
+		},
+		{
+			"type": "header",
+			"content": "區塊內距 (Padding)"
+		},
+		{
+			"type": "select",
+			"id": "padding_top",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "超小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "超大" }
+			],
+			"default": "s",
+			"label": "頂部內距"
+		},
+		{
+			"type": "select",
+			"id": "padding_bottom",
+			"options": [
+				{ "value": "no-indent", "label": "無" },
+				{ "value": "xs", "label": "超小" },
+				{ "value": "s", "label": "小" },
+				{ "value": "m", "label": "中" },
+				{ "value": "l", "label": "大" },
+				{ "value": "xl", "label": "超大" }
+			],
+			"default": "l",
+			"label": "底部內距"
+		}
+	],
+	"presets": [
+		{
+			"name": "商品網格"
+		}
+	]
+}
+{% endschema %}
