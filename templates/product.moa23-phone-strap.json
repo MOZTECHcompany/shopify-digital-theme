@@ -41,6 +41,20 @@
             "show_quantity": true,
             "show_gift_card_recipient": false
           }
+        },
+        "trust_icons_gNkzzC": {
+          "type": "trust_icons",
+          "settings": {
+            "icon_1": "shopify://shop_images/223.png",
+            "text_1": "Secure Delivery",
+            "link_1": "",
+            "icon_2": "shopify://shop_images/55.png",
+            "text_2": "1-year warranty",
+            "link_2": "",
+            "icon_3": "shopify://shop_images/converted_3.png",
+            "text_3": "Official Product",
+            "link_3": ""
+          }
         }
       },
       "block_order": [
@@ -48,7 +62,8 @@
         "price",
         "description",
         "variant_picker",
-        "buy_buttons"
+        "buy_buttons",
+        "trust_icons_gNkzzC"
       ],
       "settings": {
         "desktop_alignment": "right",
