@@ -2,8 +2,15 @@ document.addEventListener('DOMContentLoaded', function () {
 	const HIDE_DELAY_MS = 300;
 	let hideTimer;
 
-	// Try to find an existing nav item with id. If not, auto-detect by link text 'Chargers'.
 	let navItem = document.getElementById('nav-chargers');
+	const panel = document.getElementById('mega-chargers');
+
+	if (!panel) {
+		console.warn('[MegaMenu] #mega-chargers not found. Ensure snippet is rendered inside header <li>.');
+		return;
+	}
+
+	// Auto-detect nav item if id is missing
 	if (!navItem) {
 		const candidates = Array.from(document.querySelectorAll('a'));
 		for (const a of candidates) {
@@ -20,8 +27,10 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	}
 
-	const panel = document.getElementById('mega-chargers');
-	if (!navItem || !panel) return;
+	if (!navItem) {
+		console.warn('[MegaMenu] Nav item for Chargers not found. Set handle to "chargers" and add id="nav-chargers".');
+		return;
+	}
 
 	function openPanel() {
 		clearTimeout(hideTimer);
@@ -44,4 +53,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		navItem.addEventListener(evt, scheduleClose);
 		panel.addEventListener(evt, scheduleClose);
 	});
+
+	console.debug('[MegaMenu] Initialized', { navItem, panel });
 });
