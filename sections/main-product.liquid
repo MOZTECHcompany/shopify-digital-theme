@@ -882,6 +882,10 @@
                         </button>
                       </div>
 
+                      {% if show_dynamic_checkout %}
+                        <div class="product-form__separator" aria-hidden="true">或</div>
+                      {% endif %}
+
                       <div class="product-form__checkout no-js-hidden">
                         {%- if show_dynamic_checkout -%}
                           {{ form | payment_button }}
