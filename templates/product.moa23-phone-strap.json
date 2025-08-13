@@ -1,1 +1,414 @@
-{"sections":{"main":{"type":"main-product","blocks":{"title":{"type":"title","settings":{"heading_size":"h3"}},"price":{"type":"price","settings":{}},"description":{"type":"description","settings":{"description":""}},"variant_picker":{"type":"variant_picker","settings":{"picker_type":"button"}},"buy_buttons":{"type":"buy_buttons","settings":{"show_dynamic_checkout":true,"show_quantity":true,"show_gift_card_recipient":false}}},"block_order":["title","price","description","variant_picker","buy_buttons"],"settings":{"desktop_alignment":"right","mobile_alignment":"before","gallery_type":"slider_previews","aspect_ratio":"5\/4","image_fit":"cover","image_fit_modal":"contain","padding_bottom":"l"}},"product_description_2_cH8bmq":{"type":"product-description-2","blocks":{"pd2_card_banner_YHpdLN":{"type":"pd2_card_banner","settings":{"heading":"Lanyard Charging Cable","subheading":"Fashionable and aesthetic — it is alanyard and a charging cable","tag_text":"Just power.","tag_icon_image":"shopify:\/\/shop_images\/icon-02-strap.png","text_align":"left","vertical_align":"center","mobile_text_align":"left","mobile_vertical_align":"flex-start","image_desktop":"shopify:\/\/shop_images\/product-MOA23-01.jpg","image_mobile":"shopify:\/\/shop_images\/product-MOA23-02.jpg"}}},"block_order":["pd2_card_banner_YHpdLN"],"custom_css":[".pd2-card-banner {padding-top: 20px;}",".pd2-hero__tag img {width: 50px; height: 50px;}",".pd2-hero__tag span {font-size: 30px;}",".pd2-hero__tag {gap: 10px; padding-top: 20px;}",".pd2-specs-table {grid-template-columns: auto;}",".pd2-specs-and-image .pd2-specs-and-image__heading {margin-bottom: 20px !important;}"],"name":"產品描述 4.0 + 評價\/推薦","settings":{}},"product_description_custom_U97frY":{"type":"product-description-custom","blocks":{"feature_icon_grid_t9Aanq":{"type":"feature_icon_grid","settings":{"icon_1_image":"shopify:\/\/shop_images\/Capa_1_2_be9f490d-9d1e-4289-b81b-78b39cb1a436.png","icon_1_text":"Lanyard + Charging + Transmission","icon_2_image":"shopify:\/\/shop_images\/Layer_1_8b709167-abb7-459a-81d0-4b7b80c2a517.png","icon_2_text":"Support PD Fast Charging","icon_3_image":"shopify:\/\/shop_images\/Capa_1_3.png","icon_3_text":"2 Type Charging Port","icon_4_image":"shopify:\/\/shop_images\/Group_232458ec-566f-4e49-b687-7b25b5988765.png","icon_4_text":"Precision Weaving Process","icon_5_image":"shopify:\/\/shop_images\/Layer_1_1_f200e45d-8e61-4e99-bd8a-53b9854bd9ab.png","icon_5_text":"Connected Cover","icon_6_image":"shopify:\/\/shop_images\/Capa_1_4.png","icon_6_text":"Suitable for Variety of Phone Cases","padding_top":0,"padding_bottom":0,"padding_top_mobile":0,"padding_bottom_mobile":0}}},"block_order":["feature_icon_grid_t9Aanq"],"custom_css":[".product_description .product_desc {padding-top: 0px;}",".product_description {padding-top: 0px;}",".desc-block-wrapper {padding-top: 0px; padding-bottom: 0px;}"],"name":"優化版商品描述 v5.5.8","settings":{}},"product_description_2_R94PAF":{"type":"product-description-2","blocks":{"pd2_image_with_features_trAXPK":{"type":"pd2_image_with_features","settings":{"image_position":"left","section_bg_color":"rgba(0,0,0,0)","image":"shopify:\/\/shop_images\/Pictures_8.jpg","image_bg_color":"#f0f8ff","image_border_radius":15,"tag_text":"3-in- 1","heading":"Charge, Wear and Go","description":"<p><strong>One Cable Satisfies charging\/data transmission needs<\/strong><\/p><p>Meet daily use needs. Say goodbye to the trouble of charging cables getting tangled in bags<br\/><br\/><\/p>"}},"pd2_image_with_features_9mUNpG":{"type":"pd2_image_with_features","settings":{"image_position":"right","section_bg_color":"rgba(0,0,0,0)","image":"shopify:\/\/shop_images\/Pictures_9.jpg","image_bg_color":"#f0f8ff","image_border_radius":15,"tag_text":"Supports Fast Charging","heading":"High-Speed Charging Efficiency Doubled Again","description":"<p>Meet the daily emergency charging needs.<\/p>"}},"pd2_image_with_features_XmKDFU":{"type":"pd2_image_with_features","settings":{"image_position":"left","section_bg_color":"rgba(0,0,0,0)","image":"shopify:\/\/shop_images\/product-MOA23-03.jpg","image_bg_color":"#f0f8ff","image_border_radius":15,"tag_text":"Two Charging Types","heading":"2 Charging Specification for you to choose","description":"<p>Comply with Charging specifications of most devices on the market<\/p>"}},"pd2_image_with_features_gYzzcn":{"type":"pd2_image_with_features","settings":{"image_position":"right","section_bg_color":"rgba(0,0,0,0)","image":"shopify:\/\/shop_images\/product-MOA23-04.jpg","image_bg_color":"#f0f8ff","image_border_radius":15,"tag_text":"Wide Compatibility","heading":"Type-C Compatible with various devices","description":""}},"pd2_image_with_features_ritYzH":{"type":"pd2_image_with_features","settings":{"image_position":"left","section_bg_color":"rgba(0,0,0,0)","image":"shopify:\/\/shop_images\/Pictures_14.jpg","image_bg_color":"#f0f8ff","image_border_radius":15,"tag_text":"Share Everywhere","heading":"convenient data transmission","description":"<p><strong>it’s easy to share anytime<\/strong><\/p><p>Super fast data transmission, saving unnecessary waiting time<\/p>"}},"pd2_image_with_features_wKQfMT":{"type":"pd2_image_with_features","settings":{"image_position":"right","section_bg_color":"rgba(0,0,0,0)","image":"shopify:\/\/shop_images\/Pictures_15.jpg","image_bg_color":"#f0f8ff","image_border_radius":15,"tag_text":"Wear-Resistant & Tensile-Resistant Braided Wire","heading":"Super strong and weight-resistant","description":"<p>48-strand precision weaving technology, wear-resistant, tensile-resistant and not easy to break.<\/p>"}},"pd2_image_with_features_xyG6rh":{"type":"pd2_image_with_features","settings":{"image_position":"left","section_bg_color":"rgba(0,0,0,0)","image":"shopify:\/\/shop_images\/Pictures_16.jpg","image_bg_color":"#f0f8ff","image_border_radius":15,"tag_text":"Length Adjustment","heading":"Dual strap design","description":"<p><strong>Freely Control Length<\/strong><\/p><p>The length can be quickly adjusted with the alloy buckle. The texture is more comfortable and upgraded.<\/p>"}},"pd2_centered_feature_iJAq8a":{"type":"pd2_centered_feature","settings":{"section_bg_color":"rgba(0,0,0,0)","tag_text":"Wide Compatibility","heading":"Type-C Compatible with various devices","subheading":"","description":"","feature_list":""}},"pd2_standalone_image_KERANj":{"type":"pd2_standalone_image","settings":{"section_bg_color":"rgba(0,0,0,0)","tag_text":"","heading":"","subheading":"","description":"","text_color":"#121212","text_align":"left","vertical_align":"center","image":"shopify:\/\/shop_images\/product-MOA23-05.jpg","image_mobile":"shopify:\/\/shop_images\/product-MOA23-06.jpg"}},"pd2_image_with_features_VfaUAq":{"type":"pd2_image_with_features","settings":{"image_position":"right","section_bg_color":"rgba(0,0,0,0)","image":"shopify:\/\/shop_images\/Pictures_13.jpg","image_bg_color":"#f0f8ff","image_border_radius":15,"tag_text":"Various Colors","heading":"Three colors,\nEasily match daily outfit","description":""}},"pd2_centered_feature_AUYXGR":{"type":"pd2_centered_feature","settings":{"section_bg_color":"rgba(0,0,0,0)","tag_text":"","heading":"Matching outfits makes you look more stylish!","subheading":"","description":"","feature_list":""}},"pd2_standalone_image_QDBMPK":{"type":"pd2_standalone_image","settings":{"section_bg_color":"rgba(0,0,0,0)","tag_text":"","heading":"","subheading":"","description":"","text_color":"#121212","text_align":"left","vertical_align":"center","image":"shopify:\/\/shop_images\/product-MOA23-07.jpg","image_mobile":"shopify:\/\/shop_images\/product-MOA23-07.jpg"}},"pd2_image_with_features_8rpRgt":{"type":"pd2_image_with_features","settings":{"image_position":"left","section_bg_color":"rgba(0,0,0,0)","image":"shopify:\/\/shop_images\/Frame_123.jpg","image_bg_color":"#f0f8ff","image_border_radius":15,"tag_text":"One Piece for Multiple Daily Uses","heading":"More Application","description":"<p>Various items won’t get lost<\/p>"}},"pd2_image_with_features_4EPi8z":{"type":"pd2_image_with_features","settings":{"image_position":"right","section_bg_color":"rgba(0,0,0,0)","image":"shopify:\/\/shop_images\/Pictures_12.jpg","image_bg_color":"#f0f8ff","image_border_radius":15,"tag_text":"","heading":"Connected Cover","description":"<p>Protect the plug from damage<\/p><p>Prevent it from falling off and running away from home<\/p>"}},"pd2_image_with_features_gaiBXj":{"type":"pd2_image_with_features","settings":{"image_position":"left","section_bg_color":"rgba(0,0,0,0)","image":"shopify:\/\/shop_images\/Pictures_10.jpg","image_bg_color":"#f0f8ff","image_border_radius":15,"tag_text":"360° Metal Button Loop","heading":"Metal buckle, Freely adjustable without tangling","description":"<p>Zinc alloy material selection is wear-resistant, scratch-resistant and not easy to wear, and texture is more<\/p>"}},"pd2_image_with_features_zpJedR":{"type":"pd2_image_with_features","settings":{"image_position":"right","section_bg_color":"rgba(0,0,0,0)","image":"shopify:\/\/shop_images\/Pictures_11.jpg","image_bg_color":"#f0f8ff","image_border_radius":15,"tag_text":"","heading":"Complementary Phonestrap Adapter","description":"<p>Simple installation, turn your phone into a hangable phone case in one second<br\/><\/p><p><em>*The phone case is for illustration purpose only, no extras included<\/em><\/p>"}}},"block_order":["pd2_image_with_features_trAXPK","pd2_image_with_features_9mUNpG","pd2_image_with_features_XmKDFU","pd2_image_with_features_gYzzcn","pd2_image_with_features_ritYzH","pd2_image_with_features_wKQfMT","pd2_image_with_features_xyG6rh","pd2_centered_feature_iJAq8a","pd2_standalone_image_KERANj","pd2_image_with_features_VfaUAq","pd2_centered_feature_AUYXGR","pd2_standalone_image_QDBMPK","pd2_image_with_features_8rpRgt","pd2_image_with_features_4EPi8z","pd2_image_with_features_gaiBXj","pd2_image_with_features_zpJedR"],"name":"產品描述 4.0 + 評價\/推薦","settings":{}},"product-recommendations":{"type":"product-recommendations","settings":{"color_scheme":"background-1","subheading":"","subheading_style":"subtitle","subheading_icon":"none","heading":"You May Also Like","heading_size":"h2","text":"","products_limit":6,"image_ratio":"1\/1","image_fit":"cover","add_border_radius_when_contain":false,"show_secondary_image":true,"show_vendor":false,"show_desc":true,"padding_top":"l","padding_bottom":"l"}}},"order":["main","product_description_2_cH8bmq","product_description_custom_U97frY","product_description_2_R94PAF","product-recommendations"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "title": {
+          "type": "title",
+          "settings": {
+            "heading_size": "h3"
+          }
+        },
+        "inventory_L9bt7y": {
+          "type": "inventory",
+          "settings": {}
+        },
+        "price": {
+          "type": "price",
+          "settings": {}
+        },
+        "description": {
+          "type": "description",
+          "settings": {
+            "description": ""
+          }
+        },
+        "variant_picker": {
+          "type": "variant_picker",
+          "settings": {
+            "picker_type": "button"
+          }
+        },
+        "buy_buttons": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_dynamic_checkout": true,
+            "show_quantity": true,
+            "show_gift_card_recipient": false
+          }
+        },
+        "trust_icons_gNkzzC": {
+          "type": "trust_icons",
+          "settings": {
+            "icon_1": "shopify://shop_images/223.png",
+            "text_1": "Secure Delivery",
+            "link_1": "",
+            "icon_2": "shopify://shop_images/55.png",
+            "text_2": "1-year warranty",
+            "link_2": "",
+            "icon_3": "shopify://shop_images/converted_3.png",
+            "text_3": "Official Product",
+            "link_3": ""
+          }
+        }
+      },
+      "block_order": [
+        "title",
+        "inventory_L9bt7y",
+        "price",
+        "description",
+        "variant_picker",
+        "buy_buttons",
+        "trust_icons_gNkzzC"
+      ],
+      "settings": {
+        "desktop_alignment": "right",
+        "mobile_alignment": "before",
+        "gallery_type": "slider_previews",
+        "aspect_ratio": "5/4",
+        "image_fit": "contain",
+        "image_fit_modal": "contain",
+        "padding_bottom": "l"
+      }
+    },
+    "product_description_2_cH8bmq": {
+      "type": "product-description-2",
+      "blocks": {
+        "pd2_card_banner_YHpdLN": {
+          "type": "pd2_card_banner",
+          "settings": {
+            "heading": "Lanyard Charging Cable",
+            "subheading": "Fashionable and aesthetic — it is alanyard and a charging cable",
+            "tag_text": "Just power.",
+            "tag_icon_image": "shopify://shop_images/icon-02-strap.png",
+            "text_align": "left",
+            "vertical_align": "center",
+            "mobile_text_align": "left",
+            "mobile_vertical_align": "flex-start",
+            "image_desktop": "shopify://shop_images/product-MOA23-01.jpg",
+            "image_mobile": "shopify://shop_images/product-MOA23-02.jpg"
+          }
+        }
+      },
+      "block_order": [
+        "pd2_card_banner_YHpdLN"
+      ],
+      "custom_css": [
+        ".pd2-card-banner {padding-top: 20px;}",
+        ".pd2-hero__tag img {width: 50px; height: 50px;}",
+        ".pd2-hero__tag span {font-size: 30px;}",
+        ".pd2-hero__tag {gap: 10px; padding-top: 20px;}",
+        ".pd2-specs-table {grid-template-columns: auto;}",
+        ".pd2-specs-and-image .pd2-specs-and-image__heading {margin-bottom: 20px !important;}"
+      ],
+      "name": "產品描述 4.0 + 評價/推薦",
+      "settings": {}
+    },
+    "product_description_custom_U97frY": {
+      "type": "product-description-custom",
+      "blocks": {
+        "feature_icon_grid_t9Aanq": {
+          "type": "feature_icon_grid",
+          "settings": {
+            "icon_1_image": "shopify://shop_images/Capa_1_2_be9f490d-9d1e-4289-b81b-78b39cb1a436.png",
+            "icon_1_text": "Lanyard + Charging + Transmission",
+            "icon_2_image": "shopify://shop_images/Layer_1_8b709167-abb7-459a-81d0-4b7b80c2a517.png",
+            "icon_2_text": "Support PD Fast Charging",
+            "icon_3_image": "shopify://shop_images/Capa_1_3.png",
+            "icon_3_text": "2 Type Charging Port",
+            "icon_4_image": "shopify://shop_images/Group_232458ec-566f-4e49-b687-7b25b5988765.png",
+            "icon_4_text": "Precision Weaving Process",
+            "icon_5_image": "shopify://shop_images/Layer_1_1_f200e45d-8e61-4e99-bd8a-53b9854bd9ab.png",
+            "icon_5_text": "Connected Cover",
+            "icon_6_image": "shopify://shop_images/Capa_1_4.png",
+            "icon_6_text": "Suitable for Variety of Phone Cases",
+            "padding_top": 0,
+            "padding_bottom": 0,
+            "padding_top_mobile": 0,
+            "padding_bottom_mobile": 0
+          }
+        }
+      },
+      "block_order": [
+        "feature_icon_grid_t9Aanq"
+      ],
+      "custom_css": [
+        ".product_description .product_desc {padding-top: 0px;}",
+        ".product_description {padding-top: 0px;}",
+        ".desc-block-wrapper {padding-top: 0px; padding-bottom: 0px;}"
+      ],
+      "name": "優化版商品描述 v5.5.8",
+      "settings": {}
+    },
+    "product_description_2_R94PAF": {
+      "type": "product-description-2",
+      "blocks": {
+        "pd2_image_with_features_trAXPK": {
+          "type": "pd2_image_with_features",
+          "settings": {
+            "image_position": "left",
+            "section_bg_color": "rgba(0,0,0,0)",
+            "image": "shopify://shop_images/Pictures_8.jpg",
+            "image_bg_color": "#f0f8ff",
+            "image_border_radius": 15,
+            "tag_text": "3-in- 1",
+            "heading": "Charge, Wear and Go",
+            "description": "<p><strong>One Cable Satisfies charging/data transmission needs</strong></p><p>Meet daily use needs. Say goodbye to the trouble of charging cables getting tangled in bags<br/><br/></p>"
+          }
+        },
+        "pd2_image_with_features_9mUNpG": {
+          "type": "pd2_image_with_features",
+          "settings": {
+            "image_position": "right",
+            "section_bg_color": "rgba(0,0,0,0)",
+            "image": "shopify://shop_images/Pictures_9.jpg",
+            "image_bg_color": "#f0f8ff",
+            "image_border_radius": 15,
+            "tag_text": "Supports Fast Charging",
+            "heading": "High-Speed Charging Efficiency Doubled Again",
+            "description": "<p>Meet the daily emergency charging needs.</p>"
+          }
+        },
+        "pd2_image_with_features_XmKDFU": {
+          "type": "pd2_image_with_features",
+          "settings": {
+            "image_position": "left",
+            "section_bg_color": "rgba(0,0,0,0)",
+            "image": "shopify://shop_images/product-MOA23-03.jpg",
+            "image_bg_color": "#f0f8ff",
+            "image_border_radius": 15,
+            "tag_text": "Two Charging Types",
+            "heading": "2 Charging Specification for you to choose",
+            "description": "<p>Comply with Charging specifications of most devices on the market</p>"
+          }
+        },
+        "pd2_image_with_features_gYzzcn": {
+          "type": "pd2_image_with_features",
+          "settings": {
+            "image_position": "right",
+            "section_bg_color": "rgba(0,0,0,0)",
+            "image": "shopify://shop_images/product-MOA23-04.jpg",
+            "image_bg_color": "#f0f8ff",
+            "image_border_radius": 15,
+            "tag_text": "Wide Compatibility",
+            "heading": "Type-C Compatible with various devices",
+            "description": ""
+          }
+        },
+        "pd2_image_with_features_ritYzH": {
+          "type": "pd2_image_with_features",
+          "settings": {
+            "image_position": "left",
+            "section_bg_color": "rgba(0,0,0,0)",
+            "image": "shopify://shop_images/Pictures_14.jpg",
+            "image_bg_color": "#f0f8ff",
+            "image_border_radius": 15,
+            "tag_text": "Share Everywhere",
+            "heading": "convenient data transmission",
+            "description": "<p><strong>it’s easy to share anytime</strong></p><p>Super fast data transmission, saving unnecessary waiting time</p>"
+          }
+        },
+        "pd2_image_with_features_wKQfMT": {
+          "type": "pd2_image_with_features",
+          "settings": {
+            "image_position": "right",
+            "section_bg_color": "rgba(0,0,0,0)",
+            "image": "shopify://shop_images/Pictures_15.jpg",
+            "image_bg_color": "#f0f8ff",
+            "image_border_radius": 15,
+            "tag_text": "Wear-Resistant & Tensile-Resistant Braided Wire",
+            "heading": "Super strong and weight-resistant",
+            "description": "<p>48-strand precision weaving technology, wear-resistant, tensile-resistant and not easy to break.</p>"
+          }
+        },
+        "pd2_image_with_features_xyG6rh": {
+          "type": "pd2_image_with_features",
+          "settings": {
+            "image_position": "left",
+            "section_bg_color": "rgba(0,0,0,0)",
+            "image": "shopify://shop_images/Pictures_16.jpg",
+            "image_bg_color": "#f0f8ff",
+            "image_border_radius": 15,
+            "tag_text": "Length Adjustment",
+            "heading": "Dual strap design",
+            "description": "<p><strong>Freely Control Length</strong></p><p>The length can be quickly adjusted with the alloy buckle. The texture is more comfortable and upgraded.</p>"
+          }
+        },
+        "pd2_centered_feature_iJAq8a": {
+          "type": "pd2_centered_feature",
+          "settings": {
+            "section_bg_color": "rgba(0,0,0,0)",
+            "tag_text": "Wide Compatibility",
+            "heading": "Type-C Compatible with various devices",
+            "subheading": "",
+            "description": "",
+            "feature_list": ""
+          }
+        },
+        "pd2_standalone_image_KERANj": {
+          "type": "pd2_standalone_image",
+          "settings": {
+            "section_bg_color": "rgba(0,0,0,0)",
+            "tag_text": "",
+            "heading": "",
+            "subheading": "",
+            "description": "",
+            "text_color": "#121212",
+            "text_align": "left",
+            "vertical_align": "center",
+            "image": "shopify://shop_images/product-MOA23-05.jpg",
+            "image_mobile": "shopify://shop_images/product-MOA23-06.jpg"
+          }
+        },
+        "pd2_image_with_features_VfaUAq": {
+          "type": "pd2_image_with_features",
+          "settings": {
+            "image_position": "right",
+            "section_bg_color": "rgba(0,0,0,0)",
+            "image": "shopify://shop_images/Pictures_13.jpg",
+            "image_bg_color": "#f0f8ff",
+            "image_border_radius": 15,
+            "tag_text": "Various Colors",
+            "heading": "Three colors,\nEasily match daily outfit",
+            "description": ""
+          }
+        },
+        "pd2_centered_feature_AUYXGR": {
+          "type": "pd2_centered_feature",
+          "settings": {
+            "section_bg_color": "rgba(0,0,0,0)",
+            "tag_text": "",
+            "heading": "Matching outfits makes you look more stylish!",
+            "subheading": "",
+            "description": "",
+            "feature_list": ""
+          }
+        },
+        "pd2_standalone_image_QDBMPK": {
+          "type": "pd2_standalone_image",
+          "settings": {
+            "section_bg_color": "rgba(0,0,0,0)",
+            "tag_text": "",
+            "heading": "",
+            "subheading": "",
+            "description": "",
+            "text_color": "#121212",
+            "text_align": "left",
+            "vertical_align": "center",
+            "image": "shopify://shop_images/product-MOA23-07.jpg",
+            "image_mobile": "shopify://shop_images/product-MOA23-07.jpg"
+          }
+        },
+        "pd2_image_with_features_8rpRgt": {
+          "type": "pd2_image_with_features",
+          "settings": {
+            "image_position": "left",
+            "section_bg_color": "rgba(0,0,0,0)",
+            "image": "shopify://shop_images/Frame_123.jpg",
+            "image_bg_color": "#f0f8ff",
+            "image_border_radius": 15,
+            "tag_text": "One Piece for Multiple Daily Uses",
+            "heading": "More Application",
+            "description": "<p>Various items won’t get lost</p>"
+          }
+        },
+        "pd2_image_with_features_4EPi8z": {
+          "type": "pd2_image_with_features",
+          "settings": {
+            "image_position": "right",
+            "section_bg_color": "rgba(0,0,0,0)",
+            "image": "shopify://shop_images/Pictures_12.jpg",
+            "image_bg_color": "#f0f8ff",
+            "image_border_radius": 15,
+            "tag_text": "",
+            "heading": "Connected Cover",
+            "description": "<p>Protect the plug from damage</p><p>Prevent it from falling off and running away from home</p>"
+          }
+        },
+        "pd2_image_with_features_gaiBXj": {
+          "type": "pd2_image_with_features",
+          "settings": {
+            "image_position": "left",
+            "section_bg_color": "rgba(0,0,0,0)",
+            "image": "shopify://shop_images/Pictures_10.jpg",
+            "image_bg_color": "#f0f8ff",
+            "image_border_radius": 15,
+            "tag_text": "360° Metal Button Loop",
+            "heading": "Metal buckle, Freely adjustable without tangling",
+            "description": "<p>Zinc alloy material selection is wear-resistant, scratch-resistant and not easy to wear, and texture is more</p>"
+          }
+        },
+        "pd2_image_with_features_zpJedR": {
+          "type": "pd2_image_with_features",
+          "settings": {
+            "image_position": "right",
+            "section_bg_color": "rgba(0,0,0,0)",
+            "image": "shopify://shop_images/Pictures_11.jpg",
+            "image_bg_color": "#f0f8ff",
+            "image_border_radius": 15,
+            "tag_text": "",
+            "heading": "Complementary Phonestrap Adapter",
+            "description": "<p>Simple installation, turn your phone into a hangable phone case in one second<br/></p><p><em>*The phone case is for illustration purpose only, no extras included</em></p>"
+          }
+        }
+      },
+      "block_order": [
+        "pd2_image_with_features_trAXPK",
+        "pd2_image_with_features_9mUNpG",
+        "pd2_image_with_features_XmKDFU",
+        "pd2_image_with_features_gYzzcn",
+        "pd2_image_with_features_ritYzH",
+        "pd2_image_with_features_wKQfMT",
+        "pd2_image_with_features_xyG6rh",
+        "pd2_centered_feature_iJAq8a",
+        "pd2_standalone_image_KERANj",
+        "pd2_image_with_features_VfaUAq",
+        "pd2_centered_feature_AUYXGR",
+        "pd2_standalone_image_QDBMPK",
+        "pd2_image_with_features_8rpRgt",
+        "pd2_image_with_features_4EPi8z",
+        "pd2_image_with_features_gaiBXj",
+        "pd2_image_with_features_zpJedR"
+      ],
+      "name": "產品描述 4.0 + 評價/推薦",
+      "settings": {}
+    },
+    "product-recommendations": {
+      "type": "product-recommendations",
+      "settings": {
+        "color_scheme": "background-1",
+        "subheading": "",
+        "subheading_style": "subtitle",
+        "subheading_icon": "none",
+        "heading": "You May Also Like",
+        "heading_size": "h2",
+        "text": "",
+        "products_limit": 6,
+        "image_ratio": "1/1",
+        "image_fit": "cover",
+        "add_border_radius_when_contain": false,
+        "show_secondary_image": true,
+        "show_vendor": false,
+        "show_desc": true,
+        "padding_top": "l",
+        "padding_bottom": "l"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "product_description_2_cH8bmq",
+    "product_description_custom_U97frY",
+    "product_description_2_R94PAF",
+    "product-recommendations"
+  ]
+}
