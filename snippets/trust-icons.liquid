@@ -1,9 +1,25 @@
 {%- comment -%}
 Reusable trust icons snippet
 Inputs via block.settings: icon_1..3 (image), text_1..3 (text), link_1..3 (url)
+Layout controls (optional): align (left|center), gap (s|m|l), columns (2|3|4)
 {%- endcomment -%}
-<div class="product__trust-icons" {{ block.shopify_attributes }}>
-  <div class="trust-icons__wrapper">
+{%- assign align_class = '' -%}
+{%- if block.settings.align == 'center' -%}
+  {%- assign align_class = 'trust-icons--align-center' -%}
+{%- endif -%}
+{%- assign gap_class = 'trust-icons--gap-l' -%}
+{%- if block.settings.gap == 's' -%}
+  {%- assign gap_class = 'trust-icons--gap-s' -%}
+{%- elsif block.settings.gap == 'm' -%}
+  {%- assign gap_class = 'trust-icons--gap-m' -%}
+{%- endif -%}
+{%- assign cols_class = '' -%}
+{%- if block.settings.columns != blank -%}
+  {%- assign cols_class = 'trust-icons--cols-' | append: block.settings.columns -%}
+{%- endif -%}
+
+<div class="product__trust-icons {{ align_class }} {{ gap_class }} {{ cols_class }}" {{ block.shopify_attributes }}>
+  <ul class="trust-icons__wrapper" role="list">
     {%- for i in (1..3) -%}
       {%- assign icon_setting = 'icon_' | append: i -%}
       {%- assign text_setting = 'text_' | append: i -%}
@@ -14,14 +30,14 @@ Inputs via block.settings: icon_1..3 (image), text_1..3 (text), link_1..3 (url)
       {%- assign icon_link = block.settings[link_setting] -%}
 
       {%- if icon_image != blank or icon_text != blank -%}
-        <div class="trust-icon__item">
+        <li class="trust-icon__item">
           {%- if icon_link != blank -%}
             <a href="{{ icon_link }}" class="trust-icon__link" aria-label="{{ icon_text | escape }}">
           {%- endif -%}
 
           {% if icon_image != blank %}
             <div class="trust-icon__image-wrapper">
-              {{ icon_image | image_url: width: 100 | image_tag: loading: 'lazy', widths: '50, 100', class: 'trust-icon__image' }}
+              {{ icon_image | image_url: width: 100 | image_tag: alt: icon_text, loading: 'lazy', widths: '50, 100', class: 'trust-icon__image' }}
             </div>
           {% endif %}
 
@@ -32,8 +48,8 @@ Inputs via block.settings: icon_1..3 (image), text_1..3 (text), link_1..3 (url)
           {%- if icon_link != blank -%}
             </a>
           {%- endif -%}
-        </div>
+        </li>
       {%- endif -%}
     {%- endfor -%}
-  </div>
+  </ul>
 </div>

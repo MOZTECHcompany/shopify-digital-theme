@@ -62,7 +62,7 @@
       {{
         media.preview_image
         | image_url: width: 1946
-        | image_tag: loading: '', widths: widths, sizes: sizes, style: style
+        | image_tag: loading: 'eager', fetchpriority: 'high', widths: widths, sizes: sizes, style: style
       }}
     {% else %}
       {{

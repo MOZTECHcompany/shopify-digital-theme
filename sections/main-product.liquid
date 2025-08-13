@@ -804,6 +804,8 @@
                               <input
                                 class="quantity__input focus-inset"
                                 type="number"
+                                inputmode="numeric"
+                                pattern="[0-9]*"
                                 name="quantity"
                                 id="Quantity-{{ section.id }}"
                                 data-cart-quantity="{{ cart_qty }}"
@@ -960,7 +962,7 @@
                 or block.settings.show_share_copy
               -%}
                 <div class="share-buttons" aria-label="list" {{ block.shopify_attributes }}>
-                  <ul class="share-buttons__list list-unstyled">
+                  <ul class="share-buttons__list list-unstyled" role="list">
                     <li class="share-buttons__item">
                       <span class="share-buttons__label-name">{{ block.settings.share_label }}</span>
                     </li>
@@ -969,7 +971,7 @@
                         <a
                           href="https://www.facebook.com/sharer.php?u={{ shop.url | append: product.url }}"
                           class="share-buttons__button button facebook-btn focus-inset"
-                          target="_blank"
+                          target="_blank" rel="noopener noreferrer"
                         >
                           {% render 'icon-facebook' %}
                         </a>
@@ -981,7 +983,7 @@
                         <a
                           href="https://twitter.com/share?url={{ shop.url | append: product.url }}&text={{ product.title | escape }}"
                           class="share-buttons__button button twitter-btn focus-inset"
-                          target="_blank"
+                          target="_blank" rel="noopener noreferrer"
                         >
                           {% render 'icon-twitter' %}
                         </a>
@@ -993,7 +995,7 @@
                         <a
                           href="https://pinterest.com/pin/create/bookmarklet/?media={{ product.featured_media | image_url: width: 1100, height: 1100 }}&url={{ shop.url | append: product.url }}&description={{ product.title | escape }}"
                           class="share-buttons__button button pinterest-btn"
-                          target="_blank"
+                          target="_blank" rel="noopener noreferrer"
                         >
                           {% render 'icon-pinterest' %}
                         </a>
