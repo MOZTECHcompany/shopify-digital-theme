@@ -2213,3 +2213,84 @@
   outline: 0.2rem solid rgba(var(--color-accent), 0.6);
   outline-offset: 2px;
 }
+
+/* Minimalist overrides for buy buttons */
+.product__buy-buttons {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+@media (min-width: 750px) {
+  .product__buy-buttons {
+    padding: 0;
+  }
+}
+.product__buy-buttons .product-form__buttons {
+  gap: 1.6rem;
+}
+.product__buy-buttons .product-form__buttons-row {
+  gap: 1.2rem;
+}
+.product__buy-buttons .button {
+  min-height: 4.8rem;
+  border-width: 0.12rem;
+  font-weight: 600;
+  box-shadow: none;
+}
+.product__buy-buttons .product-form__submit.button.button--primary {
+  background: rgb(var(--color-button));
+  color: rgb(var(--color-button-text));
+  border-color: rgb(var(--color-button));
+  box-shadow: none;
+}
+.product__buy-buttons .product-form__submit.button.button--primary:hover {
+  background: rgba(var(--color-button), 0.92);
+}
+.product__buy-buttons .product-form__submit.button.button--primary:active {
+  transform: none;
+}
+.product__buy-buttons .product-form__submit.button.button--tertiary {
+  background: transparent;
+  color: rgb(var(--color-foreground));
+  border-color: rgba(var(--color-foreground), 0.24);
+}
+.product__buy-buttons .product-form__separator {
+  margin: 0.4rem 0 0.2rem;
+  color: rgb(var(--color-foreground-secondary));
+}
+.product__buy-buttons .product-form__separator:before,
+.product__buy-buttons .product-form__separator:after {
+  background: rgba(var(--color-border));
+}
+.product__buy-buttons .quantity {
+  background: transparent;
+  border: 0.1rem solid rgba(var(--color-border));
+}
+.product__buy-buttons .quantity__button,
+.product__buy-buttons .quantity__input {
+  height: 4.8rem;
+}
+.product__buy-buttons .quantity__button:hover {
+  background: rgba(var(--color-foreground), 0.04);
+}
+.product__buy-buttons .shopify-payment-button {
+  width: 100%;
+}
+.product__buy-buttons .shopify-payment-button__button--branded,
+.product__buy-buttons .shopify-payment-button__button--unbranded {
+  width: 100%;
+  padding: 1.2rem 1.6rem;
+  border: 0.12rem solid rgba(var(--color-foreground), 0.24);
+  background: transparent;
+  color: rgb(var(--color-foreground));
+  border-radius: 0.8rem;
+}
+.product__buy-buttons .shopify-payment-button__button--branded:hover,
+.product__buy-buttons .shopify-payment-button__button--unbranded:hover {
+  background: rgba(var(--color-foreground), 0.04);
+}
+.product__buy-buttons .shopify-payment-button__more-options {
+  margin-top: 0.6rem;
+  color: rgb(var(--color-foreground-secondary));
+}
