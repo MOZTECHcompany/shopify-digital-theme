@@ -1,0 +1,39 @@
+{%- comment -%}
+Reusable trust icons snippet
+Inputs via block.settings: icon_1..3 (image), text_1..3 (text), link_1..3 (url)
+{%- endcomment -%}
+<div class="product__trust-icons" {{ block.shopify_attributes }}>
+  <div class="trust-icons__wrapper">
+    {%- for i in (1..3) -%}
+      {%- assign icon_setting = 'icon_' | append: i -%}
+      {%- assign text_setting = 'text_' | append: i -%}
+      {%- assign link_setting = 'link_' | append: i -%}
+
+      {%- assign icon_image = block.settings[icon_setting] -%}
+      {%- assign icon_text = block.settings[text_setting] -%}
+      {%- assign icon_link = block.settings[link_setting] -%}
+
+      {%- if icon_image != blank or icon_text != blank -%}
+        <div class="trust-icon__item">
+          {%- if icon_link != blank -%}
+            <a href="{{ icon_link }}" class="trust-icon__link" aria-label="{{ icon_text | escape }}">
+          {%- endif -%}
+
+          {% if icon_image != blank %}
+            <div class="trust-icon__image-wrapper">
+              {{ icon_image | image_url: width: 100 | image_tag: loading: 'lazy', widths: '50, 100', class: 'trust-icon__image' }}
+            </div>
+          {% endif %}
+
+          {% if icon_text != blank %}
+            <p class="trust-icon__text">{{ icon_text }}</p>
+          {% endif %}
+
+          {%- if icon_link != blank -%}
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</div>

@@ -1,0 +1,196 @@
+/* Product page enhancements: variant picker, buy buttons, quantity, and trust icons */
+
+/* 1. Variant Picker UI/UX */
+.product-form__controls-group input + label {
+  border-radius: 999px;
+  border: 1.5px solid #e0e0e0;
+  background-color: transparent;
+  padding: 10px 22px;
+  color: #4a4a4a;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.product-form__controls-group input:not(:checked) + label:hover {
+  background-color: transparent !important;
+  border-color: rgb(var(--color-foreground));
+  color: rgb(var(--color-foreground));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.product-form__controls-group input:checked + label {
+  background-color: rgb(var(--color-foreground)) !important;
+  color: rgb(var(--color-background)) !important;
+  border-color: rgb(var(--color-foreground)) !important;
+  box-shadow: none;
+}
+
+.product-form__controls-group input:focus-visible + label {
+  outline: 2px solid var(--color-accent-1);
+  outline-offset: 2px;
+}
+
+/* 2. Buy Buttons & Quantity */
+.product-form__buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.product-form__buttons-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.product-form__quantity {
+  margin: 0;
+}
+
+.quantity {
+  display: flex;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 999px;
+  overflow: hidden;
+  background-color: #f9f9f9;
+}
+
+.quantity__input {
+  border: none;
+  background-color: transparent;
+  width: 40px;
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 500;
+}
+
+.quantity__button {
+  background-color: transparent;
+  border: none;
+  padding: 0 12px;
+  cursor: pointer;
+  color: #888;
+  transition: color 0.2s ease;
+}
+
+.quantity__button:hover {
+  color: rgb(var(--color-foreground));
+}
+
+.product-form__submit {
+  background-color: rgb(var(--color-foreground)) !important;
+  color: rgb(var(--color-background)) !important;
+  border: 1.5px solid rgb(var(--color-foreground)) !important;
+  border-radius: 999px !important;
+  padding: 14px 24px !important;
+  font-weight: 600 !important;
+  font-size: 1.6rem;
+  letter-spacing: 0.05em;
+  transform: translateY(0);
+  transition: all 0.25s ease-out !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.product-form__submit:hover:not([disabled]) {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 7px 20px rgba(var(--color-foreground-rgb), 0.15) !important;
+}
+
+.product-form__submit:active:not([disabled]) {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 10px rgba(var(--color-foreground-rgb), 0.12) !important;
+}
+
+.shopify-payment-button__button {
+  border-radius: 999px !important;
+  font-weight: 600 !important;
+  font-size: 1.6rem;
+  padding: 14px 24px !important;
+  transition: all 0.25s ease-out !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.shopify-payment-button__button:hover:not([disabled]) {
+  transform: translateY(-3px) !important;
+  filter: brightness(1.1);
+}
+
+.product-form__submit[disabled] {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* 3. Trust Icons */
+.product__trust-icons {
+  margin: 2.5rem 0;
+  padding-top: 2.5rem;
+  border-top: 1px solid rgba(var(--color-foreground), 0.08);
+}
+
+.trust-icons__wrapper {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 140px;
+  text-align: center;
+}
+
+.trust-icon__item {
+  flex: 0 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.trust-icon__image-wrapper {
+  max-width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trust-icon__image-wrapper img,
+.trust-icon__image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.trust-icon__text {
+  font-size: 1.3rem;
+  line-height: 1.4;
+  color: rgba(var(--color-foreground), 0.8);
+  margin: 0;
+}
+
+/* 4. Responsive Trust Icons */
+@media screen and (max-width: 749px) {
+  .product__trust-icons {
+    margin: 2rem 0;
+    padding-top: 2rem;
+  }
+  .trust-icons__wrapper {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .trust-icon__item {
+    flex-basis: 100%;
+    flex-direction: row;
+    text-align: left;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+  .trust-icon__item:last-child {
+    margin-bottom: 0;
+  }
+  .trust-icon__image-wrapper {
+    max-width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+  }
+}

@@ -4,6 +4,7 @@
 {{ 'component-badge.css' | asset_url | stylesheet_tag }}
 {{ 'component-price.css' | asset_url | stylesheet_tag }}
 {{ 'component-rte.css' | asset_url | stylesheet_tag }}
+{{ 'product-page-enhancements.css' | asset_url | stylesheet_tag }}
 
 <link rel="stylesheet" href="{{ 'component-cart-drawer.css' | asset_url }}" media="all">
 <link rel="stylesheet" href="{{ 'component-deferred-media.css' | asset_url }}" media="all">
@@ -1144,6 +1145,10 @@
               </div>
             {%- when '@app' -%}
               {% render block %}
+            {% comment %} START: Trust Icons Block {% endcomment %}
+            {%- when 'trust_icons' -%}
+              {% render 'trust-icons', block: block %}
+            {% comment %} END: Trust Icons Block {% endcomment %}
           {%- endcase -%}
         {%- endfor -%}
       </div>
@@ -2625,6 +2630,25 @@
           "default": "no-indent",
           "label": "底部間距"
         }
+      ]
+    },
+    {
+      "type": "trust_icons",
+      "name": "信任圖標",
+      "limit": 1,
+      "settings": [
+        { "type": "header", "content": "第一個圖標" },
+        { "type": "image_picker", "id": "icon_1", "label": "圖標 1" },
+        { "type": "text", "id": "text_1", "label": "文字 1", "default": "安全運送" },
+        { "type": "url", "id": "link_1", "label": "連結 1 (可選)" },
+        { "type": "header", "content": "第二個圖標" },
+        { "type": "image_picker", "id": "icon_2", "label": "圖標 2" },
+        { "type": "text", "id": "text_2", "label": "文字 2", "default": "品質保證" },
+        { "type": "url", "id": "link_2", "label": "連結 2 (可選)" },
+        { "type": "header", "content": "第三個圖標" },
+        { "type": "image_picker", "id": "icon_3", "label": "圖標 3" },
+        { "type": "text", "id": "text_3", "label": "文字 3", "default": "官方正品" },
+        { "type": "url", "id": "link_3", "label": "連結 3 (可選)" }
       ]
     }
   ]
