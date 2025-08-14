@@ -1,0 +1,331 @@
+{%- render 'pd50-styles-1' -%}
+{%- render 'pd50-styles-2' -%}
+{%- render 'pd50-body-html' -%}
+{%- render 'pd50-script' -%}
+
+{% schema %}
+{
+  "name": "產品描述 5.0 (全新架構)",
+  "tag": "section",
+  "class": "product-description-5-0",
+  "max_blocks": 70,
+  "blocks": [
+    {
+      "type": "pd6_modular_features",
+      "name": "6.1 - 模組化特色網格 (圖片模式)",
+      "settings": [
+        { "type": "paragraph", "content": "此區塊現在使用直接上傳圖片的方式來達成 2+1 的佈局，請在下方上傳三張從 Figma 設計稿導出的圖片。" },
+        { "type": "color", "id": "section_bg_color", "label": "區段背景顏色", "default": "#FFFFFF" },
+        { "type": "header", "content": "主要內容" },
+        { "type": "text", "id": "heading", "label": "主標題", "default": "Designed for Life. Powerful by Nature.", "info": "系統會自動將 'Powerful by Nature.' 加上特殊樣式。" },
+        { "type": "text", "id": "subheading", "label": "副標題", "default": "Modular Structure · Pro-Level Charging · Everyday Flexibility" },
+        { "type": "header", "content": "特色圖片 (2+1 佈局)" },
+        { "type": "image_picker", "id": "feature_image_1", "label": "左上方特色圖片" },
+        { "type": "image_picker", "id": "feature_image_2", "label": "右上方特色圖片" },
+        { "type": "image_picker", "id": "feature_image_3_wide", "label": "下方寬版特色圖片" },
+        { "type": "header", "content": "右側主圖" },
+        { "type": "image_picker", "id": "image", "label": "右側主圖" }
+      ]
+    },
+    {
+      "type": "pd6_hero_video_reveal",
+      "name": "6.0 - 英雄影片展示 (滾動縮放)",
+      "settings": [
+        { "type": "paragraph", "content": "這是一個具有滾動縮放特效的區塊。影片會隨著頁面滾動而放大至全螢幕。此特效僅在桌面版生效。" },
+        { "type": "video", "id": "video", "label": "展示影片" },
+        { "type": "header", "content": "影片上方浮水印文字" },
+        { "type": "text", "id": "heading", "label": "標題", "default": "Ark Power Bank Max" },
+        { "type": "text", "id": "subheading", "label": "副標題 (可選)", "default": "Designed for Life. Powerful by Nature." }
+      ]
+    },
+    {
+      "type": "pd5_hero_with_features",
+      "name": "5.0 - 特色英雄橫幅",
+      "settings": [
+        { "type": "paragraph", "content": "請在此區塊下方新增「子: 特色項目」來建立列表。" },
+        { "type": "textarea", "id": "heading", "label": "主標題", "default": "Ark Power Bank Pro" },
+        { "type": "text", "id": "subheading", "label": "副標題", "default": "Modular Power. Anywhere. Anytime." },
+        { "type": "header", "content": "文字顏色設定"},
+        { "type": "color", "id": "heading_color", "label": "主標題顏色", "default": "#FFFFFF" },
+        { "type": "color", "id": "subheading_color", "label": "副標題顏色", "default": "#FFFFFF" },
+        { "type": "color", "id": "feature_text_color", "label": "特色列表文字顏色", "default": "#FFFFFF" },
+        { "type": "header", "content": "桌面版對齊方式" },
+        { "type": "select", "id": "text_align", "label": "水平對齊", "options": [{ "value": "left", "label": "靠左" }, { "value": "center", "label": "置中" }, { "value": "right", "label": "靠右" }], "default": "left" },
+        { "type": "select", "id": "vertical_align", "label": "垂直對齊", "options": [{ "value": "flex-start", "label": "靠上" }, { "value": "center", "label": "置中" }, { "value": "flex-end", "label": "靠下" }], "default": "center" },
+        { "type": "header", "content": "背景圖片" },
+        { "type": "image_picker", "id": "image_desktop", "label": "桌面端背景圖片 (Desktop)" },
+        { "type": "image_picker", "id": "image_mobile", "label": "行动端背景图片 (Mobile)", "info": "如果未上傳，會使用桌面版圖片。" }
+      ]
+    },
+    {
+      "type": "pd5_feature_item_hero",
+      "name": "  └ 子: 特色項目 (橫幅用)",
+      "settings": [
+        { "type": "image_picker", "id": "icon_image", "label": "圖標" },
+        { "type": "text", "id": "text", "label": "特色描述", "default": "10,000mAh" }
+      ]
+    },
+    {
+      "type": "pd5_frustration_grid",
+      "name": "5.0 - 問題解決網格",
+      "settings": [
+        { "type": "paragraph", "content": "請在此區塊下方新增「子: 問題項目」來建立網格內容。" },
+        { "type": "color", "id": "section_bg_color", "label": "區段背景顏色", "default": "rgba(0,0,0,0)" },
+        { "type": "text", "id": "heading", "label": "主標題", "default": "The First Truly Modular Power Bank" },
+        { "type": "textarea", "id": "subheading", "label": "副標題", "default": "Built to fix what 'universal' chargers got wrong — here's what users say frustrates them most:" },
+        { "type": "text", "id": "closing_heading", "label": "結尾標題", "default": "We've solved all these problems!", "info": "Figma 中的波浪底線為特殊設計，建議使用圖片或聯絡開發者實作。" }
+      ]
+    },
+    {
+      "type": "pd5_frustration_item",
+      "name": "  └ 子: 問題項目 (網格用)",
+      "settings": [
+        { "type": "text", "id": "percentage", "label": "百分比", "default": "85%" },
+        { "type": "text", "id": "text", "label": "問題描述", "default": "'Incompatible with laptops'" }
+      ]
+    },
+    {
+      "type": "pd2_hero",
+      "name": "⭐️ 主要橫幅 (Hero)",
+      "limit": 1,
+      "settings": [
+        { "type": "textarea", "id": "heading", "label": "主標題", "default": "Space Capsule Power Bank", "info": "在此處使用 Enter 鍵可以換行" },
+        { "type": "text", "id": "subheading", "label": "副標題", "default": "The ultimate form of pocket charging" },
+        { "type": "text", "id": "tag_text", "label": "標籤文字", "default": "5,000mAh" },
+        { "type": "image_picker", "id": "tag_icon_image", "label": "標籤圖示 (Tag Icon)", "info": "建議尺寸 56x56 px。若留空，將會顯示預設圖示。" },
+        { "type": "image_picker", "id": "image_desktop", "label": "桌面端背景圖片 (Desktop)" },
+        { "type": "image_picker", "id": "image_mobile", "label": "行動端背景圖片 (Mobile)" }
+      ]
+    },
+    {
+      "type": "pd2_card_banner",
+      "name": "⭐️ 卡片式橫幅 (Card Banner)",
+      "settings": [
+        { "type": "header", "content": "內容設定" },
+        { "type": "textarea", "id": "heading", "label": "主標題", "default": "Card Banner Heading", "info": "在此處使用 Enter 鍵可以換行" },
+        { "type": "text", "id": "subheading", "label": "副標題", "default": "This is a reusable banner card." },
+        { "type": "text", "id": "tag_text", "label": "標籤文字", "default": "Feature" },
+        { "type": "image_picker", "id": "tag_icon_image", "label": "標籤圖示 (Tag Icon)", "info": "建議尺寸 56x56 px。若留空，將會顯示預設圖示。" },
+        { "type": "header", "content": "桌面版對齊方式" },
+        { "type": "select", "id": "text_align", "label": "水平對齊", "options": [{ "value": "left", "label": "靠左" }, { "value": "center", "label": "置中" }, { "value": "right", "label": "靠右" }], "default": "left" },
+        { "type": "select", "id": "vertical_align", "label": "垂直對齊", "options": [{ "value": "flex-start", "label": "靠上" }, { "value": "center", "label": "置中" }, { "value": "flex-end", "label": "靠下" }], "default": "center" },
+        { "type": "header", "content": "手機版對齊方式 (Mobile Alignment)" },
+        { "type": "select", "id": "mobile_text_align", "label": "水平對齊 (手機)", "options": [ { "value": "left", "label": "靠左" }, { "value": "center", "label": "置中" }, { "value": "right", "label": "靠右" } ], "default": "center" },
+        { "type": "select", "id": "mobile_vertical_align", "label": "垂直對齊 (手機)", "options": [ { "value": "flex-start", "label": "靠上" }, { "value": "center", "label": "置中" }, { "value": "flex-end", "label": "靠下" } ], "default": "center" },
+        { "type": "header", "content": "背景圖片" },
+        { "type": "image_picker", "id": "image_desktop", "label": "桌面端背景圖片 (Desktop)" },
+        { "type": "image_picker", "id": "image_mobile", "label": "行動端背景圖片 (Mobile)", "info": "這張圖片在手機上會根據原始比例顯示。如果未上傳，會使用桌面版圖片。" }
+      ]
+    },
+    {
+      "type": "pd2_image_with_features",
+      "name": "⭐️ 圖文 (帶浮動圖示)",
+      "settings": [
+        { "type": "paragraph", "content": "請在其下方新增「子: 浮動圖示」區塊。" },
+        { "type": "select", "id": "image_position", "label": "圖片位置", "options": [{ "value": "left", "label": "左側" }, { "value": "right", "label": "右側" }], "default": "right" },
+        { "type": "color", "id": "section_bg_color", "label": "区段背景颜色", "default": "rgba(0,0,0,0)" },
+        { "type": "image_picker", "id": "image", "label": "主圖片" },
+        { "type": "color", "id": "image_bg_color", "label": "圖片背景顏色", "default": "#f0f8ff" },
+        { "type": "range", "id": "image_border_radius", "label": "圖片圓角", "min": 0, "max": 50, "step": 1, "unit": "px", "default": 40 },
+        { "type": "header", "content": "文字內容" },
+        { "type": "text", "id": "tag_text", "label": "小標籤", "default": "Unfold" },
+        { "type": "textarea", "id": "heading", "label": "標題", "default": "Challenge the Limits\of Existing Products" },
+        { "type": "richtext", "id": "description", "label": "描述", "default": "<p>Shrink and Combine</p>" }
+      ]
+    },
+    { "type": "pd2_feature_icon", "name": "子: 浮動圖示", "settings": [ { "type": "image_picker", "id": "icon_image", "label": "小圖示圖片" }, { "type": "range", "id": "pos_top", "label": "垂直位置 (Top %)", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 50 }, { "type": "range", "id": "pos_left", "label": "水平位置 (Left %)", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 50 } ] },
+    {
+      "type": "pd2_specs_and_image",
+      "name": "⭐️ 規格表 + 圖片",
+       "settings": [
+        { "type": "paragraph", "content": "請在其下方新增「子: 規格項目」區塊。" },
+        { "type": "select", "id": "image_position", "label": "圖片位置", "options": [{ "value": "left", "label": "左側" }, { "value": "right", "label": "右側" }], "default": "right" },
+        { "type": "color", "id": "section_bg_color", "label": "区段背景颜色", "default": "rgba(0,0,0,0)" },
+        { "type": "text", "id": "heading", "label": "區塊標題", "default": "Detailed Description" },
+        { "type": "image_picker", "id": "image", "label": "圖片" },
+        { "type": "color", "id": "image_bg_color", "label": "圖片背景顏色", "default": "#f7f7f7" },
+        { "type": "range", "id": "image_border_radius", "label": "圖片圓角", "min": 0, "max": 50, "step": 1, "unit": "px", "default": 40 },
+        { "type": "checkbox", "id": "force_2x2_mobile", "label": "手機版強制顯示 2x2 網格", "info": "勾選此項後，在手機上此區塊的規格表將會以兩欄顯示，而非預設的單欄置中。", "default": false }
+      ]
+    },
+    { "type": "pd2_spec_item", "name": "子: 規格項目", "settings": [ { "type": "text", "id": "key", "label": "規格名稱", "default": "Lightning Head Output" }, { "type": "text", "id": "value", "label": "規格值", "default": "5V - 2.1A" } ] },
+    {
+      "type": "pd2_image_with_text",
+      "name": "⭐️ 圖文 (通用)",
+      "settings": [
+        { "type": "select", "id": "image_position", "label": "圖片位置", "options": [{ "value": "left", "label": "左側" }, { "value": "right", "label": "右側" }], "default": "left" },
+        { "type": "color", "id": "section_bg_color", "label": "区段背景颜色", "default": "rgba(0,0,0,0)" },
+        { "type": "image_picker", "id": "image", "label": "圖片" },
+        { "type": "color", "id": "image_bg_color", "label": "圖片背景顏色", "default": "#f7f7f7" },
+        { "type": "range", "id": "image_border_radius", "label": "圖片圓角", "min": 0, "max": 50, "step": 1, "unit": "px", "default": 40 },
+        { "type": "header", "content": "文字內容" },
+        { "type": "text", "id": "tag_text", "label": "小標籤" },
+        { "type": "textarea", "id": "heading", "label": "標題" },
+        { "type": "text", "id": "subheading", "label": "副標題 (可選)" },
+        { "type": "richtext", "id": "description", "label": "描述" },
+        { "type": "richtext", "id": "feature_list", "label": "特色列表 (可選)", "info": "範例：<p><strong>1</strong> <em>+</em> <span>Built-in Head</span></p>" }
+      ]
+    },
+    {
+      "type": "pd2_image_with_subcards",
+      "name": "⭐️ 圖文 (帶子卡片)",
+      "settings": [
+        { "type": "paragraph", "content": "如果圖文下方需要放置【卡片式】子項目 (如充電信息、安全圖標等)，請使用此區塊作為父層。" },
+        { "type": "select", "id": "image_position", "label": "圖片位置", "options": [{ "value": "left", "label": "左側" }, { "value": "right", "label": "右側" }], "default": "left" },
+        { "type": "color", "id": "section_bg_color", "label": "区段背景颜色", "default": "rgba(0,0,0,0)" },
+        { "type": "image_picker", "id": "image", "label": "圖片" },
+        { "type": "color", "id": "image_bg_color", "label": "圖片背景顏色", "default": "#f7f7f7" },
+        { "type": "range", "id": "image_border_radius", "label": "圖片圓角", "min": 0, "max": 50, "step": 1, "unit": "px", "default": 40 },
+        { "type": "header", "content": "文字內容" },
+        { "type": "text", "id": "tag_text", "label": "小標籤" },
+        { "type": "textarea", "id": "heading", "label": "標題" },
+        { "type": "text", "id": "subheading", "label": "副標題 (可選)" },
+        { "type": "richtext", "id": "description", "label": "描述" },
+        { "type": "richtext", "id": "feature_list", "label": "特色列表 (可選)", "info": "此區塊同樣支持特色列表。" }
+      ]
+    },
+    {
+      "type": "pd2_dual_mode_charging",
+      "name": "⭐️ 雙模式充電 (圖文)",
+      "settings": [
+        { "type": "select", "id": "image_position", "label": "圖片位置", "options": [{ "value": "left", "label": "左側" }, { "value": "right", "label": "右側" }], "default": "left" },
+        { "type": "color", "id": "section_bg_color", "label": "区段背景颜色", "default": "rgba(0,0,0,0)" },
+        { "type": "image_picker", "id": "image", "label": "主圖片" },
+        { "type": "color", "id": "image_bg_color", "label": "圖片背景顏色", "default": "#f7f7f7" },
+        { "type": "range", "id": "image_border_radius", "label": "圖片圓角", "min": 0, "max": 50, "step": 1, "unit": "px", "default": 40 },
+        { "type": "header", "content": "右側文字內容" },
+        { "type": "text", "id": "tag_text", "label": "小標籤", "default": "Easy to Charge" },
+        { "type": "textarea", "id": "heading", "label": "標題", "default": "Dual Mode Battery Life For Instant Full Charge Level" },
+        { "type": "text", "id": "subheading", "label": "副標題", "default": "AC plug and Type-C port to ensure full power at all times." },
+        { "type": "header", "content": "卡片一 (左)" },
+        { "type": "text", "id": "card1_title", "label": "卡片標題", "default": "Charge with AC Plug" },
+        { "type": "text", "id": "card1_time_prefix", "label": "時間前綴", "default": "About" },
+        { "type": "text", "id": "card1_time_value", "label": "時間值", "default": "4-5" },
+        { "type": "text", "id": "card1_time_suffix", "label": "時間後綴", "default": "hours" },
+        { "type": "text", "id": "card1_description", "label": "卡片描述", "default": "Charges after plugging into socket" },
+        { "type": "header", "content": "卡片二 (右)" },
+        { "type": "text", "id": "card2_title", "label": "卡片標題", "default": "Charge via Type-C Port" },
+        { "type": "text", "id": "card2_time_prefix", "label": "時間前綴", "default": "About" },
+        { "type": "text", "id": "card2_time_value", "label": "時間值", "default": "1-2" },
+        { "type": "text", "id": "card2_time_suffix", "label": "時間後綴", "default": "hours" },
+        { "type": "text", "id": "card2_description", "label": "卡片描述", "default": "Charges with charger and cable" }
+      ]
+    },
+    {
+      "type": "pd2_charging_info",
+      "name": "子: 充電信息卡片",
+      "settings": [
+        { "type": "image_picker", "id": "card_image", "label": "卡片图片 (优先)", "info": "如果上传了此图片，下方的所有文字设置将被忽略，会直接显示这张图片。" },
+        { "type": "header", "content": "文字内容 (无图片时显示)" },
+        { "type": "textarea", "id": "title_line1", "label": "标题第一行", "default": "Mobile Phone\nCharging" },
+        { "type": "text", "id": "symbol", "label": "符号", "default": "≥" },
+        { "type": "text", "id": "number", "label": "数字", "default": "1" },
+        { "type": "text", "id": "time_unit", "label": "时间单位", "default": "time" },
+        { "type": "text", "id": "subtitle", "label": "副标题", "default": "Take iPhone 15 for example" },
+        { "type": "html", "id": "description_line2", "label": "描述第二行", "default": "Charge the device from <strong>20%-100%</strong> about ≥ <strong>time</strong> when fully charged" }
+      ]
+    },
+    { "type": "pd2_safety_icon", "name": "子: 安全圖標", "settings": [ { "type": "image_picker", "id": "icon_image", "label": "圖標圖片" }, { "type": "textarea", "id": "text", "label": "圖標下方文字", "default": "Overheat\nProtection", "info": "使用換行符 (Enter 鍵) 來分行" } ] },
+    {
+      "type": "pd2_centered_feature",
+      "name": "⭐️ 置中特色文字",
+      "settings": [
+        { "type": "color", "id": "section_bg_color", "label": "区段背景颜色", "default": "rgba(0,0,0,0)" },
+        { "type": "text", "id": "tag_text", "label": "小標籤" },
+        { "type": "textarea", "id": "heading", "label": "標題", "info": "在此處使用 Enter 鍵可以換行" },
+        { "type": "text", "id": "subheading", "label": "副標題 (可選)" },
+        { "type": "richtext", "id": "description", "label": "描述" },
+        { "type": "richtext", "id": "feature_list", "label": "特色列表 (可選)", "info": "用於『同時充電』等大標題佈局。範例：<p><strong>1</strong><span>Built-in Head</span><em>+</em><strong>1</strong><span>Output Port</span></p>" }
+      ]
+    },
+    {
+      "type": "pd2_standalone_image",
+      "name": "⭐️ 圖片橫幅 (可疊加文字)",
+      "settings": [
+        { "type": "color", "id": "section_bg_color", "label": "区段背景颜色", "default": "rgba(0,0,0,0)" },
+        { "type": "header", "content": "文字內容 (可選)" },
+        { "type": "text", "id": "tag_text", "label": "小標籤" },
+        { "type": "textarea", "id": "heading", "label": "標題" },
+        { "type": "text", "id": "subheading", "label": "副標題" },
+        { "type": "richtext", "id": "description", "label": "描述" },
+        { "type": "color", "id": "text_color", "label": "文字顏色", "default": "#121212" },
+        { "type": "header", "content": "桌面版對齊方式" },
+        { "type": "select", "id": "text_align", "label": "水平對齊", "options": [{ "value": "left", "label": "靠左" }, { "value": "center", "label": "置中" }, { "value": "right", "label": "靠右" }], "default": "left" },
+        { "type": "select", "id": "vertical_align", "label": "垂直對齊", "options": [{ "value": "flex-start", "label": "靠上" }, { "value": "center", "label": "置中" }, { "value": "flex-end", "label": "靠下" }], "default": "center" },
+        { "type": "header", "content": "圖片設定" },
+        { "type": "image_picker", "id": "image", "label": "圖片 (桌面版)" },
+        { "type": "image_picker", "id": "image_mobile", "label": "手機版圖片 (可選)", "info": "如果留空，手機將會顯示桌面版圖片。" }
+      ]
+    },
+    {
+      "type": "review_summary",
+      "name": "🚀 評價區塊 (容器)",
+      "limit": 1,
+      "settings": [
+        { "type": "paragraph", "content": "請先新增此區塊，它會自動抓取下方的「└ 評價項目」並以輪播方式顯示。" },
+        { "type": "text", "id": "title", "label": "區塊標題", "default": "Customer Reviews" },
+        { "type": "text", "id": "write_review_text", "label": "撰寫評價按鈕文字", "default": "Write a review" },
+        {
+          "type": "url",
+          "id": "write_review_link",
+          "label": "撰寫評價按鈕連結",
+          "info": "請在此貼上評價 App 提供的表單連結或錨點連結 (例如: #judgeme_review_form)。如果留空，按鈕將不可點擊。"
+        },
+        { "type": "text", "id": "no_reviews_text", "label": "沒有評價時的提示文字", "default": "No reviews yet. Be the first to share your thoughts!" }
+      ]
+    },
+    {
+      "type": "customer_review",
+      "name": "  └ 評價項目",
+      "settings": [
+        { "type": "paragraph", "content": "此區塊為「評價區塊(容器)」的資料來源，請務必新增在容器下方。" },
+        { "type": "range", "id": "rating", "min": 1, "max": 5, "step": 1, "label": "星級評分", "default": 5 },
+        { "type": "text", "id": "author", "label": "評論者姓名", "default": "Customer Name" },
+        { "type": "text", "id": "title", "label": "評論標題 (選填)" },
+        { "type": "textarea", "id": "content", "label": "評論內容", "default": "This is a great product! Highly recommended." },
+        { "type": "text", "id": "date", "label": "評論日期 (選填)", "default": "2023-10-27" },
+        { "type": "checkbox", "id": "is_verified", "label": "是否為已驗證購買?", "default": true }
+      ]
+    },
+    {
+      "type": "featured_product",
+      "name": "🚀 商品輪播推薦",
+      "limit": 1,
+      "settings": [
+        { "type": "header", "content": "一般設定" },
+        { "type": "color", "id": "background_color", "label": "背景顏色", "default": "#34b4e7" },
+        { "type": "text", "id": "button_text", "label": "按鈕文字", "default": "Buy Now" },
+        { "type": "header", "content": "商品 1 設定" },
+        { "type": "product", "id": "product_1", "label": "選擇商品 1" },
+        { "type": "range", "id": "rating_1", "min": 1, "max": 5, "step": 0.1, "label": "商品 1 星級評分", "default": 5.0, "unit": "星" },
+        { "type": "number", "id": "review_count_1", "label": "商品 1 評論數量", "default": 3 },
+        { "type": "header", "content": "商品 2 設定 (選填)" },
+        { "type": "product", "id": "product_2", "label": "選擇商品 2" },
+        { "type": "range", "id": "rating_2", "min": 1, "max": 5, "step": 0.1, "label": "商品 2 星級評分", "default": 4.8, "unit": "星" },
+        { "type": "number", "id": "review_count_2", "label": "商品 2 評論數量", "default": 12 },
+        { "type": "header", "content": "商品 3 設定 (選填)" },
+        { "type": "product", "id": "product_3", "label": "選擇商品 3" },
+        { "type": "range", "id": "rating_3", "min": 1, "max": 5, "step": 0.1, "label": "商品 3 星級評分", "default": 4.9, "unit": "星" },
+        { "type": "number", "id": "review_count_3", "label": "商品 3 評論數量", "default": 8 },
+        { "type": "header", "content": "商品 4 設定 (選填)" },
+        { "type": "product", "id": "product_4", "label": "選擇商品 4" },
+        { "type": "range", "id": "rating_4", "min": 1, "max": 5, "step": 0.1, "label": "商品 4 星級評分", "default": 5.0, "unit": "星" },
+        { "type": "number", "id": "review_count_4", "label": "商品 5 評論數量", "default": 5 },
+        { "type": "header", "content": "商品 5 設定 (選填)" },
+        { "type": "product", "id": "product_5", "label": "選擇商品 5" },
+        { "type": "range", "id": "rating_5", "min": 1, "max": 5, "step": 0.1, "label": "商品 5 星級評分", "default": 4.7, "unit": "星" },
+        { "type": "number", "id": "review_count_5", "label": "商品 5 評論數量", "default": 15 }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "產品描述 5.0 (全新架構)",
+      "blocks": [
+        { "type": "pd6_hero_video_reveal" },
+        { "type": "pd6_modular_features" }
+      ]
+    }
+  ]
+}
+{% endschema %}
