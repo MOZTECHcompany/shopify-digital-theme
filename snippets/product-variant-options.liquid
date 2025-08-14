@@ -97,6 +97,21 @@
       endfor
     %}
 
+    {% liquid %}
+    {%- liquid
+      assign color_meta = shop.metaobjects['color'][color_value]
+      if color_meta
+        if color_meta.hex != blank
+          assign color_value_custom = color_meta.hex
+        elsif color_meta.color != blank
+          assign color_value_custom = color_meta.color
+        elsif color_meta.value != blank
+          assign color_value_custom = color_meta.value
+        endif
+      endif
+    -%}
+    {% endliquid %}
+
     <input
       type="radio"
       id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}-{{ product.id }}"
